@@ -1,9 +1,10 @@
 ---
 title: "Project Proposal"
 author: Colton Loftus
-geometry: margin=4cm
 output: pdf_document
 ---
+
+# Private Federated Learning Systems for Disability Software
 
 For individuals with disabilities, machine learning provides a powerful way to create more useful accessibility software. Voice recognition software is a particularly useful example that has allowed many to interact with their computers hands free.
 
@@ -21,4 +22,16 @@ In my project I will be creating a server and client for creating a community dr
 - Generalizable across machine learning tasks
 - Easy to use and self host
 
+There will be a series of challenging research questions in this project. For instance,
+
+- How do we optimize training large audio models on embedded devices like low spec smartphones?
+- How do we conserve battery and develop federated learning systems that are fault tolerant?
+- How can we incentivise and encourage those without a high tech background to participate in this type of data sharing?
+
 While I'm specifically interested in the application of this project on ML-related voice-controlled disability software these tools will generalize to any special ML tasks.
+
+During my project I plan to implement a series of deliverables
+
+- A central server that can be easily self hosted
+- A client application that can be ran on low spec devices like Linux mobile phones
+- A web interface for the central server that can be used to monitor training and connected devices

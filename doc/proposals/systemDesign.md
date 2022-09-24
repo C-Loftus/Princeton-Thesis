@@ -18,4 +18,5 @@ I will use [Yunohost](https://yunohost.org/en?q=%2Fdocs) to install my applicati
 
 ## Example of the web interface
 
-![](../assets/yunohostapps.png?raw=true)
+![](assets/yunohostapps.png?raw=true)
+![](assets/yunoconf.png)
