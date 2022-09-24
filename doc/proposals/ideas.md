@@ -4,7 +4,7 @@ Last year I worked on a project regarding disability accessibility software.
 In this software program people can control their computer with their voice.It is essentially a customizable voice assistant that is focused on helping people with disabilities on Linux. It can do everything from typing text to opening programs and manipulating windows.
 
 - This worked well but I would prefer to work on a different project the semester.
-- interested in ways to incorporate disability software with computer networks, improving incentive structures for  making accessible software, or general machine learning for low powered mobile devices  that will run such programs.
+- interested in ways to incorporate disability software with computer networks, improving incentive structures for making accessible software, or general machine learning for low powered mobile devices that will run such programs.
 
 For context I have a orthopedic disorder in my hands Which is why I am motivated for this sort of project. I do the majority of my own work through voice.
 
