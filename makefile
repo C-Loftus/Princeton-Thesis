@@ -5,7 +5,8 @@ MARGIN = 2.54cm
 GEOM = geometry:margin=$(MARGIN)
 DOC_DIR = doc/out
 FONT_SIZE = fontsize=12pt
-SETTINGS = -V $(GEOM) -V $(FONT_SIZE)
+COLOR = urlcolor='[HTML]{ff5733}'
+SETTINGS = -V $(GEOM) -V $(FONT_SIZE) -V $(COLOR)
 
 thesis:
 	pandoc $(SETTINGS) -o $(DOC_DIR)/thesis.pdf doc/chapters/*.md
