@@ -5,3 +5,15 @@ __pycache__
 *.pdf
 *.wav
 *.log
+
+*.zip
+*.rar
+*.7z
+*.gz
+*.bz2
+*.
+tmp*
+
+
+SpeechCommands/
+data/

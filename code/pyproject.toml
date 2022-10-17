@@ -1,0 +1,18 @@
+[tool.poetry]
+name = "federated speechcommands"
+version = "0.1"
+description = ""
+authors = ["Colton Loftus <cloftus[--at--]princeton(--dot--)edu>"]
+license = "GPL"
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "3.8.14"
+torch = "^1.12.1"
+torchaudio = "^0.12.1"
+flwr = "^1.0.0"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
