@@ -33,6 +33,7 @@ if __name__ == "__main__":
     model = LogisticRegression()
     utils.set_initial_params(model)
     prev = utils.get_model_parameters(model)
+
     strategy = fl.server.strategy.FedAvg(
         min_available_clients=2,
         evaluate_fn=get_evaluate_fn(model),
@@ -43,4 +44,3 @@ if __name__ == "__main__":
         strategy=strategy,
         config=fl.server.ServerConfig(num_rounds=5),
     )
-    print(f'TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT\n\n{prev=}, {utils.get_model_parameters(model)=}\n\n')
