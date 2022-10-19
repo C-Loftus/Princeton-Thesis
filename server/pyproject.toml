@@ -1,0 +1,18 @@
+[tool.poetry]
+name = "federated-server"
+version = "0.1.0"
+description = ""
+authors = ["Colton Loftus <cloftus[--at--]princeton(--dot--)edu>"]
+license = "GPL"
+readme = "README.md"
+packages = []
+
+[tool.poetry.dependencies]
+python = "3.8.14"
+flwr = "^1.0.0"
+fastapi = {extras = ["all"], version = "^0.85.1"}
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
