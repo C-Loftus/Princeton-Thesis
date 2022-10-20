@@ -23,15 +23,6 @@ strategy = fl.server.strategy.FedAvg(
     evaluate_metrics_aggregation_fn=weighted_average)
 
 
-# def start_server():
-#     fl.server.start_server(
-#         server_address="0.0.0.0:8080",
-#         config=fl.server.ServerConfig(num_rounds=3),
-#         strategy=strategy,
-#     )
-
-
-# server_process = mp.Process(target=start_server).start()
 
 
 app = FastAPI()
@@ -49,9 +40,38 @@ app.add_middleware(
     allow_headers=["*"]
 )
 
+SERVER_RUNNING = False
+
 @app.get("/")
 async def read_root():
     return {"Hello": "World"}
+
+@app.get("/start_server")
+async def start_server():
+    # check if server is already 
+    if SERVER_RUNNING:
+        return {"message": "Server already running"}
+    else:
+        SERVER_RUNNING = True
+        def start_server():
+            fl.server.start_server(
+                server_address="0.0.0.0:8080",
+                config=fl.server.ServerConfig(num_rounds=3),
+                strategy=strategy,
+            )
+        p = mp.Process(target=start_server)
+        p.start()
+        return {"message": "Server started"}
+
+@app.get("/stop_server")
+async def stop_server():
+    if SERVER_RUNNING:
+        SERVER_RUNNING = False
+        fl.server.
+        return {"message": "Server stopped"}
+    else:
+        return {"message": "Server not running"}
+
 
 @app.get('/profile')
 def my_profile():

@@ -14,6 +14,7 @@ __pycache__
 *.
 tmp*
 
-
 SpeechCommands/
 data/
+node_modules/
+pyvenv.cfg
