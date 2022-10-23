@@ -1,3 +1,8 @@
+SpeechCommands/
+data/
+node_modules/
+pyvenv.cfg
+
 .venv
 .env
 __pycache__
@@ -11,10 +16,10 @@ __pycache__
 *.7z
 *.gz
 *.bz2
-*.
-tmp*
+*.tmp*
 
-SpeechCommands/
-data/
-node_modules/
-pyvenv.cfg
+
+*.db
+*.dat
+*.dir
+*.bak
