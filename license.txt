@@ -1,0 +1,2 @@
+All code in this repository is licensed under GNU GPL v3.0
+All written documents in this repostory are licensed under CC BY-NC-SA 4.0

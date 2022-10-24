@@ -4,3 +4,5 @@ all:
 
 clean:
 	rm -rf .venv
+	rm poetry.lock
+	rm -rf __pycache__
