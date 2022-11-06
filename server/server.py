@@ -57,7 +57,7 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"]
 )
-def start_server():
+def start_flower():
     # redirect stdout to log file
     sys.stdout = open('server.log', 'w')
     sys.stderr = open('server.log', 'w')
@@ -81,20 +81,20 @@ def get_connected_clients():
 async def get_pid():
     if db.get(b"server_running") == b'1':
         return {"message": db.get("pid")}
-    return {'message': "Null PID"}
+    return {'message': "Null PID", "error": True}
 
 @app.get("/start")
 async def start_server():
     # check if server is already 
     if db.get(b'server_running') == b'1':
-        return {"message": "Server already running"}
+        return {"message": "started", "error": True}
     else:
-        p = mp.Process(target=start_server)
+        p = mp.Process(target=start_flower)
         p.start()
         
         db[b'pid'] = str(p.pid).encode('utf-8')
         db[b'server_running'] = b'1'
-        return {"message": "Server started"}
+        return {"message": "started", "error"   : False}
 
 @app.get("/stop")
 async def stop_server():
@@ -102,9 +102,9 @@ async def stop_server():
         pid = int(db[b'pid'])
         os.kill(pid, signal.SIGKILL)
         db[b'server_running'] = b'0'
-        return {"message": "Server stopped"}
+        return {"message": "stopped", "error": False}
     else:
-        return {"message": "Server not running"}
+        return {"message": "stopped", "error": True}
 
 
 if __name__ == "__main__":
