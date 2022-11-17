@@ -1,6 +1,6 @@
 import "./App.css";
-import QueryButton from "./components/QueryButton";
 import ToggleServer from "./components/ToggleServer";
+import ServerForm from "./components/ServerForm";
 
 function App() {
 
@@ -8,6 +8,8 @@ function App() {
     <div className="App">
       <header className="App-header">
       <ToggleServer />
+      <ServerForm/>
+
       </header>
     </div>
   );
