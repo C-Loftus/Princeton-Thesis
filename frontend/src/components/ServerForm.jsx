@@ -1,45 +1,18 @@
-import { Formik } from "formik";
-import { useFormik } from 'formik';
-import React from 'react';
+import { useForm } from "react-hook-form";
 
 export default function ServerForm(props) {
-  const formik = useFormik({
-    initialValues: {
-      strategy: "FedAvg",
-      clients: 5,
-    },
-    onSubmit: (values) => {
-      alert(JSON.stringify(values, null, 2));
-    },
-  });
-
-  console.log(formik.values);
+  const { register, handleSubmit, errors } = useForm();
+  const onSubmit = (data) => {
+    console.log(data);
+  };
 
   return (
-    <form onSubmit={formik.handleSubmit}>
-      <h5> Select the Strategy to use </h5>
-      <select value={formik.values.strategy} onChange={formik.handleChange}>
-        <option value="FedAvg">FedAvg</option>
-        <option value="FedAvgM">FedAvgM</option>
-        <option value="QFedAvg">QFedAvg</option>
-        <option value="FaultTolerantFedAvg">FaultTolerantFedAvg</option>
-        <option value="FedOpt">FedOpt</option>
-        <option value="FedAdagrad">FedAdagrad</option>
-        <option value="FedAdam">FedAdam</option>
-        <option value="FedYogi">FedYogi</option>
-      </select>
-
-      <h5> Input the number of clients to require </h5>
-      <input
-        type="number"
-        id="quantity"
-        name="quantity"
-        min="1"
-        max="100"
-        placeholder="5"
-        value={formik.values.clients}
-        onChange={formik.handleChange}
-      ></input>
+    <form onSubmit={handleSubmit(onSubmit)}>
+      <input name="email" ref={register({ required: true })} />
+      {errors.email && <span>This field is required</span>}
+      <input name="password" ref={register({ required: true })} />
+      {errors.password && <span>This field is required</span>}
+      <button type="submit">Submit</button>
     </form>
   );
 }
