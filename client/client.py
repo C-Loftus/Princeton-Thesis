@@ -204,7 +204,7 @@ class FlowerClient(fl.client.NumPyClient):
         return loss, len(test_loader.dataset), {"accuracy": accuracy}
 
 def main():
-
+    print("Starting flower client")
     # Start Flower client
     fl.client.start_numpy_client(
         server_address="127.0.0.1:8080",

@@ -1,12 +1,13 @@
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi import FastAPI, HTTPException
 import uvicorn
-import os, signal, dbm
-import multiprocessing as mp
-
+import os, signal, shelve, requests
 from federatedAlgo import start_flower
+import flwr as fl
+from multiprocessing import Queue
 
 app = FastAPI()
+clientManager: Queue = None
 
 origins = [
     "http://localhost:5000",
@@ -30,7 +31,7 @@ def reset_db():
 @app.on_event("startup")
 async def startup_event():
     global db
-    db = dbm.open('db', 'c')
+    db = shelve.open("db") 
     reset_db()
 
 @app.on_event("shutdown")
@@ -39,7 +40,7 @@ async def shutdown_event():
     db.close()
 
 def isRunning():
-    return db[b'server_running'] == b'1'
+    return db['server_running'] == '1'
 
 def get_connected_clients():
     return db.keys()
@@ -57,18 +58,20 @@ async def start_server(requiredClients : int = 2, strategy : str = 'FedAvg'):
     if isRunning():
         raise HTTPException(status_code=404, detail="Server already running")
     elif not isRunning():
-        p = mp.Process(target=start_flower, args=(requiredClients, strategy))
-        p.start()
-        db[b'pid'] = str(p.pid).encode('utf-8')
-        db[b'server_running'] = b'1'
+        global clientManager
+        clientManager, pid = start_flower(requiredClients, strategy)
+
+        db['pid'] = str(pid).encode('utf-8')
+        db['server_running'] = '1'
+
         return {"detail": "started"}
 
 @app.get("/stop", status_code=200)
 async def stop_server():
     if isRunning():
-        pid = int(db[b'pid'])
+        pid = int(db['pid'])
         os.kill(pid, signal.SIGKILL)
-        db[b'server_running'] = b'0'
+        db['server_running'] = '0'
         return {"detail": "stopped"}
     else:
         raise HTTPException(status_code=404, detail="Server not running")
@@ -76,6 +79,22 @@ async def stop_server():
 @app.get("/running", status_code=200)
 async def is_server_running():
     return {"detail": isRunning()}
+
+@app.get("/ip")
+async def get_ip():
+    ip = requests.get('https://checkip.amazonaws.com').text.strip()
+    # get port that fastapi is running on
+    port = os.environ.get('PORT', 5000)
+    ipAndPort = ip + ":" + str(port)
+    return {"detail": ipAndPort}
+
+@app.get("/clients")
+async def get_clients():
+    if isRunning():
+        
+        return {"detail": len(clientManager.get())}
+    else:
+        raise HTTPException(status_code=404, detail="Server not running")
 
 
 if __name__ == "__main__":

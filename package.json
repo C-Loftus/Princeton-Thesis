@@ -1,6 +1,9 @@
 {
   "dependencies": {
-    "react-hook-form": "^7.39.4",
-    "yup": "^0.32.11"
+    "@chakra-ui/react": "^2.4.1",
+    "@emotion/react": "^11.10.5",
+    "@emotion/styled": "^11.10.5",
+    "framer-motion": "^6.5.1",
+    "react-hook-form": "^7.39.5"
   }
 }
