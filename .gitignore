@@ -18,9 +18,20 @@ __pycache__
 *.bz2
 *.tmp*
 
-
 *.db
 *.dat
 *.dir
 *.bak
 
+dist
+dist-ssr
+*.local
+
+# Editor specific files
+.idea
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?

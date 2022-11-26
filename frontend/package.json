@@ -1,46 +1,28 @@
 {
-  "name": "frontend",
-  "version": "0.1.0",
+  "name": "thesis-frontend",
   "private": true,
-  "proxy": "http://localhost:5000",
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "start-backend": "fuser -k 5000/tcp; cd ../server/ && pwd && ./.venv/bin/python server.py",
+    "both": "npm run start-backend & npm dev"
+  },
   "dependencies": {
-    "@testing-library/jest-dom": "^5.16.5",
-    "@testing-library/react": "^13.4.0",
-    "@testing-library/user-event": "^13.5.0",
-    "axios": "^1.1.3",
+    "@chakra-ui/react": "^2.4.1",
+    "@emotion/react": "^11.10.5",
+    "@emotion/styled": "^11.10.5",
+    "framer-motion": "^6.5.1",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "react-hook-form": "^7.39.5",
-    "react-scripts": "5.0.1",
-    "web-vitals": "^2.1.4"
-  },
-  "scripts": {
-    "start": "react-scripts start",
-    "start-backend": "fuser -k 5000/tcp; cd ../server/ && pwd && ./.venv/bin/python server.py",
-    "both": "npm run start-backend & npm start",
-    "build": "react-scripts build",
-    "test": "react-scripts test",
-    "eject": "react-scripts eject"
-  },
-  "eslintConfig": {
-    "extends": [
-      "react-app",
-      "react-app/jest"
-    ]
-  },
-  "browserslist": {
-    "production": [
-      ">0.2%",
-      "not dead",
-      "not op_mini all"
-    ],
-    "development": [
-      "last 1 chrome version",
-      "last 1 firefox version",
-      "last 1 safari version"
-    ]
+    "react-hook-form": "^7.39.5"
   },
   "devDependencies": {
-    "eslint-plugin-react-hooks": "^4.6.0"
+    "@types/react": "^18.0.24",
+    "@types/react-dom": "^18.0.8",
+    "@vitejs/plugin-react": "^2.2.0",
+    "vite": "^3.2.3"
   }
 }
