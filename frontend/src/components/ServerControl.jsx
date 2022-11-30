@@ -1,14 +1,13 @@
-import { useForm } from "react-hook-form";
-import { useEffect } from "react";
-import { Select, useDisclosure } from "@chakra-ui/react";
-import { Input } from "@chakra-ui/react";
 import {
   Alert,
   AlertIcon,
-  AlertTitle,
-  AlertDescription,
+  Fade,
+  Input,
+  Select,
+  useDisclosure,
 } from "@chakra-ui/react";
-import { Fade, ScaleFade, Slide, SlideFade } from "@chakra-ui/react";
+import { useEffect } from "react";
+import { useForm } from "react-hook-form";
 
 export default function ServerForm(props) {
   const { isOpen, onToggle } = useDisclosure();
@@ -24,9 +23,9 @@ export default function ServerForm(props) {
     },
   });
 
-  const onSubmit = (d) => {
+  const onSubmit = () => {
     const query = isRunning ? "stop" : "start";
-    fetch(query)
+    fetch(`api/${query}`)
       .then((res) => {
         if (res.ok) {
           setIsRunning(!isRunning);
@@ -43,11 +42,14 @@ export default function ServerForm(props) {
   };
 
   useEffect(() => {
-    fetch(`/running`)
-      .then((res) => res.json())
+    fetch(`/api/running`)
+      .then((response) => response.json())
       .then((data) => {
-        console.log(data.detail);
+        console.log(`is running?: ${data}`);
         setIsRunning(data.detail);
+      })
+      .catch((err) => {
+        console.log(err);
       });
   }, [isRunning, setIsRunning]);
 
@@ -88,7 +90,7 @@ export default function ServerForm(props) {
       <Input
         type="submit"
         onClick={onToggle}
-        value={`Turn the Server ${isRunning ? "off" : "on"}`}
+        value={`Turn the Federate Learning Server ${isRunning ? "off" : "on"}`}
       />
     </form>
   );

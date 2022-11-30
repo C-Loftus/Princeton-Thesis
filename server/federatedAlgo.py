@@ -2,13 +2,12 @@ import flwr as fl
 from flwr.common import Metrics
 from typing import List, Tuple, Union
 import sys
-import multiprocessing as mp
-from multiprocessing import Queue 
+from flowerThread import StoppableThread, threading
 
 ADDR = "0.0.0.0:8080"
 
 
-def serverProcess(userStrategy, clientManager, requiredClients):
+def serverThread(userStrategy, clientManager, requiredClients):
     with open('server.log', 'w') as f:
         sys.stderr = f
         fl.server.start_server(
@@ -20,7 +19,7 @@ def serverProcess(userStrategy, clientManager, requiredClients):
         )
 
 
-def start_flower(requiredClients: int, strategy: str) -> Tuple[Queue, Union[int, None]]:
+def start_flower(requiredClients: int, strategy: str)-> Tuple[fl.server.client_manager.ClientManager, threading.Thread]:
     strategies = {
         "FedAvg": fl.server.strategy.FedAvg,
         "FedAvgM": fl.server.strategy.FedAvgM,
@@ -32,15 +31,13 @@ def start_flower(requiredClients: int, strategy: str) -> Tuple[Queue, Union[int,
         "FedYogi": fl.server.strategy.FedYogi,
     }
     userStrategy = strategies[strategy]
-    # redirect stdout to log file
-    sys.stdout = open('server.log', 'w')
 
     clientManager = fl.server.SimpleClientManager()
 
-    p = mp.Process(target=serverProcess, args=(userStrategy, clientManager, requiredClients))
-    p.start()
+    handle = StoppableThread(target=serverThread, args=(userStrategy, clientManager, requiredClients))
+    handle.start()
 
-    return (clientManager, p.pid)
+    return (clientManager, handle)
 
 # Define metric aggregation function
 def weighted_average(metrics: List[Tuple[int, Metrics]]) -> Metrics:
