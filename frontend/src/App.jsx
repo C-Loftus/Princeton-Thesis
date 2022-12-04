@@ -2,8 +2,6 @@ import "./App.css";
 import ServerInfo from "./components/ServerInfo";
 import ServerControl from "./components/ServerControl";
 import { useState } from "react";
-import { ChakraProvider } from '@chakra-ui/react'
-import Test from "./components/Test";
 
 function App() {
   const [isRunning, setIsRunning] = useState(false);

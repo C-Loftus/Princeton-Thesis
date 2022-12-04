@@ -1,7 +1,10 @@
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi import FastAPI, HTTPException
 import uvicorn
-import os, signal, shelve, requests
+import os
+import signal
+import shelve
+import requests
 from federatedAlgo import start_flower
 import flwr as fl
 from multiprocessing import Queue
@@ -23,24 +26,30 @@ app.add_middleware(
     allow_headers=["*"]
 )
 
+
 def reset_db():
     db['clients'] = '0'
     db['server_running'] = '0'
 
 # on startup, start the database
+
+
 @app.on_event("startup")
 async def startup_event():
     global db
-    db = shelve.open("db") 
+    db = shelve.open("db")
     reset_db()
+
 
 @app.on_event("shutdown")
 async def shutdown_event():
     reset_db()
     db.close()
 
+
 def isRunning():
     return db['server_running'] == '1'
+
 
 def get_connected_clients():
     return db.keys()
@@ -52,9 +61,10 @@ def get_connected_clients():
 #     elif not isRunning():
 #         raise HTTPException(status_code=404, detail="Server not running")
 
+
 @app.get("/start", status_code=200)
-async def start_server(requiredClients : int = 2, strategy : str = 'FedAvg'):
-    # check if server is already 
+async def start_server(requiredClients: int = 2, strategy: str = 'FedAvg'):
+    # check if server is already
     if isRunning():
         raise HTTPException(status_code=404, detail="Server already running")
     elif not isRunning():
@@ -65,6 +75,7 @@ async def start_server(requiredClients : int = 2, strategy : str = 'FedAvg'):
 
         return {"detail": "started"}
 
+
 @app.get("/stop", status_code=200)
 async def stop_server():
     if isRunning():
@@ -74,9 +85,11 @@ async def stop_server():
     else:
         raise HTTPException(status_code=404, detail="Server not running")
 
+
 @app.get("/running", status_code=200)
 async def is_server_running():
     return {"detail": isRunning()}
+
 
 @app.get("/host_ip")
 async def get_ip():
@@ -86,11 +99,11 @@ async def get_ip():
     ipAndPort = ip + ":" + str(port)
     return {"detail": ipAndPort}
 
+
 @app.get("/ip")
 async def get_ip():
     return {"detail": "127.0.0.1:8080"}
 
-    
 
 @app.get("/clients")
 async def get_clients():
@@ -101,4 +114,9 @@ async def get_clients():
 
 
 if __name__ == "__main__":
-    uvicorn.run("server:app", host="localhost", port=5000, debug=True, log_level="info")
+    try:
+        uvicorn.run("server:app", host="localhost",
+                    port=5000, debug=True, log_level="info")
+    except KeyboardInterrupt:
+        import sys
+        sys.exit(0)

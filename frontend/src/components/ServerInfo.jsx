@@ -1,5 +1,6 @@
 import { Icon } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
+import ConnectedClients from "./ConnectedClients";
 
 export default function ToggleServer(props) {
   const { isRunning } = props;
@@ -27,8 +28,10 @@ export default function ToggleServer(props) {
         />
       </Icon>
       <p> {isRunning && `Connect Clients to ${ip}`} </p>
-      <hr/>
-      <br/>
+      <hr />
+      <ConnectedClients />
+      <br />
+      
     </div>
   );
 }

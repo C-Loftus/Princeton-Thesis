@@ -32,9 +32,6 @@ export default function ServerForm(props) {
         }
         res.json();
       })
-      .then((data) => {
-        console.log(data.message);
-      })
       .catch((err) => {
         console.log(err);
       });

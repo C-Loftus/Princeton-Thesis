@@ -1,2 +1,2 @@
-All prose documents (all content in a file with a .txt .md or .pdf extension) in this repostory are licensed under CC BY-NC-SA 4.0
-All code (all content in a file without a .txt .md or .pdf extension) in this repository is licensed under GNU GPL v3.0
+All prose documents (all content in a file in this repository with a .txt .md or .pdf extension) in this repostory are licensed under CC BY-NC-SA 4.0
+All code (all content in this repository in a file without a .txt .md or .pdf extension) in this repository is licensed under GNU GPL v3.0
