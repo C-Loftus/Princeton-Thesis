@@ -11,6 +11,8 @@ python = "3.8.14"
 torch = "^1.12.1"
 torchaudio = "^0.12.1"
 flwr = "^1.0.0"
+requests = "^2.28.1"
+PySimpleGUIWeb = "^0.39.0"
 
 
 [build-system]

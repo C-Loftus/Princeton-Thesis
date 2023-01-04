@@ -9,6 +9,9 @@ COLOR = urlcolor='[HTML]{ff5733}'
 SETTINGS = -V $(GEOM) -V $(FONT_SIZE) -V $(COLOR) --filter pandoc-citeproc --bibliography=citations.bib --csl=ieee.csl --metadata link-citations=true --lua-filter=./columns.lua
 
 thesis:
+	pandoc $(SETTINGS) -o $(OUT_DIR)/thesis.pdf main.md
+
+combine:
 	pandoc $(SETTINGS) -o $(OUT_DIR)/thesis.pdf ./chapters/*.md 
 
 chapters:
