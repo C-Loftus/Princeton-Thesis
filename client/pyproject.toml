@@ -14,9 +14,11 @@ PySimpleGUIWeb = "^0.39.0"
 torch = "^1.13.1"
 torchaudio = "^0.13.1"
 
+[tool.poe.tasks]
+test = "kitty"
 
 [tool.poetry.group.dev.dependencies]
-reloader = "^0.6"
+poethepoet = "^0.17.1"
 
 [build-system]
 requires = ["poetry-core"]
