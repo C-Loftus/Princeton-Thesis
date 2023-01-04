@@ -1,27 +1,41 @@
 import PySimpleGUIWeb as sg
-from training import main_training
 import requests
 sg.theme('DarkAmber')
 import shelve
-IP="http://localhost:8080"
+IP="http://localhost:5000/openapi.json"
 
+
+route_description = {
+    "/start": "Start the server",
+    "/stop": "Stop the server",
+    "/running": "Check if the server is running",
+    "/clients": "Get the number of connected clients",
+}
 
 global db
 db = shelve.open("client.db")
 db["url"] = "None" if "url" not in db else db["url"]
 
+def get_routes():
+    response = requests.get(IP).json()
     
-def create_ui():
+    buttons=[]
+    for route in (response['paths']): 
+        if route in route_description:
+            key = "-STATUS-" if route == "/running" else route
+            buttons.append(sg.Button(route_description[route], key=key))
+    return buttons
+    
+
+def create_ui(route_buttons):
     # Create a shelve object to store the server URL
 
     # Create the layout of the GUI
     layout = [[sg.Text("Connect to a server for Federated Learning", font=("Helvetica", 22), justification='r')],
             [sg.Text(f'Saved Server URL: {db["url"] if "url" in db else "None"}', key="-URL-")],
             [sg.Text("Update Server URL:"), sg.Input()], 
-            [sg.Button("Ping Server", key="-STATUS-")],
-            [sg.Button("Start Federated Training Process", key="-START-")],
-            [sg.Button("Stop Federation Training Process", key="-STOP-")],
-            [sg.Button("Convert Talon Data", key="-CONVERT-")],
+            [sg.Button("Connect")],
+            [sg.Text("Interact with server API:"), *route_buttons],
             [sg.Text("Response:", size=(15, 1)), sg.Multiline(size=(40, 10), key="-RESPONSE-")]]
 
     window = sg.Window("Connection", layout)
@@ -42,31 +56,20 @@ def create_ui():
             window["-URL-"].update(f'Saved Server URL: {db["url"] if "url" in db else "None"}')
             
         elif event == "-STATUS-":
+            # Check if the server is running
             try:
                 response = requests.get(db["url"])
-            # We should expect this connection error since the server looks for the numpy client
-            #  Since we are not running that client yet is it expected to get this air in thus it is 
-            # a good sign that the server is running
-            except requests.exceptions.ConnectionError:
-                window["-RESPONSE-"].update("Server is healthy and ready to be connected to")
-            except Exception as e:
-                window["-RESPONSE-"].update(str(e))
-            else:
-                window["-RESPONSE-"].update(response.text)
-
-
-        elif event == "-START-":
-            # Start the server
-            try:
-                main_training()
                 window["-RESPONSE-"].update(response.text)
             except Exception as e:
                 window["-RESPONSE-"].update(str(e))
+        elif event: 
+            # Send a GET request to the server and display the response
+            response = requests.get(db["url"] + event)
+            window["-RESPONSE-"].update(response.text)
 
 
     window.close()
 
 if __name__ == "__main__":
-    # import reloader
-    # reloader.enable()
-    create_ui()
+    route_buttons = get_routes()
+    create_ui(route_buttons)+   

@@ -187,7 +187,7 @@ class FlowerClient(fl.client.NumPyClient):
         loss, accuracy = test(self.net, self.test_loader)
         return loss, len(self.test_loader.dataset), {"accuracy": accuracy}
 
-def main():
+def main_training():
 
     # global is fine since each client is a separate process and no state is updated
     # makes functions cleaner with fewer hyperparams to pass 
@@ -203,7 +203,7 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    main_training()
 
 
 

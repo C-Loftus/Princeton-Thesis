@@ -2,14 +2,11 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi import FastAPI, HTTPException
 import uvicorn
 import os
-import signal
 import shelve
 import requests
 from federatedAlgo import start_flower
-import flwr as fl
-from multiprocessing import Queue
 
-app = FastAPI()
+app = FastAPI(openapi_url="/openapi.json")
 clientManager = None
 serverHandle = None
 
@@ -61,6 +58,10 @@ def get_connected_clients():
 #     elif not isRunning():
 #         raise HTTPException(status_code=404, detail="Server not running")
 
+
+@app.get("/")
+async def root():
+    return {"detail": "Successfully pinged server. Connect to API endpoints to interact with server."}
 
 @app.get("/start", status_code=200)
 async def start_server(requiredClients: int = 2, strategy: str = 'FedAvg'):
