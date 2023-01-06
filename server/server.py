@@ -64,13 +64,14 @@ async def root():
     return {"detail": "Successfully pinged server. Connect to API endpoints to interact with server."}
 
 @app.get("/start", status_code=200)
-async def start_server(requiredClients: int = 2, strategy: str = 'FedAvg'):
+async def start_server(clients: int = 4, strategy: str = 'FedAvg'):
     # check if server is already
     if isRunning():
         raise HTTPException(status_code=404, detail="Server already running")
     elif not isRunning():
         global clientManager, serverHandle
-        clientManager, serverHandle = start_flower(requiredClients, strategy)
+        print(f'Starting server with {clients} clients and strategy {strategy}')
+        clientManager, serverHandle = start_flower(clients, strategy)
 
         db['server_running'] = '1'
 
@@ -105,7 +106,6 @@ async def get_ip():
 async def get_ip():
     return {"detail": "127.0.0.1:8080"}
 
-
 @app.get("/clients")
 async def get_clients():
     if isRunning():
@@ -120,4 +120,5 @@ if __name__ == "__main__":
                     port=5000, debug=True, log_level="info")
     except KeyboardInterrupt:
         import sys
+        stop_server()
         sys.exit(0)

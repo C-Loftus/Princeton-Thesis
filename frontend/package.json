@@ -8,7 +8,7 @@
     "build": "vite build",
     "preview": "vite preview",
     "fastapi": "fuser -k 5000/tcp; cd ../server/ && pwd && ./.venv/bin/python server.py",
-    "both": "npm run fastapi & npm run dev & firefox http://localhost:3000",
+    "both": "fuser -k 3000/tcp; npm run fastapi & npm run dev & firefox http://localhost:3000",
     "client": "cd ../client/ && pwd && ./.venv/bin/python client.py",
     "testConnection": "npm run both & (sleep 3; curl localhost:5000/start) & npm run client"
   },

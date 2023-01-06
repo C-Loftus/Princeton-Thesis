@@ -9,7 +9,7 @@ from architecture import SubsetSC, M5
 # Define all constants, datasets and hyper parameters for training
 class TRAINING_CONFIG():
     def __init__(self):
-        self.batch_size = 10
+        self.batch_size = 5
         self.log_interval = 20
         self.n_epoch = 1
         self.new_sample_rate = 8000

@@ -17,7 +17,7 @@ def create_ui():
     # Create the layout of the GUI
     layout = [[sg.Text("Connect to a server for Federated Learning", font=("Helvetica", 22), justification='r')],
             [sg.Text(f'Saved Server URL: {db["url"] if "url" in db else "None"}', key="-URL-")],
-            [sg.Text("Update Server URL:"), sg.Input()], 
+            [sg.Text("Update Server URL:"), sg.Input(), sg.Button("Update", key="-UPDATE-")], 
             [sg.Button("Ping Server", key="-STATUS-")],
             [sg.Button("Start Federated Training Process", key="-START-")],
             [sg.Button("Stop Federation Training Process", key="-STOP-")],
@@ -30,36 +30,27 @@ def create_ui():
         event, values = window.read()
         if event in (sg.WIN_CLOSED, "Close Window"):
             break
-        if event == "Connect":
+        if event == "-UPDATE-":
             url = values[0] if values[0] != "" else db["url"]
             db["url"] = url
-
-            try:
-                response = requests.get(url)
-                window["-RESPONSE-"].update(response.text)
-            except Exception as e:
-                window["-RESPONSE-"].update(str(e))
             window["-URL-"].update(f'Saved Server URL: {db["url"] if "url" in db else "None"}')
             
         elif event == "-STATUS-":
             try:
                 response = requests.get(db["url"])
-            # We should expect this connection error since the server looks for the numpy client
-            #  Since we are not running that client yet is it expected to get this air in thus it is 
-            # a good sign that the server is running
-            except requests.exceptions.ConnectionError:
-                window["-RESPONSE-"].update("Server is healthy and ready to be connected to")
-            except Exception as e:
-                window["-RESPONSE-"].update(str(e))
-            else:
-                window["-RESPONSE-"].update(response.text)
+            except requests.exceptions.ConnectionError as e:
+                if "BadStatusLine" in str(e):
+                    window["-RESPONSE-"].update("Server is running and ready for your training")
+                else:
+                    window["-RESPONSE-"].update("Server is not running")
 
 
         elif event == "-START-":
             # Start the server
             try:
+                window["-RESPONSE-"].update("Starting the training process. This will take a while...")
                 main_training()
-                window["-RESPONSE-"].update(response.text)
+                window["-RESPONSE-"].update("Finished training process")
             except Exception as e:
                 window["-RESPONSE-"].update(str(e))
 
@@ -67,6 +58,4 @@ def create_ui():
     window.close()
 
 if __name__ == "__main__":
-    # import reloader
-    # reloader.enable()
     create_ui()

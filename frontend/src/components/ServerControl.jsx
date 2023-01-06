@@ -6,26 +6,33 @@ import {
   Select,
   useDisclosure,
 } from "@chakra-ui/react";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 
 export default function ServerForm(props) {
+
   const { isOpen, onToggle } = useDisclosure();
-  const { isRunning, setIsRunning } = props;
+  const { isRunning, setIsRunning, requiredClients, setRequiredClients } = props;
   const {
     register,
     handleSubmit,
     reset,
+    getValues,
     formState: { errors },
   } = useForm({
     defaultValues: {
       strategy: "FedAvg",
+      clients: 4,
     },
   });
 
+
   const onSubmit = () => {
+    const strategy = getValues("strategy");
+    const clients = getValues("clients");
+    setRequiredClients(clients);
     const query = isRunning ? "stop" : "start";
-    fetch(`api/${query}`)
+    fetch(`api/${query}?strategy=${strategy}&clients=${clients}`)
       .then((res) => {
         if (res.ok) {
           setIsRunning(!isRunning);

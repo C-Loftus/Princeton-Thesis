@@ -6,6 +6,7 @@ pyvenv.cfg
 .venv
 .env
 __pycache__
+.pytest_cache
 
 *.pdf
 *.wav
@@ -17,6 +18,7 @@ __pycache__
 *.gz
 *.bz2
 *.tmp*
+tmp*
 
 *.db
 *.dat

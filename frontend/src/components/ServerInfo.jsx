@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import ConnectedClients from "./ConnectedClients";
 
 export default function ToggleServer(props) {
-  const { isRunning } = props;
+  const { isRunning, requiredClients } = props;
   const [ip, setIp] = useState("");
 
   useEffect(() => {
@@ -27,9 +27,10 @@ export default function ToggleServer(props) {
           d="M 100, 100 m -75, 0 a 75,75 0 1,0 150,0 a 75,75 0 1,0 -150,0"
         />
       </Icon>
-      <p> {isRunning && `Connect Clients to ${ip}`} </p>
+      <p> {isRunning && `Connect ${requiredClients} Clients to ${ip}`} </p>
       <hr />
-      <ConnectedClients />
+      {isRunning && <ConnectedClients />}
+      
       <br />
       
     </div>
