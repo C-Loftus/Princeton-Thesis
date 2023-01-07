@@ -94,7 +94,7 @@ async def is_server_running():
 
 
 @app.get("/host_ip")
-async def get_ip():
+async def host_ip():
     ip = requests.get('https://checkip.amazonaws.com').text.strip()
     # get port that fastapi is running on
     port = os.environ.get('PORT', 5000)

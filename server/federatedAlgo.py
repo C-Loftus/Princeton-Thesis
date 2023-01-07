@@ -4,7 +4,7 @@ from typing import List, Tuple, Union, Optional, Dict
 import sys
 from flowerThread import StoppableThread, threading
 
-ADDR = "0.0.0.0:8080"
+ADDR = "127.0.0.1:8080"
 
 def fit_config(server_round: int) -> Dict[str, fl.common.Scalar]:
     """Return a configuration with static batch size and (local) epochs."""
@@ -52,20 +52,15 @@ def serverThread(userStrategy, clientManager, requiredClients):
         on_fit_config_fn=fit_config,
     )
 
-    # Run server
-    fl.server.start_server(
-        config=fl.server.ServerConfig(num_rounds=3),
-        strategy=strategy,
-    )
-
     with open('server.log', 'w') as f:
         sys.stderr = f
         fl.server.start_server(
             server_address=ADDR,
-            config=fl.server.ServerConfig(num_rounds=3),
+            config=fl.server.ServerConfig(num_rounds=2),
             client_manager=clientManager,
-            strategy=userStrategy(
-                evaluate_metrics_aggregation_fn=weighted_average),
+            strategy=strategy
+            # userStrategy(
+                # evaluate_metrics_aggregation_fn=weighted_average),
         )
 
 
