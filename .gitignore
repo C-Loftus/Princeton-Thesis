@@ -11,6 +11,7 @@ __pycache__
 *.pdf
 *.wav
 *.log
+*.err
 
 *.zip
 *.rar
@@ -19,6 +20,7 @@ __pycache__
 *.bz2
 *.tmp*
 tmp*
+*.npz
 
 *.db
 *.dat

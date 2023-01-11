@@ -40,8 +40,9 @@ class M5(nn.Module):
         return F.log_softmax(x, dim=2)
 
 class SubsetSC(SPEECHCOMMANDS):
-    def __init__(self, subset: str = None):
-        super().__init__("./", download=True)
+    def __init__(self, subset: str = None, fromTalon = False):
+        
+        super().__init__("./", download= not fromTalon)
 
         def load_list(filename):
             filepath = os.path.join(self._path, filename)

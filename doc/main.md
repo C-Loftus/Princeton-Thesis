@@ -2,13 +2,54 @@
 bibliography: ["./citations.bib"]
 ---
 
+$$
+ \forall{talon\_data}_1^{|talon\_data| := N}
+$$
+
+```{.mermaid format=svg .mermaid loc=assets}
+erDiagram
+    TALON_DATA_1 ||--|| TRAINING_CLIENT_1: converts
+    TALON_DATA_1 {
+        origin client_1_desktop
+    }
+    TALON_DATA_2 ||--|| TRAINING_CLIENT_2: converts
+    TALON_DATA_2 {
+        origin client_2_desktop
+    }
+    TALON_DATA_N ||--|| TRAINING_CLIENT_N: converts
+    TALON_DATA_N {
+        origin client_N_desktop
+    }
+    TRAINING_CLIENT_1 ||--|| FLOWER_SERVER : federates_with
+    TRAINING_CLIENT_1   {
+        platform desktop
+    }
+    TRAINING_CLIENT_2 ||--|| FLOWER_SERVER: federates_with
+    TRAINING_CLIENT_2 {
+        platform desktop
+    }
+    TRAINING_CLIENT_N ||--|| FLOWER_SERVER: federates_with
+    TRAINING_CLIENT_N {
+        platform desktop
+    }
+    FLOWER_SERVER ||--|| SPEECH_COMMANDS_MODEL: creates
+    SPEECH_COMMANDS_MODEL  ||--|| LINUX_ACCESSIBILITY_CLIENT : powers
+    LINUX_ACCESSIBILITY_CLIENT {
+        platform mobile
+    }
+
+    REACT_FRONTEND ||--|| FAST_API_ENDPOINT: interacts_with
+    FAST_API_ENDPOINT ||--|| FLOWER_SERVER: controls
+
+```
+
 # Abstract
 
 For individuals with disabilities, machine learning provides a powerful way to create more useful accessibility software. Voice recognition software is a particularly useful example that has allowed many to interact with their computers hands free.
 
 However, many models related to specialty tasks suffer from a lack of data, well trained models, or an ecosystem through which to share them. Machine learning tasks for disability software often lack corporate incentives and thus depend upon community-led, manual solutions that potentially compromise privacy.
 
-In my paper, I describe a novel way to apply Federated Learning for voice-based accessibility software. This federated-learning-based solution allows models to be trained without exposing sensitive voice data to a central server. It also seeks to apply user-centered design principles to reduce the complexity of the federated learning process for end users. My program allows users to use their data generated from existing accessibility software. This data can be used to build the backend for new voice control solutions on mobile devices. Throughout this paper,I describe the technical implementation of this solution and at the end of the paper, discuss the implications of this work for the future of disability software.
+In my paper, I describe a novel way to apply Federated Learning for voice-based accessibility software. This solution using federated learning allows models to be trained without exposing sensitive voice data to a central server. It applies user-centered design principles to reduce the complexity of the federated learning process for end users. My program allows users to use their data generated from existing accessibility software. This data can be used to build the backend for new voice control solutions on mobile devices. Throughout this paper,I describe the technical implementation of this solution and at the end of the paper, discuss the implications of this work for the future of disability software.
 
 # Introduction
 
@@ -36,15 +77,15 @@ Thus in summary, our key challenge for machine learning in healthcare is preserv
 
 Federated Learning is a machine learning paradigm that seeks to solve these issues. In traditional machine learning, clients are required to send their data to a centralized server and trust it will take the appropriate protections to anonymize it. However,in Federated Learning, all training is done on user devices. Then after training is finished, all that is transferred to the server are the model weights. The data itself stays on user devices.
 
-Essentially what this means is that the server never sees the data, and thus, it is not subject to the same privacy concerns as traditional machine learning. This is a particularly useful paradigm for healthcare, and allows data autonomy to be not only feasible, but also efficient. Users can share data with non-profits and community initiatives without having to worry about the security of their data. This is because the data never leaves the user's device.
+Essentially what this means is that the server never sees the data, and thus, it is not subject to the same privacy concerns as traditional machine learning. This is a particularly useful paradigm for healthcare. It allows data autonomy without needing to compromise on the use of large-scale datasets. Users can share data with non-profits and community initiatives without having to worry about the security of their data. This is because the data never leaves the user's device.
 
-Currently as of right now, federated learning has been successful particularly with mobile computing like smartphones or IoT devices. Companies like Google and Apple have been able to leverage federated learning to train models on datasets like keyboard data that would be otherwise sensitive to train on. Datasets like these have allowed for useful predictive typing models that are personalized to the individual user.
+Currently within industry, federated learning has been successful particularly with mobile computing like smartphones or IoT devices. Companies like Google and Apple have been able to leverage federated learning to train models on datasets like keyboard data that would be otherwise sensitive to train on. Datasets like these have allowed for useful predictive typing models that are personalized to the individual user. However, as of right now, federated learning is still an emerging research area and usually is abstracted away from end-users.
 
 ## Disability Application
 
 While there are many domains that will benefit from this paradigm of data sharing, one of the most promising and the focus of this paper is voice controlled accessibility software. This software allows users without the use of their hands to control their computer without typing or using the mouse. For this type of software, it often relies upon huge voice datasets. While these models have good performance in general use, users may want to fine-tune them for specific applications that would otherwise not be contained in a general-purpose dataset. For instance, Mozilla's Common Voice \footnote{https://commonvoice.mozilla.org/en} is a great data set for general voice recognition, but may not be enough to support user with a particular accent, speech impediment, job specific technical vocabulary.
 
-Disability applications often are supported through grassroots communities with economies of sharing.
+Disability applications often are supported through grassroots communities with economies of sharing. Within such social arrangements, there is often a compromise regarding either efficiency or privacy.
 
 ## HCI and Design Work
 
@@ -59,15 +100,15 @@ We will need to overcome these challenges for Federated learning to go beyond ju
 
 # Background
 
-Before discussing my work, it is useful to give an overview of the existing field of voice-controlled disability software. These software tools helped to inform my design decisions. I specifically wanted to create a federated learning solution that could help to address some of the existing issues in this software ecosystem.
+Before discussing my work, it is useful to give an overview of the existing field of voice-controlled disability software and Federated Learning frameworks. These software tools helped to inform my design decisions. I specifically wanted to create a federated learning solution that could help to address some of the existing issues in this software ecosystem.
 
 ## Disability Software
 
-Within voice-controlled disability there are a few main categories. First
+Within voice-controlled disability there are a few main categories.
 
 ### Application-Specific Accessibility Software
 
-Application-Specific solutions are often built specifically for one platform like a web browser or
+Application-Specific solutions are the first main category of voice based accessibility tools. These are often the solutions people are most familiar with and are built specifically for one platform like a web browser or smartphone app.
 
 ### General Purpose Accessibility Software
 
@@ -92,7 +133,7 @@ I believe that I have already helped to progress this challenge through my previ
 
 # Approach
 
-As stated, my project goal was to create a federated learning system for voice controlled disability software. I wanted to create a proof of concept to show how federated learning could be applied to the disability software space and in doing so investigate new way of UI and UX design.
+As stated, my project goal was to create a federated learning system for voice controlled disability software. I wanted to create a full federated learning ecosystem to show how it could be applied to the disability software space. Additionally, in doing so I also wanted to investigate new way of UI and UX design.
 
 I split up the technical implementation of my project into five main parts.
 
@@ -132,11 +173,13 @@ Finally, we can also adapt the adaptive optimization methods of traditionally no
 
 # Implementation
 
-## Webserver Frontend
+With this background in mind, I will now proceed to discuss the implementation of my software and the various challenges I overcame. As stated previously, I sought to create a minimum viable product for implementing a full federated learning ecosystem. Each part of this ecosystem has a decoupled architecture which will allow new innovations to add features to specific parts of the system without needing to change others.
 
 ## Webserver Backend
 
-For my backend I used FastAPI. FastAPI allows for the creation of web apis in Python.
+The first For my backend I used FastAPI. FastAPI allows for the creation of web apis in Python. The goal of this the server is to launch and manage the central Federated Learning server.
+
+## Webserver Frontend
 
 ## Client
 
@@ -163,3 +206,7 @@ The one limitation on this would be that such users would need to have Linux sma
 # Acknowledgements
 
 I would like to thank my advisor, Professor Kyle Jamieson at Princeton University for his advice and insight throughout the research process.
+
+```
+
+```

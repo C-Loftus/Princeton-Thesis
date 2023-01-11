@@ -6,7 +6,7 @@ GEOM = geometry:margin=$(MARGIN)
 OUT_DIR = ./out
 FONT_SIZE = fontsize=12pt
 COLOR = urlcolor='[HTML]{ff5733}'
-SETTINGS = -V $(GEOM) -V $(FONT_SIZE) -V $(COLOR) --filter pandoc-citeproc --bibliography=citations.bib --csl=ieee.csl --metadata link-citations=true --lua-filter=./columns.lua
+SETTINGS = -V $(GEOM) -V $(FONT_SIZE) -V $(COLOR) --filter pandoc-citeproc --bibliography=citations.bib --csl=ieee.csl --metadata link-citations=true --lua-filter=./columns.lua -F mermaid-filter
 
 thesis:
 	pandoc $(SETTINGS) -o $(OUT_DIR)/thesis.pdf main.md
@@ -35,3 +35,5 @@ dependencies:
 	
 	sudo apt install pandoc
 	sudo apt install pandoc-citeproc
+	sudo apt install librsvg2-bin
+	sudo npm install --global mermaid-filter
