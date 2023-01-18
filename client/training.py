@@ -8,15 +8,16 @@ from architecture import SubsetSC, M5
 
 # Define all constants, datasets and hyper parameters for training
 class TRAINING_CONFIG():
-    def __init__(self):
+    
+    def __init__(self, useTalon: bool = False):
         self.batch_size = 5
         self.log_interval = 20
         self.n_epoch = 1
         self.new_sample_rate = 8000
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-        self.train_set = SubsetSC("training")
-        self.test_set = SubsetSC("testing")
+        self.train_set = SubsetSC("training", useTalon=useTalon)
+        self.test_set = SubsetSC("testing", useTalon=useTalon)
 
         waveform, sample_rate, label, speaker_id, utterance_number = self.train_set[0]
 
@@ -192,7 +193,7 @@ def main_training():
     # global is fine since each client is a separate process and no state is updated
     # makes functions cleaner with fewer hyperparams to pass 
     global tc
-    tc = TRAINING_CONFIG()
+    tc = TRAINING_CONFIG(useTalon=True)
 
     print("Starting flower client")
     # Start Flower client

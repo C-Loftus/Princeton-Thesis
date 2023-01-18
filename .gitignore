@@ -39,3 +39,9 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+
+validation_list.txt
+training_data.txt
+training_list.txt
+testing_list.txt

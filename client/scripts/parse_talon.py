@@ -1,10 +1,14 @@
-import os
+import os, random
 import concurrent.futures
 import subprocess, random
 
 RECORDING_PATH = os.path.expanduser("~/.talon/recordings")
 SCRIPT_PATH = os.path.dirname(os.path.realpath(__file__))
-OUTPUT_PATH = os.path.join(SCRIPT_PATH, "talon-conversion")
+data_dir = os.path.join(SCRIPT_PATH, "../data")
+
+OUTPUT_PATH = os.path.join(SCRIPT_PATH, data_dir, "talon-conversion")
+hostname = os.uname()[1]
+USER_ID = hash(hostname)  % 10000
 
 parseCmd = lambda filename: filename.split("-")[0]
 
@@ -28,21 +32,28 @@ def parse():
 
     wav_files = []
     commands = []
+    timesSaid = {}
+
 
     for filename in os.listdir(RECORDING_PATH):
 
         cmd = parseCmd(filename)
 
         if sufficientForTraining(filename, cmd):
+
+            timesSaid[cmd] = timesSaid.get(cmd, -1) + 1
         
             command_path = makeCmdDir(cmd)
+            # 
 
-            output_name = str(hash(filename) % 10000)
+            output_name = f'{USER_ID}_nohash_{timesSaid[cmd]}.wav'
+# Convert to exactly two hundred fifty sixk bit rate.
+            command = f'ffmpeg -i {RECORDING_PATH}/{filename} -ar 16000 -b:a 256k -minrate 256k -maxrate 256k -y {command_path}/{output_name}'
 
-            commands.append("ffmpeg -y -i %s/%s %s/%s.wav" %
-                (RECORDING_PATH, filename, command_path, output_name))
+            # command = f'ffmpeg -i {RECORDING_PATH}/{filename} -ac 1 -ar 16000 -bits_per_raw_sample 16 -c:a pcm_s16le {command_path}/{output_name
+            commands.append(command)
 
-            full_path = os.path.join(OUTPUT_PATH, command_path, output_name + ".wav")
+            full_path = os.path.join(OUTPUT_PATH, command_path, output_name)
 
             wav_files.append(str(full_path))
 
@@ -67,7 +78,7 @@ def parse():
         val_filenames = wav_files[train_split:val_split]
         test_filenames = wav_files[val_split:]
         
-        with open(os.path.join(OUTPUT_PATH, "training_data.txt"), "w") as f:    
+        with open(os.path.join(OUTPUT_PATH, "training_list.txt"), "w") as f:    
             for filename in train_filenames:
                 f.write(f'{filename}\n')
 
@@ -77,7 +88,7 @@ def parse():
         with open(os.path.join(OUTPUT_PATH, "testing_list.txt"), "w") as f:    
             for filename in test_filenames:
                 f.write(f'{filename}\n')
-        
+        print(commands[-1])
 
 
 if __name__ == "__main__":

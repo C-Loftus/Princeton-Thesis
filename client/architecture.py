@@ -40,12 +40,19 @@ class M5(nn.Module):
         return F.log_softmax(x, dim=2)
 
 class SubsetSC(SPEECHCOMMANDS):
-    def __init__(self, subset: str = None, fromTalon = False):
-        
-        super().__init__("./", download= not fromTalon)
+    def __init__(self, subset: str = None, downloadDataset: bool = True, useTalon: bool = False):
+        root_dir = os.path.join(os.path.dirname(os.path.realpath(__file__)), "data")
+        super().__init__(root_dir, download= downloadDataset)
 
         def load_list(filename):
-            filepath = os.path.join(self._path, filename)
+            if useTalon:
+                # generate relative path from string
+                filepath = os.path.join(os.path.dirname(os.path.realpath(__file__)), "data")
+                filepath = os.path.join(filepath, "talon-conversion")
+                filepath = os.path.join(filepath, filename)
+
+            else:
+                filepath = os.path.join(self._path, filename)
             with open(filepath) as fileobj:
                 return [os.path.normpath(os.path.join(self._path, line.strip())) for line in fileobj]
 
@@ -53,7 +60,16 @@ class SubsetSC(SPEECHCOMMANDS):
             self._walker = load_list("validation_list.txt")
         elif subset == "testing":
             self._walker = load_list("testing_list.txt")
-        elif subset == "training":
+         # the speech commands data set does not have an explicit training list
+        elif subset == "training" and not useTalon:
             excludes = load_list("validation_list.txt") + load_list("testing_list.txt")
             excludes = set(excludes)
             self._walker = [w for w in self._walker if w not in excludes]
+        # If we are using the talon data set there's an explicit training list
+        elif subset == "training" and useTalon:
+            self._walker = load_list("training_list.txt")
+
+if __name__ == "__main__":
+     # print the full path of this script
+    print(os.path.realpath(__file__))
+    sc = SubsetSC(subset="training", downloadDataset=False, useTalon=True)
