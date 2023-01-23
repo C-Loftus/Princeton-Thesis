@@ -2,47 +2,6 @@
 bibliography: ["./citations.bib"]
 ---
 
-$$
- \forall{talon\_data}_1^{|talon\_data| := N}
-$$
-
-```{.mermaid format=svg .mermaid loc=assets}
-erDiagram
-    TALON_DATA_1 ||--|| TRAINING_CLIENT_1: converts
-    TALON_DATA_1 {
-        origin client_1_desktop
-    }
-    TALON_DATA_2 ||--|| TRAINING_CLIENT_2: converts
-    TALON_DATA_2 {
-        origin client_2_desktop
-    }
-    TALON_DATA_N ||--|| TRAINING_CLIENT_N: converts
-    TALON_DATA_N {
-        origin client_N_desktop
-    }
-    TRAINING_CLIENT_1 ||--|| FLOWER_SERVER : federates_with
-    TRAINING_CLIENT_1   {
-        platform desktop
-    }
-    TRAINING_CLIENT_2 ||--|| FLOWER_SERVER: federates_with
-    TRAINING_CLIENT_2 {
-        platform desktop
-    }
-    TRAINING_CLIENT_N ||--|| FLOWER_SERVER: federates_with
-    TRAINING_CLIENT_N {
-        platform desktop
-    }
-    FLOWER_SERVER ||--|| SPEECH_COMMANDS_MODEL: creates
-    SPEECH_COMMANDS_MODEL  ||--|| LINUX_ACCESSIBILITY_CLIENT : powers
-    LINUX_ACCESSIBILITY_CLIENT {
-        platform mobile
-    }
-
-    REACT_FRONTEND ||--|| FAST_API_ENDPOINT: interacts_with
-    FAST_API_ENDPOINT ||--|| FLOWER_SERVER: controls
-
-```
-
 # Abstract
 
 For individuals with disabilities, machine learning provides a powerful way to create more useful accessibility software. Voice recognition software is a particularly useful example that has allowed many to interact with their computers hands free.
@@ -104,32 +63,40 @@ Before discussing my work, it is useful to give an overview of the existing fiel
 
 ## Disability Software
 
-Within voice-controlled disability there are a few main categories.
+Within voice-controlled disability software, many of the design philosophies behind different programs can be grouped into two main categories.
 
 ### Application-Specific Accessibility Software
 
-Application-Specific solutions are the first main category of voice based accessibility tools. These are often the solutions people are most familiar with and are built specifically for one platform like a web browser or smartphone app.
+Application-Specific solutions are the first main category of voice based accessibility tools. These are often the solutions people are most familiar with and are built specifically for one platform like a web browser or smartphone app. In this model, it is up to each program to implement its own accessibility tools. One example is the extension LipSurf. \footnote{https://www.lipsurf.com/} This extension allows users within Chrome to control their browser with just voice. It takes advantage of browser specific accessibility APIs and thus does not provide any control of other desktop applications. While this is a downside for some, it can also be a benefit for others. LipSurf is very easy to install and use, and it is very clear where the goals of the project begin and end. For other desktop applications, it is beyond the scope of this software and as a result the developer and community can focus more on just web tools .
 
 ### General Purpose Accessibility Software
 
+General purpose accessibility software is the other philosophy behind the design of voice based accessibility software. Under this design philosophy, the user runs one large voice control program that can interact with the entire desktop, not just one application. While it has much more potential for general use, it is also harder to learn for new users. It is also a greater development burden you need to design around the entire desktop, and not just one application like the browser that is cross platform.
+
 #### Dragon
 
-Dragon is an
+The first and perhaps most well known example of this sort of accessibility software is Dragon.Dragon is a proprietary voice control program that has been around since the 1990s (and even earlier with early builds). It is heavily marketed towards enterprise and business customers and tends to be focused on providing functionality for industries like healthcare, legal services, law enforcement, and others that require lots of writing. While Dragon has innovated on many fronts over the years, it currently only supports Windows and given its proprietary nature, can be hard to extend and customize. As a result, many users of Dragon (especially those looking to perform specialized tasks like computer programming) have begun to adopt other tools.
 
 #### Talon
 
-The next main option for Linux is Talon. \footnote{https://talonvoice.com/} Talon is a general purpose voice control engine for which individuals can write scripts to customize its behavior. Upon downloading it, Talon provides no desktop control functionality and is only a voice parser. However, there is a large community repository of Talon scripts called Knausj Talon. \footnote{https://github.com/knausj85/knausj\_talon} These can be imported and customized as desired.
+One such other tool is Talon. \footnote{https://talonvoice.com/} Talon is a general purpose voice control engine for which individuals can write scripts to customize its behavior. Upon downloading it, Talon provides no desktop control functionality and is only a voice parser. However, there is a large community repository of Talon scripts called Knausj Talon. \footnote{https://github.com/knausj85/knausj\_talon} These can be imported and customized as desired.
 
-Talon has a large user community with specific user scripts for doing things like coding by voice and navigating the web browser. These solutions are often more customizable and efficient given the fact that their designers are often also part of the Talon community as users.
-One of the benefits of talon is that you can enable the option 'Save Recordings.' This will create an annotated dataset of user recordings for every command. Thus it is very easy to generate a personalized dataset when using talon.
+Talon has a large user community with specific user scripts for doing nearly anything you would want on your desktop, anything from coding by voice to playing video games. These solutions are often more customizable and efficient given the fact that their designers are often also part of the Talon community as users.
+One of the benefits of Talon is that you can enable the option 'Save Recordings.' This will create an annotated dataset of user recordings for every command. Thus it is very easy to generate a personalized dataset when using talon.
 
-While both of these voice control solutions work well for many, each has a downside. Both Dragon-Naturally-Speaking and Talon are closed source. This may be a downside for privacy conscious individuals, even though many extensions are nonetheless open source and community developed. Dragon-Naturally-Speaking is also not free, and the cost may be a significant impediment to many users. Finally, Talon Voice does not support ARM-based CPUs and lacks a way of automatically sharing data in its ecosystem. Contributing data to use for future model training involves a manual process of sending recorded data to the developer.\footnote{https://noise.talonvoice.com/}
+While both of these voice control solutions work well for many, each has a downside. Both Dragon-Naturally-Speaking and Talon (here referring to the voice parser,not the user scripts) are closed source. This may be a downside for privacy conscious individuals, even though many extensions are nonetheless open source and community developed. Dragon-Naturally-Speaking is also not free, and the cost may be a significant impediment to many users. Finally, Talon Voice and Dragon do not support mobile devices and lack a way of automatically sharing data in its ecosystem. In Talon, contributing data to use for future model training involves a manual process of sending recorded data to the developer.\footnote{https://noise.talonvoice.com/}
+
+As a result there arenumerous research opportunities in voice controlled accessibility software. Everything from developing new open source voice parsers for mobile devices, to new ways of sharing community customizations and data, all have great potential to dramatically help not only current users, but also future users on devices and architectures that have yet to be commonly adopted.
 
 ## Linux Mobile Devices
 
-As we saw when describing the current landscape of hands-free accessibility software, a significant amount of the issues come from the fact that parts of the ecosystem are closed source, and do not support ARM-based CPUs. As a result, for my research, I was specifically interested to targeting Linux smartphones.Linux smartphones are unique in the fact that they are often made specifically for the purpose of user privacy. As such, there is significant overlap in the user base with those who are looking to gain data autonomy and participate in grassroots social computing initiatives. In addition, they can typically run any desktop Linux software, so long as it is compiled for an ARM-based CPU and has it appropriate UI for a mobile device, so my federated learning solution could work on both desktop and mobile Linux devices. While Linux smartphones are a very small market currently, there is a passionate community around the devices and I wanted to not only solve an existing problem in the voice controlled accessibility ecosystem, but also tie in my work with anticipating future issues that wall come about due to a lack of accessibility support on new ARM mobile devices.
+As we saw when describing the current landscape of hands-free accessibility software, a significant amount of the issues come from the fact that parts of the ecosystem are closed source and do not support mobile devices. Additionally, even though Talon can automatically produce a personalized and labeled dataset, there are not any devices or ecosystems which seek to take advantage of this.
 
-I believe that I have already helped to progress this challenge through my previous research \footnote{https://github.com/C-Loftus/Starling}. This program I wrote is a proof of concept voice control solution on Linux. In this paper, my solution for sharing data and training models with federated learning can help provide new solutions for the machine learning backend.
+As a result, for my research, I was specifically interested in targeting Linux smartphones.Linux smartphones are unique in the fact that they are a mobile device, but can also typically run any desktop Linux software, so long as a ARM-build exists. This greatly reduces the friction for users that seek to migrate between desktop and mobile devices. An addition to these technical benefits, the demographic of these new open source mobile initiatives are looking to gain data autonomy and participate in grassroots social computing initiatives. This makes them more likely to participate in federated learning technology (especially given the privacy preserving nature of the tech).
+
+By building for a new ecosystem like Linux mobile devices,I wanted to not only solve an existing problem in the voice controlled accessibility ecosystem, but also tie in my work with anticipating future issues that wall come about due to a lack of accessibility support on new ARM mobile devices.
+
+Finally, as previously stated, Linux mobile devices can more easily run existing Linux software than alternatives like Android or IOS. This will allow me to adapt my previous research developing an open source voice parser for linux \footnote{https://github.com/C-Loftus/Starling}.  This will allow me to lay the groundwork not only for new community based federated learning solutions,but also the parsers and accessibility software that will consume these models.
 
 # Approach
 
@@ -142,6 +109,48 @@ I split up the technical implementation of my project into five main parts.
 - Webserver Frontend
 - Linux GUI Client
 - Packaging and Distribution
+  A visual description of each part can be seen in the diagram below.
+
+$$
+ \forall{talon\_data}_1^{|talon\_data| := N}
+$$
+
+```{.mermaid format=svg .mermaid loc=assets}
+erDiagram
+    TALON_DATA_1 ||--|| TRAINING_CLIENT_1: converts
+    TALON_DATA_1 {
+        origin client_1_desktop
+    }
+    TALON_DATA_2 ||--|| TRAINING_CLIENT_2: converts
+    TALON_DATA_2 {
+        origin client_2_desktop
+    }
+    TALON_DATA_N ||--|| TRAINING_CLIENT_N: converts
+    TALON_DATA_N {
+        origin client_N_desktop
+    }
+    TRAINING_CLIENT_1 ||--|| FLOWER_SERVER : federates_with
+    TRAINING_CLIENT_1   {
+        platform desktop
+    }
+    TRAINING_CLIENT_2 ||--|| FLOWER_SERVER: federates_with
+    TRAINING_CLIENT_2 {
+        platform desktop
+    }
+    TRAINING_CLIENT_N ||--|| FLOWER_SERVER: federates_with
+    TRAINING_CLIENT_N {
+        platform desktop
+    }
+    FLOWER_SERVER ||--|| SPEECH_COMMANDS_MODEL: creates
+    SPEECH_COMMANDS_MODEL  ||--|| LINUX_ACCESSIBILITY_CLIENT : powers
+    LINUX_ACCESSIBILITY_CLIENT {
+        platform mobile
+    }
+
+    REACT_FRONTEND ||--|| FAST_API_ENDPOINT: interacts_with
+    FAST_API_ENDPOINT ||--|| FLOWER_SERVER: controls
+
+```
 
 The goal of this architecture is to make it so a server administrator ( the person that will eventually get the final trained model ) can easily start a federated learning training process without needing to have any knowledge of coding. Additionally, since the federated learning process can be controlled through a web API, it makes it easier to create new clients for various different devices.
 
@@ -206,7 +215,3 @@ The one limitation on this would be that such users would need to have Linux sma
 # Acknowledgements
 
 I would like to thank my advisor, Professor Kyle Jamieson at Princeton University for his advice and insight throughout the research process.
-
-```
-
-```
