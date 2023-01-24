@@ -9,6 +9,7 @@ data_dir = os.path.join(SCRIPT_PATH, "../data")
 OUTPUT_PATH = os.path.join(SCRIPT_PATH, data_dir, "talon-conversion")
 hostname = os.uname()[1]
 USER_ID = hash(hostname)  % 10000
+MIN_SAMPLE_AMT = 4
 
 parseCmd = lambda filename: filename.split("-")[0]
 
@@ -16,7 +17,7 @@ def sufficientForTraining(filename, cmd) -> bool:
     words_in_command = len(cmd.split(" "))
     return filename.endswith(".flac") and \
             words_in_command == 1 and \
-            len([f for f in os.listdir(RECORDING_PATH) if parseCmd(f) == cmd]) > 1
+            len([f for f in os.listdir(RECORDING_PATH) if parseCmd(f) == cmd]) > MIN_SAMPLE_AMT
 
 def makeCmdDir(cmd):
     command_path = os.path.join(OUTPUT_PATH, cmd)
@@ -47,10 +48,13 @@ def parse():
             # 
 
             output_name = f'{USER_ID}_nohash_{timesSaid[cmd]}.wav'
-# Convert to exactly two hundred fifty sixk bit rate.
-            command = f'ffmpeg -i {RECORDING_PATH}/{filename} -ar 16000 -b:a 256k -minrate 256k -maxrate 256k -y {command_path}/{output_name}'
 
-            # command = f'ffmpeg -i {RECORDING_PATH}/{filename} -ac 1 -ar 16000 -bits_per_raw_sample 16 -c:a pcm_s16le {command_path}/{output_name
+            # settings = " -ar 16000 -b:a 256k -minrate 256k -maxrate 256k -y"
+            # settings = '-ss 0 -t 1 -f lavfi -i anullsrc=channel_layout=stereo -filter_complex "[1][0]concat=n=2:v=0:a=1[out]" -map "[out]" -c:a pcm_s16le'
+            settings = ' -ss 0 -t 1 -af "apad=pad_len=1" -c:a pcm_s16le'
+            command = f'ffmpeg -i {RECORDING_PATH}/{filename} {settings} -y {command_path}/{output_name}'
+
+
             commands.append(command)
 
             full_path = os.path.join(OUTPUT_PATH, command_path, output_name)

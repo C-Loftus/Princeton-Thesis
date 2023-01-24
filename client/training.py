@@ -56,7 +56,10 @@ class TRAINING_CONFIG():
         self.net = self.model.to(self.device)
 
         n = count_parameters(self.model)
-        print("Number of parameters: %s" % n)
+        print(f"Number of parameters: {n}\n")
+        print(f"Number of training examples: {len(self.train_set)}\n")
+        print(f"Number of testing examples: {len(self.test_set)}\n")
+        print(f"Number of classes: {len(self.labels)}\n")
 
         self.optimizer = optim.Adam(self.model.parameters(), lr=0.01, weight_decay=0.0001)
         self.scheduler = optim.lr_scheduler.StepLR(self.optimizer, step_size=20, gamma=0.1)  # reduce the learning after 20 epochs by a factor of 10
