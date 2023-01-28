@@ -8,8 +8,8 @@ if [ "$1" = "-s" ]; then
     .../server/.venv/bin/python ../server/server.py &
     sleep 3  # Sleep for 3s to give the server enough time to start
 fi
-
-for i in `seq 0 1 5`; do
+curl localhost:5000/start
+for i in `seq 0 1 15`; do
     echo "Starting client $i"
     sleep 1
     ../.venv/bin/python ../training.py &
@@ -19,3 +19,5 @@ done
 trap "trap - SIGTERM && kill -- -$$" SIGINT SIGTERM
 # Wait for all background processes to complete
 wait
+echo "Stopping flwr server"
+curl localhost:5000/stop

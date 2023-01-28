@@ -1,3 +1,7 @@
+# This file contains code from the link below that has been forked,changed and extended. 
+#  All referenced code is use under a BSD License
+# https://github.com/pytorch/tutorials/blob/master/intermediate_source/speech_command_classification_with_torchaudio_tutorial.py
+
 import os
 from torchaudio.datasets import SPEECHCOMMANDS
 from torch import nn
@@ -5,7 +9,11 @@ import torch.nn.functional as F
 
 
 class M5(nn.Module):
-    def __init__(self, n_input=1, n_output=35, stride=8, n_channel=64):
+    def __init__(self, n_input=1, n_output=35, stride=16, n_channel=32, useTalon=False):
+        if useTalon:
+            stride=8
+            n_channel=64
+
         super().__init__()
         print(f"n_input: {n_input}, n_output: {n_output}, stride: {stride}, n_channel: {n_channel}")
         self.conv1 = nn.Conv1d(n_input, n_channel, kernel_size=80, stride=stride)

@@ -1,18 +1,26 @@
+# This file contains code from the link below that has been forked,changed and extended. 
+#  All referenced code is use under a BSD License
+# https://github.com/pytorch/tutorials/blob/master/intermediate_source/speech_command_classification_with_torchaudio_tutorial.py
+
+
 import torch
 import torch.nn.functional as F
 import torch.optim as optim
 import torchaudio
-from collections import OrderedDict
+from torch import Tensor
+from collections import OrderedDict, defaultdict
 import flwr as fl
 from architecture import SubsetSC, M5
+
+# level = defaultdict(lambda: 0)
 
 # Define all constants, datasets and hyper parameters for training
 class TRAINING_CONFIG():
     
     def __init__(self, useTalon: bool = False):
-        self.batch_size = 5
+        self.batch_size = 2
         self.log_interval = 20
-        self.n_epoch = 1
+        self.n_epoch = 2
         self.new_sample_rate = 8000
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
@@ -52,7 +60,7 @@ class TRAINING_CONFIG():
 
         self.pbar_update = 1 / (len(self.train_loader) + len(self.test_loader))
         self.losses = []
-        self.model = M5(n_input=self.transformed.shape[0], n_output=len(self.labels))
+        self.model = M5(n_input=self.transformed.shape[0], n_output=len(self.labels), useTalon=useTalon)
         self.net = self.model.to(self.device)
 
         n = count_parameters(self.model)
@@ -60,6 +68,8 @@ class TRAINING_CONFIG():
         print(f"Number of training examples: {len(self.train_set)}\n")
         print(f"Number of testing examples: {len(self.test_set)}\n")
         print(f"Number of classes: {len(self.labels)}\n")
+        print(f"Length of training set: {len(self.train_loader)}, length of validation set: {len(self.test_loader)}\n")
+        print(f"Labels: {self.labels}\n")
 
         self.optimizer = optim.Adam(self.model.parameters(), lr=0.01, weight_decay=0.0001)
         self.scheduler = optim.lr_scheduler.StepLR(self.optimizer, step_size=20, gamma=0.1)  # reduce the learning after 20 epochs by a factor of 10
@@ -123,9 +133,60 @@ def train(model, epoch, log_interval):
         data = tc.transform(data)
         output = model(data)
 
-        # negative log-likelihood for a tensor of size (batch x 1 x n_output)
-        loss = F.nll_loss(output.squeeze(), target)
 
+        # negative log-likelihood for a tensor of size (batch x 1 x n_output)
+        try:
+            loss = F.nll_loss(output.squeeze(), target)
+        except:
+            # try:
+            #     loss = F.nll_loss(output.squeeze(), target.repeat(output.shape[0]))
+            #     level[0]=level[0] + 1
+            # except:
+            #     try:
+            #         target = target.view(-1)
+            #         loss = F.nll_loss(output.squeeze(), target)
+            #         level[ 1]=level[ 1] + 1
+            #     except:
+            #         try:
+            #             loss = torch.nn.CrossEntropyLoss()(output, target.squeeze())
+            #             level[2]=level[2] + 1
+            #         except:
+            #             try:
+            #                 if output.shape[0] != target.shape[0]:
+            #                     target = target.view(-1, *[1 for _ in range(len(output.shape)-1)])
+            #                 loss = F.nll_loss(output, target)
+            #                 level[2]=level[2] + 1
+
+            #             except:
+            #                 try:
+            #                     target = target.reshape(-1, 1)
+            #                     loss = F.nll_loss(output.squeeze(), target)
+            #                     level[ 3]=level[ 3] + 1
+            #                 except :
+            #                     try:
+            #                         target = target.flatten()
+            #                         loss = F.nll_loss(output.squeeze(), target)
+            #                         level[ 4]=level[ 4] + 1
+            #                     except :
+            #                         try:
+            #                             if output.shape[0] != target.shape[0]:
+            #                                 target = target.repeat(output.shape[0])
+            #                             loss = F.nll_loss(output.squeeze(), target)
+            #                             level[ 5]=level[ 5] + 1
+            #                         except :
+            #                             try:
+            #                                 if output.shape != target.shape:
+            #                                     target = target.expand(output.shape)
+            #                                 loss = F.nll_loss(output.squeeze(), target)
+            #                                 level[ 6]=level[ 6] + 1
+                                        # except :
+                                            # try:
+                                                target = target.flatten()
+                                                loss = F.nll_loss(output.squeeze(), target)
+                                                # level[ 7]=level[ 7] + 1
+                                            # except :
+                                            #     loss = torch.nn.CrossEntropyLoss()(output, target)
+                                            #     level[ 8]=level[ 8] + 1
         tc.optimizer.zero_grad()
         loss.backward()
         tc.optimizer.step()
@@ -204,7 +265,8 @@ def main_training():
         server_address="127.0.0.1:8080",
         client=FlowerClient(tc.net, tc.train_loader, tc.test_loader),
     )
-
+    print("Finished flower client")
+    print(level)
 
 if __name__ == "__main__":
     main_training()

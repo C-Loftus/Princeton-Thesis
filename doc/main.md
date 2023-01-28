@@ -96,20 +96,21 @@ As a result, for my research, I was specifically interested in targeting Linux s
 
 By building for a new ecosystem like Linux mobile devices,I wanted to not only solve an existing problem in the voice controlled accessibility ecosystem, but also tie in my work with anticipating future issues that wall come about due to a lack of accessibility support on new ARM mobile devices.
 
-Finally, as previously stated, Linux mobile devices can more easily run existing Linux software than alternatives like Android or IOS. This will allow me to adapt my previous research developing an open source voice parser for linux \footnote{https://github.com/C-Loftus/Starling}.  This will allow me to lay the groundwork not only for new community based federated learning solutions,but also the parsers and accessibility software that will consume these models.
+Finally, as previously stated, Linux mobile devices can more easily run existing Linux software than alternatives like Android or IOS. This will allow me to adapt my previous research developing an open source voice parser for linux \footnote{https://github.com/C-Loftus/Starling}. This will allow me to lay the groundwork not only for new community based federated learning solutions,but also the parsers and accessibility software that will consume these models.
 
 # Approach
 
-As stated, my project goal was to create a federated learning system for voice controlled disability software. I wanted to create a full federated learning ecosystem to show how it could be applied to the disability software space. Additionally, in doing so I also wanted to investigate new way of UI and UX design.
+As previously stated, my project goal was to create a federated learning system for voice controlled disability software. I wanted to create a full ecosystem to show how federated learning could be applied to the disability software space. Additionally, in doing so I also wanted to investigate new design principles and the emerging platform of Linux smartphones.
 
 I split up the technical implementation of my project into five main parts.
 
 - Machine Learning Architecture and Algorithms
 - Webserver Backend
 - Webserver Frontend
-- Linux GUI Client
+- GUI Client for participating in federated learning and converting talon data
 - Packaging and Distribution
-  A visual description of each part can be seen in the diagram below.
+
+A visual description of each part can be seen in the diagram below.
 
 $$
  \forall{talon\_data}_1^{|talon\_data| := N}
@@ -152,13 +153,24 @@ erDiagram
 
 ```
 
-The goal of this architecture is to make it so a server administrator ( the person that will eventually get the final trained model ) can easily start a federated learning training process without needing to have any knowledge of coding. Additionally, since the federated learning process can be controlled through a web API, it makes it easier to create new clients for various different devices.
+The goal of this architecture is to make it so both a server administrator ( the person that will eventually get the final trained model ) and existing Talon users can easily start a federated learning training process . They should be able to do this without needing to have any knowledge of coding. In addition to the user experience goals, the technical design is loosely coupled and is thus easier to build upon in the future. For instance, since the federated learning process can be controlled through a web API,users can develop their own clients or integrate their own ways of parsing Talon user data. My architecture provides a useful default client but is by no means required.
 
 ## Federated Learning Implementation
 
-The first thing I had to do was make a decision regarding which federated learning library to use. Currently there are a few main options. There are options like `fedjax` [@fedjax2021], Pysyft[@DBLP:journals/corr/abs-1811-04017], and flwr[@beutel2020flower]. While a comprehensive comparison of all options would be beyond the scope of this paper, I chose to go with flwr. This library allows you to apply federation strategies to existing models in popular frameworks like PyTorch and Tensorflow.
+Now that the general overview of the architecture has been described, it is useful to begin describing the technical details of my project. I will do this by discussing the tools I used and the code I wrote for federated learning.
 
-With this
+The first thing I had to do was make a decision regarding which federated learning library to use. Currently there are a few main options. There are options like `fedjax` [@fedjax2021], Pysyft[@DBLP:journals/corr/abs-1811-04017], and flwr[@beutel2020flower]. While a comprehensive comparison of all options would be beyond the scope of this paper, I chose to go with flwr. This library allows you to apply federation strategies to existing models in popular frameworks like PyTorch and Tensorflow. flwr thus allows you to focus more on modeling and abstracts away aspects of federated learning like networking and error handling that are less relevant to this project.
+
+With this decision in mind, I then had to choose a model upon which I would implement federated learning. I had a few main goals for this model given the fact that it would be used on lightweight Linux mobile devices.
+
+- It must be a model capable of processing human speech in English
+- It should be feasible to train without a GPU
+- It does not need to have a large vocabulary size
+- The model itself should be small and easy to run on a mobile device
+- The model should be focused more on commands rather than dictating sentences
+
+As a result, I decided to use the M5 model architecture.[@https://doi.org/10.48550/arxiv.1610.00087]
+This architecture is designed for making inferences on raw wave form data with minimal processing.This model takes advantage of advances in convolutional neural networks while still making it relatively resource efficient to train and process inferences through. For instance the paper says how "By applying batch normalization, residual learning, and a careful design of down-sampling layers, we overcome the difficulties in training very deep models while keeping the computation cost low."In the paper they use the UrbanSound8k dataset which contains 10 environmental sounds that the model is trained to distinguish. While this dataset is different from the speech commands used for voice controlled accessibility software, it is a good baseline metric for determining the models performance on classifying discrete noises in a noisy environment, also an essential property for accessibility software.
 
 ### Federated Learning Strategies
 
