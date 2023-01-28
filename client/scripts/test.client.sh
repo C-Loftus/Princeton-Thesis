@@ -9,7 +9,7 @@ if [ "$1" = "-s" ]; then
     sleep 3  # Sleep for 3s to give the server enough time to start
 fi
 curl localhost:5000/start
-for i in `seq 0 1 15`; do
+for i in `seq 0 1 10`; do
     echo "Starting client $i"
     sleep 1
     ../.venv/bin/python ../training.py &

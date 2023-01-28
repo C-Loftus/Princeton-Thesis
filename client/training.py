@@ -1,4 +1,4 @@
-# This file contains code from the link below that has been forked,changed and extended. 
+# This file contains code from the link below that has been forked,changed and extended.
 #  All referenced code is use under a BSD License
 # https://github.com/pytorch/tutorials/blob/master/intermediate_source/speech_command_classification_with_torchaudio_tutorial.py
 
@@ -12,11 +12,8 @@ from collections import OrderedDict, defaultdict
 import flwr as fl
 from architecture import SubsetSC, M5
 
-# level = defaultdict(lambda: 0)
-
 # Define all constants, datasets and hyper parameters for training
-class TRAINING_CONFIG():
-    
+class TRAINING_CONFIG:
     def __init__(self, useTalon: bool = False):
         self.batch_size = 2
         self.log_interval = 20
@@ -30,7 +27,9 @@ class TRAINING_CONFIG():
         waveform, sample_rate, label, speaker_id, utterance_number = self.train_set[0]
 
         self.labels = sorted(list(set(datapoint[2] for datapoint in self.train_set)))
-        self.transform = torchaudio.transforms.Resample(orig_freq=sample_rate, new_freq=self.new_sample_rate)
+        self.transform = torchaudio.transforms.Resample(
+            orig_freq=sample_rate, new_freq=self.new_sample_rate
+        )
         self.transformed = self.transform(waveform)
 
         if self.device == "cuda":
@@ -60,7 +59,11 @@ class TRAINING_CONFIG():
 
         self.pbar_update = 1 / (len(self.train_loader) + len(self.test_loader))
         self.losses = []
-        self.model = M5(n_input=self.transformed.shape[0], n_output=len(self.labels), useTalon=useTalon)
+        self.model = M5(
+            n_input=self.transformed.shape[0],
+            n_output=len(self.labels),
+            useTalon=useTalon,
+        )
         self.net = self.model.to(self.device)
 
         n = count_parameters(self.model)
@@ -68,11 +71,17 @@ class TRAINING_CONFIG():
         print(f"Number of training examples: {len(self.train_set)}\n")
         print(f"Number of testing examples: {len(self.test_set)}\n")
         print(f"Number of classes: {len(self.labels)}\n")
-        print(f"Length of training set: {len(self.train_loader)}, length of validation set: {len(self.test_loader)}\n")
+        print(
+            f"Length of training set: {len(self.train_loader)}, length of validation set: {len(self.test_loader)}\n"
+        )
         print(f"Labels: {self.labels}\n")
 
-        self.optimizer = optim.Adam(self.model.parameters(), lr=0.01, weight_decay=0.0001)
-        self.scheduler = optim.lr_scheduler.StepLR(self.optimizer, step_size=20, gamma=0.1)  # reduce the learning after 20 epochs by a factor of 10
+        self.optimizer = optim.Adam(
+            self.model.parameters(), lr=0.01, weight_decay=0.0001
+        )
+        self.scheduler = optim.lr_scheduler.StepLR(
+            self.optimizer, step_size=20, gamma=0.1
+        )  # reduce the learning after 20 epochs by a factor of 10
         # # The transform needs to live on the same device as the model and the data.
         self.transform = self.transform.to(self.device)
 
@@ -80,6 +89,7 @@ class TRAINING_CONFIG():
 def number_of_correct(pred, target):
     # count number of correct predictions
     return pred.squeeze().eq(target).sum().item()
+
 
 def get_likely_index(tensor):
     # find most likely label index for each element in the batch
@@ -91,19 +101,23 @@ def index_to_label(index):
     # This is the inverse of label_to_index
     return tc.labels[index]
 
+
 def pad_sequence(batch):
     # Make all tensor in a batch the same length by padding with zeros
     batch = [item.t() for item in batch]
-    batch = torch.nn.utils.rnn.pad_sequence(batch, batch_first=True, padding_value=0.)
+    batch = torch.nn.utils.rnn.pad_sequence(batch, batch_first=True, padding_value=0.0)
     return batch.permute(0, 2, 1)
+
 
 def count_parameters(model):
     return sum(p.numel() for p in model.parameters() if p.requires_grad)
 
-def collate_fn(batch):
 
-    def label_to_index(word,):
-    # Return the position of the word in labels
+def collate_fn(batch):
+    def label_to_index(
+        word,
+    ):
+        # Return the position of the word in labels
         return torch.tensor(tc.labels.index(word))
 
     # A data tuple has the form:
@@ -122,6 +136,7 @@ def collate_fn(batch):
 
     return tensors, targets
 
+
 def train(model, epoch, log_interval):
     model.train()
     for batch_idx, (data, target) in enumerate(tc.train_loader):
@@ -133,70 +148,31 @@ def train(model, epoch, log_interval):
         data = tc.transform(data)
         output = model(data)
 
-
         # negative log-likelihood for a tensor of size (batch x 1 x n_output)
         try:
             loss = F.nll_loss(output.squeeze(), target)
         except:
-            # try:
-            #     loss = F.nll_loss(output.squeeze(), target.repeat(output.shape[0]))
-            #     level[0]=level[0] + 1
-            # except:
-            #     try:
-            #         target = target.view(-1)
-            #         loss = F.nll_loss(output.squeeze(), target)
-            #         level[ 1]=level[ 1] + 1
-            #     except:
-            #         try:
-            #             loss = torch.nn.CrossEntropyLoss()(output, target.squeeze())
-            #             level[2]=level[2] + 1
-            #         except:
-            #             try:
-            #                 if output.shape[0] != target.shape[0]:
-            #                     target = target.view(-1, *[1 for _ in range(len(output.shape)-1)])
-            #                 loss = F.nll_loss(output, target)
-            #                 level[2]=level[2] + 1
+            try:
+                if output.shape != target.shape:
+                    target = target.expand(output.shape)
+                loss = F.nll_loss(output.squeeze(), target)
+            except:
+                target = target.flatten()
+                loss = F.nll_loss(output.squeeze(), target)
 
-            #             except:
-            #                 try:
-            #                     target = target.reshape(-1, 1)
-            #                     loss = F.nll_loss(output.squeeze(), target)
-            #                     level[ 3]=level[ 3] + 1
-            #                 except :
-            #                     try:
-            #                         target = target.flatten()
-            #                         loss = F.nll_loss(output.squeeze(), target)
-            #                         level[ 4]=level[ 4] + 1
-            #                     except :
-            #                         try:
-            #                             if output.shape[0] != target.shape[0]:
-            #                                 target = target.repeat(output.shape[0])
-            #                             loss = F.nll_loss(output.squeeze(), target)
-            #                             level[ 5]=level[ 5] + 1
-            #                         except :
-            #                             try:
-            #                                 if output.shape != target.shape:
-            #                                     target = target.expand(output.shape)
-            #                                 loss = F.nll_loss(output.squeeze(), target)
-            #                                 level[ 6]=level[ 6] + 1
-                                        # except :
-                                            # try:
-                                                target = target.flatten()
-                                                loss = F.nll_loss(output.squeeze(), target)
-                                                # level[ 7]=level[ 7] + 1
-                                            # except :
-                                            #     loss = torch.nn.CrossEntropyLoss()(output, target)
-                                            #     level[ 8]=level[ 8] + 1
         tc.optimizer.zero_grad()
         loss.backward()
         tc.optimizer.step()
 
         # print training stats
         if batch_idx % log_interval == 0:
-            print(f"Train Epoch: {epoch} [{batch_idx * len(data)}/{len(tc.train_loader.dataset)} ({100. * batch_idx / len(tc.train_loader):.0f}%)]\tLoss: {loss.item():.6f}")
+            print(
+                f"Train Epoch: {epoch} [{batch_idx * len(data)}/{len(tc.train_loader.dataset)} ({100. * batch_idx / len(tc.train_loader):.0f}%)]\tLoss: {loss.item():.6f}"
+            )
 
         # record loss
         tc.losses.append(loss.item())
+
 
 def test(model, epoch):
     model.eval()
@@ -213,10 +189,13 @@ def test(model, epoch):
         pred = get_likely_index(output)
         correct += number_of_correct(pred, target)
 
-    print(f"\nTest Epoch: {epoch}\tAccuracy: {correct}/{len(tc.test_loader.dataset)} ({100. * correct / len(tc.test_loader.dataset):.0f}%)\n")
+    print(
+        f"\nTest Epoch: {epoch}\tAccuracy: {correct}/{len(tc.test_loader.dataset)} ({100. * correct / len(tc.test_loader.dataset):.0f}%)\n"
+    )
     loss = sum(tc.losses) / len(tc.losses)
     accuracy = correct / len(tc.test_loader.dataset)
     return loss, accuracy
+
 
 def predict(tensor):
     # Use the model to predict the label of the waveform
@@ -226,6 +205,7 @@ def predict(tensor):
     tensor = get_likely_index(tensor)
     tensor = index_to_label(tensor.squeeze())
     return tensor
+
 
 class FlowerClient(fl.client.NumPyClient):
     def __init__(self, net, train_loader, test_loader) -> None:
@@ -252,10 +232,11 @@ class FlowerClient(fl.client.NumPyClient):
         loss, accuracy = test(self.net, self.test_loader)
         return loss, len(self.test_loader.dataset), {"accuracy": accuracy}
 
+
 def main_training():
 
     # global is fine since each client is a separate process and no state is updated
-    # makes functions cleaner with fewer hyperparams to pass 
+    # makes functions cleaner with fewer hyperparams to pass
     global tc
     tc = TRAINING_CONFIG(useTalon=True)
 
@@ -266,10 +247,7 @@ def main_training():
         client=FlowerClient(tc.net, tc.train_loader, tc.test_loader),
     )
     print("Finished flower client")
-    print(level)
+
 
 if __name__ == "__main__":
     main_training()
-
-
-
