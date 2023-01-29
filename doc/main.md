@@ -155,9 +155,13 @@ erDiagram
 
 The goal of this architecture is to make it so both a server administrator ( the person that will eventually get the final trained model ) and existing Talon users can easily start a federated learning training process . They should be able to do this without needing to have any knowledge of coding. In addition to the user experience goals, the technical design is loosely coupled and is thus easier to build upon in the future. For instance, since the federated learning process can be controlled through a web API,users can develop their own clients or integrate their own ways of parsing Talon user data. My architecture provides a useful default client but is by no means required.
 
+# Implementation
+
+With this background in mind, I will now proceed to discuss the implementation of my software and the various challenges I overcame. As stated previously, I sought to create a minimum viable product for implementing a full federated learning ecosystem. Each part of this ecosystem has a decoupled architecture which will allow new innovations to add features to specific parts of the system without needing to change others.
+
 ## Federated Learning Implementation
 
-Now that the general overview of the architecture has been described, it is useful to begin describing the technical details of my project. I will do this by discussing the tools I used and the code I wrote for federated learning.
+The first and most essential part of my project was implementing the technical aspects of federated learning. These new machine learning aggregation strategies effected not only my decisions regarding modeling, but also principles of user experience design.
 
 The first thing I had to do was make a decision regarding which federated learning library to use. Currently there are a few main options. There are options like `fedjax` [@fedjax2021], Pysyft[@DBLP:journals/corr/abs-1811-04017], and flwr[@beutel2020flower]. While a comprehensive comparison of all options would be beyond the scope of this paper, I chose to go with flwr. This library allows you to apply federation strategies to existing models in popular frameworks like PyTorch and Tensorflow. flwr thus allows you to focus more on modeling and abstracts away aspects of federated learning like networking and error handling that are less relevant to this project.
 
@@ -170,7 +174,34 @@ With this decision in mind, I then had to choose a model upon which I would impl
 - The model should be focused more on commands rather than dictating sentences
 
 As a result, I decided to use the M5 model architecture.[@https://doi.org/10.48550/arxiv.1610.00087]
-This architecture is designed for making inferences on raw wave form data with minimal processing.This model takes advantage of advances in convolutional neural networks while still making it relatively resource efficient to train and process inferences through. For instance the paper says how "By applying batch normalization, residual learning, and a careful design of down-sampling layers, we overcome the difficulties in training very deep models while keeping the computation cost low."In the paper they use the UrbanSound8k dataset which contains 10 environmental sounds that the model is trained to distinguish. While this dataset is different from the speech commands used for voice controlled accessibility software, it is a good baseline metric for determining the models performance on classifying discrete noises in a noisy environment, also an essential property for accessibility software.
+This architecture is designed for making inferences on raw wave form data with minimal processing. Compared to larger conformer or wav2letter models, M5 requires less code and disk space to run. As a result it also makes it easier to deploy to mobile devices that may have limited disk space or nontraditional package management.
+
+With regards the technical aspects of this model, it takes advantage of advances in convolutional neural networks while still making it relatively resource efficient to train and process inferences. For instance the paper says how "By applying batch normalization, residual learning, and a careful design of down-sampling layers, we overcome the difficulties in training very deep models while keeping the computation cost low."In the paper they use the UrbanSound8k dataset which contains 10 environmental sounds that the model is trained to distinguish. While this dataset is different from the speech commands used for voice controlled accessibility software, it is a good baseline metric for determining the models performance on classifying discrete noises in a noisy environment: also an essential property for accessibility software.
+
+### Client Implementation
+
+After implementing the model in Pytorch code, it then became time to integrate it with flwr and federated learning. In flwr, it is up to the user to implement 4 main functions on the model.
+
+```
+class FlowerClient(fl.client.NumPyClient):
+
+    def get_parameters(self, config):
+
+    def set_parameters(self, parameters):
+
+    def fit(self, parameters, config):
+
+    def evaluate(self, parameters, config):
+```
+
+As previously stated, in federated learning, all training happens on device and then the model parameters are exported to a central server where they are aggregated in some way, so as to preserve privacy but also reap the benefits from a large base of training data. As a result it is up to the client to define how they will fit the model, and export parameters to the central server. This implementation can be found in [client/training.py](client/training.py). With regards to the details of the implementation, I use negative log likelihood as my loss function and batch processing to reduce the load of system resources. I use the former given the fact I am doing multi class classification over audio data and want a probability distribution that sums to one. With regards to batch processing, I wanted to incorporate accessibility in an unconventional way. While we often think about accessibility as a physical property, it can also be a technical one back can limit users with lower end hardware from participating in software communities. Simpler models and batch processing make it so we can engage with the largest possible audience. While I do not assume people will be training their models on Linux mobile devices, my hope was that strategies like these can open up such a possibility in the future.
+
+### Training Data
+ Now that we have defined the overview of my model architecture.
+
+## Flwr Central Webserver
+
+The first For my backend I used FastAPI. FastAPI allows for the creation of web apis in Python. The goal of this the server is to launch and manage the central Federated Learning server.
 
 ### Federated Learning Strategies
 
@@ -192,17 +223,7 @@ Finally, we can also adapt the adaptive optimization methods of traditionally no
 
 ## HCI and UX
 
-# Implementation
-
-With this background in mind, I will now proceed to discuss the implementation of my software and the various challenges I overcame. As stated previously, I sought to create a minimum viable product for implementing a full federated learning ecosystem. Each part of this ecosystem has a decoupled architecture which will allow new innovations to add features to specific parts of the system without needing to change others.
-
-## Webserver Backend
-
-The first For my backend I used FastAPI. FastAPI allows for the creation of web apis in Python. The goal of this the server is to launch and manage the central Federated Learning server.
-
 ## Webserver Frontend
-
-## Client
 
 ## Packaging and Distribution
 

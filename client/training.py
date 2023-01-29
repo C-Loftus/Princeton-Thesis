@@ -15,7 +15,7 @@ from architecture import SubsetSC, M5
 # Define all constants, datasets and hyper parameters for training
 class TRAINING_CONFIG:
     def __init__(self, useTalon: bool = False):
-        self.batch_size = 2
+        self.batch_size = 256
         self.log_interval = 20
         self.n_epoch = 2
         self.new_sample_rate = 8000
@@ -173,7 +173,6 @@ def train(model, epoch, log_interval):
         # record loss
         tc.losses.append(loss.item())
 
-
 def test(model, epoch):
     model.eval()
     correct = 0
@@ -192,6 +191,7 @@ def test(model, epoch):
     print(
         f"\nTest Epoch: {epoch}\tAccuracy: {correct}/{len(tc.test_loader.dataset)} ({100. * correct / len(tc.test_loader.dataset):.0f}%)\n"
     )
+    
     loss = sum(tc.losses) / len(tc.losses)
     accuracy = correct / len(tc.test_loader.dataset)
     return loss, accuracy
