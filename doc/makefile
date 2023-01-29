@@ -6,7 +6,20 @@ GEOM = geometry:margin=$(MARGIN)
 OUT_DIR = ./out
 FONT_SIZE = fontsize=12pt
 COLOR = urlcolor='[HTML]{ff5733}'
-SETTINGS = -V $(GEOM) -V $(FONT_SIZE) -V $(COLOR) --filter pandoc-citeproc --bibliography=citations.bib --csl=ieee.csl --metadata link-citations=true --lua-filter=./columns.lua -F mermaid-filter
+# use one.five spacing
+SPACING = documentclass=report
+
+
+SETTINGS = -V $(GEOM) \
+  -V $(FONT_SIZE)\
+  -V $(COLOR) \
+  -V $(SPACING) \
+  --filter pandoc-citeproc \
+  --bibliography=citations.bib \
+  --csl=ieee.csl \
+  --metadata link-citations=true \
+  --lua-filter=./columns.lua \
+  -F mermaid-filter 
 
 thesis:
 	pandoc $(SETTINGS) -o $(OUT_DIR)/thesis.pdf main.md
