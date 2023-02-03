@@ -21,7 +21,7 @@ export default function ServerForm(props) {
     formState: { errors },
   } = useForm({
     defaultValues: {
-      strategy: "FedAvg",
+      strategy: "FedAvgM",
       clients: 4,
     },
   });

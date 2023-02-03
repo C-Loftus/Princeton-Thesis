@@ -65,9 +65,9 @@ Before discussing voice-based accessibility software it is useful to describe th
 
 Federated Learning, despite being such a new and promising field, is based upon a much simpler and older one: federation. Federation as a general concept in computing is a backbone to many of the essential software tools we use every day. Email and git are two great examples of fundamental software technologies that are built upon federation. Anyone can start their own email or git server, control their own mail inbox or code repositories respectively, and choose to communicate with other servers of the same type. Despite the fact that these technologies are built upon federation, in reality the majority of individuals depend upon highly centralized applications (Gmail and Github, being two examples, respectively). As a result, if we want federated learning to break this general trend within federated software, we need both incentives and intuitive tooling to support independent communities.
 
-For examples of this, we can look to recent studies regarding the behavior of users in other federated networks such as Mastodon. Mastodon is an alternative social media platform that anyone can self-host and federate with other instances. This allows for decentralized data sharing and moderation- However, even though the software is designed for decentralization, users often congregate towards centralized servers. [@10.1145/3355369.3355572] After Elon Musk bought twitter and caused many users to seek alternative platforms, Mastodon saw a huge influx of new users. However, many of these users were confused regarding which instance to use, and how their data was being retained. \footnote{\url{https://www.newyorker.com/culture/infinite-scroll/what-fleeing-twitter-users-will-and-wont-find-on-mastodon}}
+For examples of this, we can look to recent studies regarding the behavior of users in other federated networks such as Mastodon. Mastodon is an alternative social media platform that anyone can self-host and federate with other instances. This allows for decentralized data sharing and moderation- However, even though the software is designed for decentralization, users often congregate towards centralized servers. [@10.1145/3355369.3355572] After Elon Musk bought twitter and caused many users to seek alternative platforms, Mastodon saw a huge influx of new users. However, many of these users were confused regarding which instance to use, and how their data was being retained. \small\footnote{\url{{https://www.newyorker.com/culture/infinite-scroll/what-fleeing-twitter-users-will-and-wont-find-on-mastodon}}}
 
-Thus even though Mastodon has nothing to do with federated machine learning , it is a good example of how users are not accustomed to dealing with decentralized data. When implementing new forms of data sharing we need not only new technical solutions, but also new design strategies. After all, our goal is to share data in a way that is both efficient and democratic. Little will be accomplished at scale if only power users and hobby hackers participate.
+Thus even though Mastodon is a social network and not a machine learning toolkit, it is a good example of how users are not accustomed to dealing with federated systems and decentralized data. When implementing new forms of data sharing we need not only new technical solutions, but also new design strategies. After all, our goal is to share data in a way that is both efficient and democratic. Little will be accomplished at scale if only power users and hobby hackers participate.
 
 With regards to federated learning specifically, often programmers completely abstract away the federation process. For instance, in the case of mobile phones, it is assumed that a beneficent central company will train models in the background, and the user can benefit without needing to understand the process. Many, even technical users, are not aware that their phone passively trains such models at nighttime.
 
@@ -116,11 +116,13 @@ By building for a new ecosystem like Linux mobile devices,I wanted to not only s
 
 Finally, as previously stated, Linux mobile devices can more easily run existing Linux software than alternatives like Android or IOS. This will allow me to adapt my previous research developing an open source voice parser for linux \footnote{\url{https://github.com/C-Loftus/Starling}}. This will allow me to lay the groundwork not only for new community based federated learning solutions,but also the parsers and accessibility software that will consume these models.
 
-# Approach
+# Approach to Architecture Design
 
-As previously stated, my project goal was to create a federated learning system for voice controlled accessibility software. I wanted to create a full ecosystem to show how federated learning could be applied to the accessibility software space. Additionally, in doing so I also wanted to investigate new design principles and the emerging platform of Linux smartphones.
+As previously stated, my project goal was to create a full-stack federated learning system for voice controlled accessibility software. I wanted to create an ecosystem to show how federated learning could be applied to all levels of the accessibility software space. Additionally, in doing so I also wanted to investigate new design principles and the emerging platform of Linux smartphones.
 
-I split up the technical implementation of my project into five main parts.
+When designing my architecture I was focused on both technical efficiency but also user accessibility. Namely for the latter, I wanted to design solutions that worked well for users who use only voice. I also wanted to consider accessibility from a intellectual standpoint. It is important that I designed the architecture in such a way that is not opaque and allows for community contribution. I want users of all backgrounds to be able to clearly trace the path their data takes throughout the machine learning process.
+
+With this in mind, I split up the technical implementation of my project into five main parts.
 
 - Machine Learning Architecture and Algorithms
 - Webserver Backend
@@ -171,7 +173,7 @@ erDiagram
 
 ```
 
-The goal of this architecture is to make it so both a server administrator ( the person that will eventually get the final trained model ) and existing Talon users can easily start a federated learning training process . They should be able to do this without needing to have any knowledge of coding. In addition to the user experience goals, the technical design is loosely coupled and is thus easier to build upon in the future. For instance, since the federated learning process can be controlled through a web API,users can develop their own clients or integrate their own ways of parsing Talon user data. My architecture provides a useful default client but is by no means required.
+With regards to the technical goal of this architecture, it was intended to make it so both a server administrator ( the person that will eventually get the final trained model ) and existing Talon users can easily start a federated learning training process . They should be able to do this without needing to have any knowledge of coding. In addition to the user experience goals, the technical design is loosely coupled and is thus easier to build upon in the future. For instance, since the federated learning process can be controlled through a web API,users can develop their own clients or integrate their own ways of parsing Talon user data. My architecture provides a useful default client but is by no means required.
 
 # Implementation
 
@@ -179,7 +181,7 @@ With this background in mind, I will now proceed to discuss the implementation o
 
 ## Federated Learning Implementation
 
-The first and most essential part of my project was implementing the technical aspects of federated learning. These new machine learning aggregation strategies effected not only my decisions regarding modeling, but also principles of user experience design.
+The first and most essential part of my project was implementing the technical aspects of federated learning. These new machine learning aggregation strategies affected not only my decisions regarding modeling, but also principles of user experience design.
 
 The first thing I had to do was make a decision regarding which federated learning library to use. Currently there are a few main options. There are options like `fedjax` [@fedjax2021], Pysyft[@DBLP:journals/corr/abs-1811-04017], and flwr[@beutel2020flower]. While a comprehensive comparison of all options would be beyond the scope of this paper, I chose to go with flwr. This library allows you to apply federation strategies to existing models in popular frameworks like PyTorch and Tensorflow. flwr thus allows you to focus more on modeling and abstracts away aspects of federated learning like networking client descri and error handling that are less relevant to this project.
 
@@ -218,23 +220,31 @@ As previously stated, in federated learning, all training happens on device and 
 
 Now that we have defined the overview of my model architecture I will described the training data that can be used to generate the model. Given the fact that the M5 model is designed for short commands and not full sentences, it is find useful data or generate new data sets from existing ones. One such example is the `SpeechCommands` dataset. I was able to take advantage of existing research using this combination of the dataset and M5 \footnote{\url{https://github.com/pytorch/tutorials/blob/master/intermediate_source/speech_command_classification_with_torchaudio_tutorial.py}}. This dataset is a series of roughly thirty different common words that could be used as commands. ( For instance common names, numbers ,and directions). This is a useful data set for testing the model architecture and providing a good baseline for federated learning, before new user data is factored in.
 
-The next source of user data is from user generated datasets. As spoken previously, [talon](#talon) is one of the most commonly used community driven voice control solutions. This software also allows users to automatically generate labeled recordings as they use the software. This is usually used for debugging purposes, but it can also be used to generate a dataset for training future models.
+The next source of user data is from user generated datasets. As spoken previously, [talon](#talon) is one of the most commonly used community driven voice control solutions.
+Talon commands use natural language to control the desktop in an intuitive way and automating many tasks that would otherwise be very tedious. Talon can also send keyboard inputs or dictate full paragraphs. Some example Talon commands\footnote{ To clarify, when I say Talon commands I'm referring to the commands in the default community distribution of talon scripts called "Knausj"}, for context include:
 
-By default Talon outputs its data in a `.flac` format and includes every single parsed audio statement. As a result it includes audio of variable lengths. To convert the audio into a format that can be used for training, I wrote a script located at [client/scripts/parse_talon.py](../client/scripts/parse_talon.py). Once the user data is filtered through this script the user will have a large dataset of speech commands that can be used with the M5 model above.
+- `focus firefox`
+- `new bookmark`
+  - ( examples of custom, application specific commands)
+- `press enter`
+- `press control shift pit`
+  - ( examples of keypress commands)
+- `Talon can also dictate long sentences like this and thus is great for many difference contexts`
+  - (example of a dictated sentence)
 
-## Flwr Central Webserver
+While saying these sorts of commands,Talon allows users to automatically generate labeled recordings as they use the software. This is usually used for debugging purposes, but it can also be used to generate a dataset for training future models.
 
-Now that we have described the model and the data, it is important to clarify how the `flwr` webserver is setup in my project. While `flwr` is an excellent technical library, similar to other federated learning tools as mentioned in #[background](https://www.cursorless.org/), it provides little for end-user interaction. In order to get information like the amount of clients, whether training is in process,
+By default Talon outputs its data in a `.flac` format and includes every single parsed audio statement. As a result it includes audio of variable lengths. To convert the audio into a format that can be used for training, I wrote a script located at [client/scripts/parse_talon.py](../client/scripts/parse_talon.py). Once the user data is filtered through this script the user will have a large dataset of speech commands that can be used with the M5 model above. To ensure that only useful commands are making it into the training set, the central server can define a schema of commands. If we did not have this safeguard, then some users could mistakenly train with infrequent or unusual command names. ( This is since Talon is so customizable and allows users to change command names or command frequencies very easily). A central federated learning server administrator can decide which command names the community should train with. By default the commands are the most common ones said in Talon, namely the names of letters ( according to a phonetic alphabet), numbers, and common key names (enter,home, etcetera)
 
-In thus even though this seems like just in architectural decision to make an API wrapper, it actually also reveals a design consideration.
+## `flwr` Central Webserver
 
-The first For my backend I used FastAPI. FastAPI allows for the creation of web apis in Python. The goal of this the server is to launch and manage the central Federated Learning server.
+Now that we have described the model and the data, it is important to clarify how the `flwr` webserver is setup in my project. To begin the entire federated learning process, a server administrator will launch the `flwr` webserver. This will open a port for clients to connect to. It is up to the clients to use their data and train the models locally. However once an epoch has completed, the parameters will be sent to the central webserver and an aggregation function will be ran.
 
-### Federated Learning Strategies
+### Federated Learning Aggregation Strategies
 
-In federated learning, the flower server needs to make a decision regarding how to aggregate the weights from the clients. Different aggregation strategies can be used to provide better properties for specialty tasks, or make up for technical limitations in the client system (power, network connection, processing power, etc).
+In federated learning, the `flwr` server needs to make a decision regarding how to aggregate the weights from the different clients. Different aggregation strategies can be used to provide better properties for specialty tasks, or make up for technical limitations in the client system (power, network connection, processing power, etc).
 
-When deciding to use a strategy, it is important to consider the following properties: [@https://doi.org/10.48550/arxiv.1602.05629]
+When deciding to use a strategy, it is important to consider how many of the following properties hold: [@https://doi.org/10.48550/arxiv.1602.05629]
 
 - Non-IID: Any particular user's local data set will not necessarily be representative of the population distribution
 - Unbalanced: The number of samples per user is not necessarily the same
@@ -242,19 +252,52 @@ When deciding to use a strategy, it is important to consider the following prope
 - Heterogeneous: The users' devices are different (e.g. different hardware, different operating systems, different software versions, etc.)
 - Limited communication: The users' devices are not necessarily connected to the internet all the time, or have limited bandwidth
 
-The most well known federated learning algorithm is FedAvg, this appeared in the same paper where the term "Federated Learning" was coined.[@https://doi.org/10.48550/arxiv.1602.05629] This algorithm works by randomly sampling from the users and averaging their update weights. However, this algorithm has some limitations. If we have particularly unbalanced data the algorithm may not synthesize between clients well. For this reason, the Federated Average with momentum algorithm was proposed. This strategy helps to eliminate the unbalanced data problem by using a momentum term to help the algorithm converge to a better solution. [@https://doi.org/10.48550/arxiv.1909.06335] This algorithm uses a gradient history to dampen oscillations during training. As a result, this algorithm also has the favorable property of being able to generally train more quickly than FedAvg.
+The most well known federated learning algorithm is FedAvg, this appeared in the same paper where the term "Federated Learning" was coined.[@https://doi.org/10.48550/arxiv.1602.05629] This algorithm works by randomly sampling from the users and averaging their update weights. However, this algorithm has some limitations. If we have particularly unbalanced data the algorithm may not aggregate between clients well. For this reason, the algorithm, Federated Average with momentum (FedAvgM), was proposed. This strategy helps to eliminate the unbalanced data problem by using a momentum term to help the algorithm converge to a better solution. [@https://doi.org/10.48550/arxiv.1909.06335] This algorithm uses a gradient history to dampen oscillations during training. As a result, this algorithm also has the favorable property of being able to generally train more quickly than FedAvg.
 
-While approaching training from perspective of data heterogeneity is one way to approach the tradeoff, we can also use strategies that try to limit network communication between the client and the server. One such strategy is known as QFedAvg. This strategy uses a quantization technique to reduce the amount of data that needs to be sent between the client and the server. [@https://doi.org/10.48550/arxiv.1602.05629] This strategy is particularly useful when the clients have limited network connectivity. If network speed is not the issue but rather interruptions in the connection, we can use FaultTolerantFedAvg.
+While approaching training from perspective of data. distributions is one way to approach the tradeoff, we can also use strategies that try to limit network communication between the client and the server. One such strategy is known as QFedAvg. This strategy uses a quantization technique to reduce the amount of data that needs to be sent between the client and the server. [@https://doi.org/10.48550/arxiv.1602.05629] This strategy is particularly useful when the clients have limited network connectivity. If network speed is not the issue but rather interruptions in the connection, we can use FaultTolerantFedAvg.
 
-Finally, we can also adapt the adaptive optimization methods of traditionally non-federated algorithms. We can use federated versions of adaptive optimizers, including Adagrad, Adam, and Yogi to make our systems easier to tune and gain more favorable convergence behavior. [@https://doi.org/10.48550/arxiv.2003.00295]
+Finally, we can also modify and use adaptive optimization methods from traditionally non-federated algorithms. We can use federated versions of adaptive optimizers, including Adagrad, Adam, and Yogi to make our systems easier to tune and gain more favorable convergence behavior. [@https://doi.org/10.48550/arxiv.2003.00295] The downside is that FedOpt, FedAdaGrad, FedAdam, FedYogi all require "initial_parameters to be set" in `flwr`. This means that they are best used to improve the performance of an existing model, not necessarily be the backbone of training a model through federation from the ground up.
 
-## HCI and UX
+`flwr` supports all of these aggregation functions and as a result I have built all these algorithms into my own program. However, it is important to discuss which should be the default strategy given the general properties of this machine learning task. As we stated previously this task for voice recognition with talon data has:
+
+- a relatively small amount of users but a relatively large amount of data from each
+- no existing publicly available models to train on top of
+- a shared subset of labels coming from a central schema on the server at training time
+  - however between different users, there is not necessarily a common distribution for each word on this subset
+  - This is since the dataset is being generated through everyday usage of talon, not specifically to try and make a dataset
+- relatively stable internet connections ( at least compared to federated learning on IoT devices)
+
+As a result from these properties we can see that training with talon is actually a much different task than some of the classic federated learning challenges discussed above [@https://doi.org/10.48550/arxiv.1602.05629] For Talon users, the main challenge is trying to converge relatively quickly with a relatively small amount of data (since we are operating at the scale of individuals in a community, not sets of patients in entire hospitals or similar scales). As a result I chose to have FedAvgM as the default aggregation function. This algorithm helps to reduce the impact of uneven data distribution you would see among user datasets. It does not focus as much on network connectivity like QFedAvg since we can assume that many Talon users have relatively stable internet connections ( given the user demographic of talon being fairly technical due to its customizable nature). Finally I did not choose any of adaptive optimization methods since we currently do not have any pretrained weights to use as a baseline.
+
+In summary, talon data is not only an interesting data source that is easy to generate Over a long period of time, it also challenges many of our assumptions about federated learning. Namely that the bottleneck is in power , network communication, or convergence time. We saw much the opposite, that federated learning with talon data is more constrained on the size of the datasets and as we will discuss later, also the social aspects of getting community members involved.
+
+## Additional Backend Functionality
+
+While `flwr` is an excellent technical library, similar to other federated learning research mentioned in [background](#background), it provides little functionality for end-user interaction. By default, the server blocks the main thread and isn't intended to be interacted with while training. In order to get information like the amount of clients, whether training is in process, and networking information, it is necessary to extend the behavior of the default code.
+
+Thus,to extend this behavior, I decided to create another web application as a wrapper over `flwr`.
+
+Thus, even though this seems like just an architectural or coding decision to make an API wrapper, it actually also reveals a design consideration.
+
+The first for my backend I used FastAPI. FastAPI allows for the creation of web apis in Python. The goal of this the server is to launch and manage the central Federated Learning server.
 
 ## Webserver Frontend
+
+The front end for this project was implemented using React 
 
 ## Packaging and Distribution
 
 One of the advantages of building for Linux devices is that there are already multiple options for packaging and software distribution. I had a few main goals when distributing my software. While machine learning dependencies are often very large,
+
+## HCI and UX
+
+As stated in the [introduction](#introduction), one of the main goalsOf this project was too implement federated learning in a way that would be accessible for users of all backgrounds. It wasn't enough to simply make federated learning more transparent and user friendly. It also had to be done in a way that supported users that rely upon assist of technology.
+
+### Design around Web Interfaces
+
+# Using the Model on Linux Mobile Devices
+
+Up until this point,we have created a system for creating datasets from Talon, training models with federated learning, and controlling it all through an intuitive web frontend.
 
 # Evaluation
 
@@ -264,11 +307,13 @@ One of the advantages of building for Linux devices is that there are already mu
 
 ## User Studies
 
-In the future, it could be useful to extend this technical research by seeking out users with disabilities to participate in a user study. These users would need to have a large amount of voice data.
+In the future, it would be useful to extend this technical research by seeking out users with disabilities to participate in a user study.
 
-The one limitation on this would be that such users would need to have Linux smartphones. This is a very specialized demographic and thus would not be representative of the smartphone-owning population as a whole.
+## Preventing Bad Actors
 
-##
+Throughout this paper, there was the general assumption that users in federated learning would not be trying to take advantage of the system by purposefully using mislabeled training data. In the case of voice controlled accessibility software, it can be assumed that this would probably be a relatively insignificant issue given the lack of incentive for hackers.
+
+Despite this, if attackers did such a thing and there is a small enough sample size, it would significantly decrease the performance of the model after the final aggregation.
 
 # Conclusion
 

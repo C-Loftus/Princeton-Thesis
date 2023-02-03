@@ -191,8 +191,10 @@ def test(model, epoch):
     print(
         f"\nTest Epoch: {epoch}\tAccuracy: {correct}/{len(tc.test_loader.dataset)} ({100. * correct / len(tc.test_loader.dataset):.0f}%)\n"
     )
-    
-    loss = sum(tc.losses) / len(tc.losses)
+    if len(tc.losses) == 0:
+        loss = float(sum(tc.losses)) 
+    else:
+        loss = sum(tc.losses) / len(tc.losses) 
     accuracy = correct / len(tc.test_loader.dataset)
     return loss, accuracy
 

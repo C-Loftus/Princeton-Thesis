@@ -5,6 +5,7 @@ import os
 import shelve
 import requests
 from federatedAlgo import start_flower
+from typing import List
 
 app = FastAPI(openapi_url="/openapi.json")
 clientManager = None
@@ -23,6 +24,39 @@ app.add_middleware(
     allow_headers=["*"]
 )
 
+default_commands = [
+     "look",
+      "map",
+      "one",
+      "gust",
+      "bat",
+      "quench",
+      "vest",
+      "trap",
+      "sit",
+      "zip",
+      "three",
+      "sun",
+      "drum",
+      "air",
+      "whale",
+      "yank",
+      "near",
+      "pit",
+      "two",
+      "end",
+      "each",
+      "odd",
+      "harp",
+      "crunch",
+      "urge",
+       "red",
+      "plex",
+      "fine",
+      "jury",
+      "home"
+]
+
 
 def reset_db():
     db['clients'] = '0'
@@ -37,11 +71,6 @@ async def startup_event():
     db = shelve.open("db")
     reset_db()
 
-
-@app.on_event("shutdown")
-async def shutdown_event():
-    reset_db()
-    db.close()
 
 
 def isRunning():
@@ -64,7 +93,7 @@ async def root():
     return {"detail": "Successfully pinged server. Connect to API endpoints to interact with server."}
 
 @app.get("/start", status_code=200)
-async def start_server(clients: int = 4, strategy: str = 'FedAvg'):
+async def start_server(clients: int = 4, strategy: str = 'FedAvgM'):
     # check if server is already
     if isRunning():
         raise HTTPException(status_code=404, detail="Server already running")
@@ -113,6 +142,23 @@ async def get_clients():
     else:
         raise HTTPException(status_code=404, detail="Server not running")
 
+@app.get("/commands")
+def command_list():
+    if 'commands' in db: 
+        return {
+            "detail": db['commands']
+        } 
+    
+    else:  
+        return {
+            "detail": default_commands
+        }
+
+@app.put("/commands")
+def command_list(commands: List[str]):
+    # Save the commands to the database
+    db['commands'] = commands
+    return 
 
 if __name__ == "__main__":
     try:

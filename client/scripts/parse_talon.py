@@ -1,5 +1,6 @@
 import os, random
 import concurrent.futures
+import requests,sys
 import subprocess, random
 
 RECORDING_PATH = os.path.expanduser("~/.talon/recordings")
@@ -9,15 +10,26 @@ data_dir = os.path.join(SCRIPT_PATH, "../data")
 OUTPUT_PATH = os.path.join(SCRIPT_PATH, data_dir, "talon-conversion")
 hostname = os.uname()[1]
 USER_ID = hash(hostname)  % 10000
-MIN_SAMPLE_AMT = 4
+MIN_NUM_SAMPLES = 4
 
 parseCmd = lambda filename: filename.split("-")[0]
 
-def sufficientForTraining(filename, cmd) -> bool:
+def validForTraining(filename, cmd) -> bool:
+
+    # Send a web request to the server to get the list of commands
+
+    result= requests.get("http://localhost:5000/commands")
+    try:
+        training_commands = result.json()['detail']
+    except Exception as e:
+        print(" Error getting commands from the server. Is the server running?")
+        sys.exit(1)
+        
     words_in_command = len(cmd.split(" "))
     return filename.endswith(".flac") and \
             words_in_command == 1 and \
-            len([f for f in os.listdir(RECORDING_PATH) if parseCmd(f) == cmd]) > MIN_SAMPLE_AMT
+            cmd in training_commands and \
+            len([f for f in os.listdir(RECORDING_PATH) if parseCmd(f) == cmd]) > MIN_NUM_SAMPLES
 
 def makeCmdDir(cmd):
     command_path = os.path.join(OUTPUT_PATH, cmd)
@@ -40,7 +52,7 @@ def parse():
 
         cmd = parseCmd(filename)
 
-        if sufficientForTraining(filename, cmd):
+        if validForTraining(filename, cmd):
 
             timesSaid[cmd] = timesSaid.get(cmd, -1) + 1
         
@@ -51,6 +63,8 @@ def parse():
 
             # settings = " -ar 16000 -b:a 256k -minrate 256k -maxrate 256k -y"
             # settings = '-ss 0 -t 1 -f lavfi -i anullsrc=channel_layout=stereo -filter_complex "[1][0]concat=n=2:v=0:a=1[out]" -map "[out]" -c:a pcm_s16le'
+            
+            #  Settings to  convert to 16 bit 16khz wav for training with torch
             settings = ' -ss 0 -t 1 -af "apad=pad_len=1" -c:a pcm_s16le'
             command = f'ffmpeg -i {RECORDING_PATH}/{filename} {settings} -y {command_path}/{output_name}'
 

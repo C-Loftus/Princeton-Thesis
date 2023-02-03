@@ -7,7 +7,6 @@ from flowerThread import StoppableThread, threading
 ADDR = "127.0.0.1:8080"
 
 def fit_config(server_round: int) -> Dict[str, fl.common.Scalar]:
-    """Return a configuration with static batch size and (local) epochs."""
     config: Dict[str, fl.common.Scalar] = {
         "epoch_global": str(server_round),
         "epochs": str(1),
@@ -39,7 +38,7 @@ def serverThread(userStrategy, clientManager, requiredClients):
             weights = super().aggregate_fit(server_round, results, failures)
             if weights is not None:
                 # Save weights
-                print(f"Saving round {server_round} weights...")
+                print(f"Saving round {server_round} weights")
                 np.savez(f"round-{server_round}-weights.npz", *weights)
             return weights
 
