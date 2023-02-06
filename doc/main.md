@@ -14,9 +14,9 @@ In my paper, I describe a novel way to apply Federated Learning for voice-based 
 
 # Introduction
 
-In recent years, machine learning has created significant advances in patient care across the medical industry. Sophisticated machine learning applications have emerged for drug discovery, accessibility accommodations, patient monitoring services, and much more. [@10.1145/3167486.3167551] Advances in reinforcement-learning now allows for vital healthcare applications to be deployed even in novel environments.[@10.1145/3477600] New ways of optimizing and distributing training has allowed for models to be trained in restrictive environments [@10.1145/3427796.3433935].
+In recent years, machine learning has created significant advances in patient care across the healthcare industry. Sophisticated machine learning applications have emerged for drug discovery, accessibility accommodations, patient monitoring services, and much more. [@10.1145/3167486.3167551] Advances in reinforcement-learning now allows for vital healthcare applications to be deployed even in novel environments.[@10.1145/3477600] New ways of optimizing and distributing training has allowed for models to be trained in restrictive environments with limited data sets [@10.1145/3427796.3433935].
 
-Despite these algorithmic advances, health care data continues to be one of the most challenging data sources for machine learning. It is subject to particularly strict legal regulations and the stakes for user privacy are often much higher than other social data. For instance, in the case of automatic diagnostic software, even if the model performs well, steps must be taken to ensure patient privacy throughout the training process.
+Despite these algorithmic advances, the logistics of healthcare data continues to make it one of the most challenging data sources for machine learning. It is subject to particularly strict legal regulations and the stakes for user privacy are often much higher than other social data. For instance, in the case of automatic diagnostic software, even if the model performs well, steps must be taken to ensure patient privacy throughout the training process.
 
 Thus, in general in order to do machine learning for health care in a traditional setting, data must be rigorously anonymized and stored in secure computing environments. While this is theoretically acceptable, in practice it often fails. This is usually the case for a few main reasons.
 
@@ -216,7 +216,7 @@ class FlowerClient(fl.client.NumPyClient):
 
 As previously stated, in federated learning, all training happens on device and then the model parameters are exported to a central server where they are aggregated in some way, so as to preserve privacy but also reap the benefits from a large base of training data. As a result it is up to the client to define how they will fit the model, and export parameters to the central server. This implementation can be found in [client/training.py](../client/training.py). With regards to the details of the implementation, I use negative log likelihood as my loss function and batch processing to reduce the load of system resources. I use the former given the fact I am doing multi class classification over audio data and want a probability distribution that sums to one. With regards to batch processing, I wanted to incorporate accessibility in an unconventional way. While we often think about accessibility as a physical property, it can also be a technical one back can limit users with lower end hardware from participating in software communities. Simpler models and batch processing make it so we can engage with the largest possible audience. While I do not assume people will be training their models on Linux mobile devices, my hope was that strategies like these can open up such a possibility in the future.
 
-### Training Data
+### Client Training Data
 
 Now that we have defined the overview of my model architecture I will described the training data that can be used to generate the model. Given the fact that the M5 model is designed for short commands and not full sentences, it is find useful data or generate new data sets from existing ones. One such example is the `SpeechCommands` dataset. I was able to take advantage of existing research using this combination of the dataset and M5 \footnote{\url{https://github.com/pytorch/tutorials/blob/master/intermediate_source/speech_command_classification_with_torchaudio_tutorial.py}}. This dataset is a series of roughly thirty different common words that could be used as commands. ( For instance common names, numbers ,and directions). This is a useful data set for testing the model architecture and providing a good baseline for federated learning, before new user data is factored in.
 
@@ -275,29 +275,62 @@ In summary, talon data is not only an interesting data source that is easy to ge
 
 While `flwr` is an excellent technical library, similar to other federated learning research mentioned in [background](#background), it provides little functionality for end-user interaction. By default, the server blocks the main thread and isn't intended to be interacted with while training. In order to get information like the amount of clients, whether training is in process, and networking information, it is necessary to extend the behavior of the default code.
 
-Thus,to extend this behavior, I decided to create another web application as a wrapper over `flwr`.
+Thus,to extend this behavior, I decided to create another web application as a wrapper over `flwr`. This web application is used to create an API for useful metadata and controlling the training process. For my backend I used FastAPI. FastAPI allows for the creation of web apis in Python.
 
-Thus, even though this seems like just an architectural or coding decision to make an API wrapper, it actually also reveals a design consideration.
+With regards to technical features, the wrapper over `flwr` is relatively simple. However despite this, there are once again interesting social implications with such design decisions. At stated previously, federated learning has often been applied to edge and mobile devices, and is totally abstracted away. Thus it makes sense that by default `flwr` does not provide all of these controls that i added in my API. Thus, there is an important lesson to take away from this . For us to achieve our accessibility goals, it is not always about user interfaces, but sometimes is about more foundational aspects of a code base. We ought to ask ourselves, why is certain data being exposed or hidden from the user. What do these decisions of visibility reveal about the the underlying premises of a technology? To achieve success with federated learning in a communal environment, we need to make it easy for developers and community members to get the data they need, not just server administrators controlling the backend.
 
-The first for my backend I used FastAPI. FastAPI allows for the creation of web apis in Python. The goal of this the server is to launch and manage the central Federated Learning server.
+## Webserver and Client Frontends
 
-## Webserver Frontend
+Now that we have described the entire backend and machine learning implementation, it is useful to describe the front ends that control it. Once again, when creating different front end technologies, there was not only the question of feature richness and visual design,
 
-The front end for this project was implemented using React 
+The front end for this project was implemented using React
 
 ## Packaging and Distribution
+
+As stated previously the goal of this project is not only to implement a full stack federated learning application from a technical standpoint, but also do it in such a way that is intuitive and user friendly. One of the core challenges confederated learning can also be viewed from a DevOps perspective: namely, packaging and distributing machine learning code to users with many different environments.
 
 One of the advantages of building for Linux devices is that there are already multiple options for packaging and software distribution. I had a few main goals when distributing my software. While machine learning dependencies are often very large,
 
 ## HCI and UX
 
-As stated in the [introduction](#introduction), one of the main goalsOf this project was too implement federated learning in a way that would be accessible for users of all backgrounds. It wasn't enough to simply make federated learning more transparent and user friendly. It also had to be done in a way that supported users that rely upon assist of technology.
+As stated in the [introduction](#introduction), one of the main goals of this project was to implement federated learning in a way that would be accessible for users of all backgrounds. It wasn't enough to simply make federated learning more transparent and user friendly. It also had to be done in a way that supported users that rely upon assistive technology.
+
+There were a series of essential principles
+
+- design around discrete instead of continuous inputs
+
+### Design Around Discrete Instead of Continuous Inputs
+
+Whenever you are looking to control an application interface, you should look to use tools that have a declarative way of separating different content into components.
 
 ### Design around Web Interfaces
 
+### Build Upon intuitive behaviors
+
 # Using the Model on Linux Mobile Devices
 
-Up until this point,we have created a system for creating datasets from Talon, training models with federated learning, and controlling it all through an intuitive web frontend.
+Up until this point,we have created a system for creating datasets from Talon, training models with federated learning, and controlling it all through an intuitive web frontend. with this in mind it is now useful to begin a discussion regarding how to actually use the models and export them to user devices. As stated previously, in this project I was focused on Linux mobile devices. this is since android and iOS already have voice control options and given the lack of root access, are not necessarily the type of devices I am interested in building for to begin with. With this in mind it is useful to begin a discussion of the general state of Linux mobile phones and explain
+
+## Operating System Choices
+
+just like on the Linux desktop there are many options for mobile Linux phones each with their own design philosophies, technical tools, and target demographics. has stated previously, Linux mobile phones are a relatively recent phenomenon and have nowhere near as much support as the desktop Linux community. As a result much of the development is entirely grassroots and community driven with very little corporate funding or academic sponsorship. as a result I believe that this is even more of a reason why it is so important to develop accessibility tools as soon as possible for the platform. without these tools entire demographics of users will be left out from this new software revolution. while this may seem like an overstatement there are many reasons why Linux smartphones are particularly unique
+
+### Open and Private by Default
+
+While android can be rooted and many custom roms can be installed on popular phones like the google pixel, none of this process is encouraged by the manufacturer. in this case, there is a clear divide between the hardware and software developers. While many people point out how android is open source, the size and monolithic nature of the code base makes it prohibitively difficult for average users to make contributions. For instance in order to make any sort of fundamental changes, it requires the user to download the entire one hundred gigabyte codebase and have roughly sixteen gigabytes of ram to recompile from source. Finally most hardware manufacturers patch their own close sore software on top of stock android, effectively undermining any sort of claims of user freedom.
+
+With Linux smartphones, The user has essentially any freedom they would have on the desktop. Specific hardware manufacturers have also arisen that align themselves with the same goals as the software community. One such company is Pine64. Their Linux smartphone called the PinePhone was used for all Linux mobile testing and development for this project. this device is relatively ubiquitous for the Linux mobile software community and as a result it supports nearly all software in the ecosystem( This is not always a given given the wide variety of mobile specific hardware like cameras, modems, and environment sensors)
+
+### User Interfaces
+
+Given the fact that lots of existing desktop software can be ported to mobile, there are both many options for both the OS itself, as well as the user interfaces. For context, these are analogous to what would be the desktop environments on a desktop Linux computer. I choose not to use the term desktop environment when speaking about mobile devices, just for clarity. While discussing the many intricacies of the different mobile operating systems is not of particular relevance to this paper, the different user interface options on the other hand have significant relevance to user experience and the design of voice controlled accessibility software.
+
+Just as we did previously when discussing different types of voice controlled accessibility software, it is helpful to provide a brief overview of the state of mobile Linux user interfaces. There are three main options:  Phosh, SXMO,and Plasma Mobile.  By enumerating their strengths and weaknesses it will help to contextualize the design of my  voice control client.
+
+#### Phosh
+
+
+As we discussed previously, voice controlled accessibility software works best with discrete,  clear labels as well as building  upon existing interfaces, not replacing them.
 
 # Evaluation
 
