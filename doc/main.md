@@ -1,7 +1,8 @@
 ---
 bibliography: ["./citations.bib"]
-
+title: "Federated Learning Systems for Linux Accessibility Software"
 header-includes: \usepackage{url}
+author: "Colton Loftus"
 ---
 
 # Abstract
@@ -325,12 +326,40 @@ With Linux smartphones, The user has essentially any freedom they would have on 
 
 Given the fact that lots of existing desktop software can be ported to mobile, there are both many options for both the OS itself, as well as the user interfaces. For context, these are analogous to what would be the desktop environments on a desktop Linux computer. I choose not to use the term desktop environment when speaking about mobile devices, just for clarity. While discussing the many intricacies of the different mobile operating systems is not of particular relevance to this paper, the different user interface options on the other hand have significant relevance to user experience and the design of voice controlled accessibility software.
 
-Just as we did previously when discussing different types of voice controlled accessibility software, it is helpful to provide a brief overview of the state of mobile Linux user interfaces. There are three main options:  Phosh, SXMO,and Plasma Mobile.  By enumerating their strengths and weaknesses it will help to contextualize the design of my  voice control client.
+Just as we did previously when discussing different types of voice controlled accessibility software, it is helpful to provide a brief overview of the state of mobile Linux user interfaces. There are three main options: Phosh,Plasma Mobile and SXMO. By enumerating their strengths and weaknesses it will help to contextualize the design of my voice control client.
 
-#### Phosh
+#### Phosh & Plasma Mobile
 
+Phosh It's a mobile Linux user interface based upon Gnome.Given the fact that many Gnome applications already support devices with small screen resolutions, many apps transfer over well with few modifications necessary. Generally speaking, the user experience seeks to mimic earlier versions of android. There's a app drawer with app logos, menus that are accessed from swiping down at the top of the screen, and a gallery of running applications. As such it is relatively user friendly and has already shipped on some commercial smartphones like the Librem 5 from Purism. Given the fact that Linux smartphones are still in their infancy,Phosh has gained much support simply due to the fact that it is more stable and/or lighter weight than many other interface options.
+![An example of phosh](assets/2023-02-07-23-14-25.png)
 
-As we discussed previously, voice controlled accessibility software works best with discrete,  clear labels as well as building  upon existing interfaces, not replacing them.
+The next main Linux user interface is Plasma Mobile. Plasma Mobile has a similar design philosophy to Phosh, except for the fact that it is based on KDE, not Gnome. Once again it borrows a significant amount of its design philosophy from android and iOS. Plasma mobile has a standard home screen of applications with GUI menus and homescreen widgets.
+
+![An example of plasma mobile](assets/2023-02-07-23-22-09.png)
+
+While much more could be said about both of these user interfaces, the fact is that they are largely seeking to mimic existing designed principles. They are primarily touch focused and have a familiar focus upon a homescreen with Gui applications. However, neither of these interfaces have had the time or money to develop in the same way as android or iOS. as a result, Linux accessibility on mobile is sorely lacking. as stated previously, talon and dragon do not run on these devices and given the fact they are totally centered around touch input, they are essentially unusable for people with accessibility issues. However come of this does not have to be the case. How can we rethink user interface design to design accessible systems, even in a constrained environment?
+
+#### SXMO
+
+SXMO, (Simple X Mobile), is the third major mobile Linux user interface. however, it takes a significantly different design approach regarding both the user experience and the underlying software that powers it.SXMO is designed to be minimalist in nature and closer to the unix philosophy of simple distinct minimal programs.SXMO is not built on either Gnome or KDE but rather a highly modified version of DWM .DWM is a dynamic tiling window manager Linux desktops. This means that it automatically fits new windows to a grid or workspace as they are spawned.Traditionally this software has been us launched by Linux enthusiasts looking for a lightweight and hackable desktop. ( For instance, there is no config file. To make any custom changes you need to edit the source code itself.)
+
+At first glance, this seems to be even worse in accessibility than both plasma mobile and Phosh. However this is not the case due to a series of modifications over DWM. SXMO, instead of using gui based windows, uses a series of context menus to navigate around the system. For instance, when you are in the terminal you can press the volume up key to launch a menu with the following options
+
+-
+- For context,SXMO was designed alongside many users using the pine phone. This device has relatively low end specifications and a touchscreen that is rather underwhelming. As a result SXMO decided to use the volume up,volume down, and power buttons as discrete navigation options. Instead of trying to mimic android and iOS it created its own mobile design philosophy. Namely, provide a way to launch menus with nested, configurable options. Then software developers can implement menu options for their application. Under the hood, it is simply controlling sets of shell scripts that the user can easily access.
+
+As we discussed previously, voice controlled accessibility software works best with discrete, clear labels as well as building upon existing interfaces, not replacing them. SXMO does exactly this. For instance, when a menu shows up on the screen, a user has a distinct set of actions that they can perform. They can very clearly use a command like `five` to refer to the fifth element in the menu. This creates for not only a simple command to remember, but also one that is easier to train and later weight to run, compared to a general purpose voice recognition model.
+
+Another key element of SXMO is the fact that it is meant to be hackable. This means that menu actions can easily be edited in distinct shell scripts and it is easy to extend the behavior even of relatively fundamental aspects of the user interface, such as the desktop itself.SSH is also well supported which makes the device feel like a small Linux desktop, more than a distinct mobile device. while this flexibility will require lots of development work to bring it to fruition, the fact of the matter is that SXMO has a fundamentally different way about thinking about mobile computing.
+
+To summarize SXMO's design philosophy:
+
+- make it hackable and transparent
+- don't harshly distinguish between mobile and the desktop
+- don't use unnecessarily complicated software
+- try simple analog input options before complex touchscreen ones
+
+All these properties make SXMO a particularly exciting platform for experimenting with the next generation of accessibility software and alternative HCI ideals. SXMO isn't trying to mimic iOS or android, and that is exactly what makes it special. SXMO Provides a lightweight and transparent way of controlling all the essentials of your phone, Yet at the same time being designed in such a way that can be extended ( in this case, with accessibility software)
 
 # Evaluation
 
