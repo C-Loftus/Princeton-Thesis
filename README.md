@@ -1,6 +1,6 @@
 # Federated Learning for ML-Based Disability Applications
 
-This repository holds the code and written paper for my Princeton senior thesis in Computer Science.
+This repository is a monorepo for all code and written work for my Princeton senior thesis in Computer Science.
 
 ## My Project
 
