@@ -1,3 +1,4 @@
+# numen does not have functions  or variables built into the phrase file, so we have to repeat some behavior and not have it be as terse as it could be
 
 toggle keyboard: /usr/share/sxmo/default_hooks/three_button_touchscreen/sxmo_hook_inputhandler.sh "voldown_one"
 
