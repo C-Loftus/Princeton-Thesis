@@ -1,0 +1,67 @@
+# Cancel sentence
+# For example, "four down no five down" would just do "five down".
+@cancel no
+
+# Transcribe a sentence
+# For example, "scribe please type this".
+
+@transcribe say:set fmt echo normal\
+localpen printf %s\\n "$NUMEN_TRANSCRIPT" | /usr/libexec/numen/phrases/fmt "$fmt"
+
+# Transcribe a sentence formatted...
+# With the first letter uppercase
+@transcribe transcribe:set fmt echo sentence\
+localpen printf %s\\n "$NUMEN_TRANSCRIPT" | /usr/libexec/numen/phrases/fmt "$fmt"
+
+# With Each First Letter Uppercase
+@transcribe title:set fmt echo title\
+localpen printf %s\\n "$NUMEN_TRANSCRIPT" | /usr/libexec/numen/phrases/fmt "$fmt"
+
+# UPPERCASE
+@transcribe all caps:set fmt echo upper\
+localpen printf %s\\n "$NUMEN_TRANSCRIPT" | /usr/libexec/numen/phrases/fmt "$fmt"
+
+# with_underscrores_inbetween
+@transcribe snake scribe:set fmt echo snake\
+localpen printf %s\\n "$NUMEN_TRANSCRIPT" | /usr/libexec/numen/phrases/fmt "$fmt"
+
+# UPPERCASE_WITH_UNDERSCRORES_INBETWEEN
+@transcribe trench scribe:set fmt echo uppersnake\
+localpen printf %s\\n "$NUMEN_TRANSCRIPT" | /usr/libexec/numen/phrases/fmt "$fmt"
+
+# with-dashes-inbetween
+@transcribe dash scribe:set fmt echo dash\
+localpen printf %s\\n "$NUMEN_TRANSCRIPT" | /usr/libexec/numen/phrases/fmt "$fmt"
+
+# with.dots.inbetween
+@transcribe dot scribe:set fmt echo dot\
+localpen printf %s\\n "$NUMEN_TRANSCRIPT" | /usr/libexec/numen/phrases/fmt "$fmt"
+
+# with/slashes/inbetween
+@transcribe path scribe:set fmt echo path\
+localpen printf %s\\n "$NUMEN_TRANSCRIPT" | /usr/libexec/numen/phrases/fmt "$fmt"
+
+# allsmashedtogether
+@transcribe smash scribe:set fmt echo smash\
+localpen printf %s\\n "$NUMEN_TRANSCRIPT" | /usr/libexec/numen/phrases/fmt "$fmt"
+
+# camelCase
+@transcribe cam scribe:set fmt echo camel\
+localpen printf %s\\n "$NUMEN_TRANSCRIPT" | /usr/libexec/numen/phrases/fmt "$fmt"
+
+# UpperCamelCase
+@transcribe camel scribe:set fmt echo uppercamel\
+localpen printf %s\\n "$NUMEN_TRANSCRIPT" | /usr/libexec/numen/phrases/fmt "$fmt"
+
+# Erase the transcription
+scratch that:localeval awk -v n=${#NUMEN_TEXT} 'BEGIN {for(;n--;) print "press BackSpace"}'
+
+# Go to the start of the transcription
+initial:localeval awk -v n=${#NUMEN_TEXT} 'BEGIN {for(;n--;) print "press Left"}'
+
+# Menu of transcription results
+# (Requires the dmenu command)
+transcripts:eval /usr/libexec/numen/phrases/transcripts "$fmt" &
+# Menu to change transcription result
+# (Requires the dmenu command)
+change:eval /usr/libexec/numen/phrases/transcripts "$fmt" change &

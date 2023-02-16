@@ -1,0 +1,6 @@
+# These are just for --gadget mode.
+
+# Switch to controlling the gadget
+@gadget suck gadget:handler kernel
+# Switch to controlling the receiving machine
+@gadget suck host:handler gadget

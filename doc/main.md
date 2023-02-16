@@ -1,6 +1,7 @@
 ---
 bibliography: ["./citations.bib"]
-title: "Social Applications of Federated Learning: Accessibility Software,Mobile Devices, and Beyond"
+title: "Social Applications of Federated Machine Learning: Accessibility Software, Mobile Devices, and Beyond"
+# title: "New Paradigms in Voice Controlled Accessibility Software: Federated Learning, UX Design, and Linux Mobile Devices"
 header-includes: \usepackage{url}
 author: "Colton Loftus"
 ---
@@ -11,7 +12,9 @@ For individuals with disabilities, machine learning provides a powerful way to c
 
 However, many models related to specialty tasks suffer from a lack of data, well trained models, or an ecosystem through which to share them. Machine learning tasks for accessibility software often lack corporate incentives and thus depend upon community-led, manual solutions that potentially compromise privacy.
 
-In my paper, I describe a novel way to apply Federated Learning for voice-based accessibility software. This solution using federated learning allows models to be trained without exposing sensitive voice data to a central server. It applies user-centered design principles to reduce the complexity of the federated learning process for end users. My program allows users to use their data generated from existing accessibility software. This data can be used to build the backend for new voice control solutions on mobile devices. Throughout this paper,I describe the technical implementation of this solution and at the end of the paper, discuss the implications of this work for the future of accessibility software.
+In my paper, I describe a novel way to apply Federated Learning for voice-based accessibility software. This solution using federated learning allows models to be trained without exposing sensitive voice data to a central server. It applies user-centered design principles to reduce the complexity of the federated learning process for end users. My program allows users to use their data generated from existing accessibility software. This data can be used to build the backend for new voice control software on mobile devices. Throughout this paper,I describe the technical implementation of this solution and the user experience goals that informed my design.
+
+Finally in the last section of the paper, I discuss the current landscape of Linux mobile devices and and how we can more effectively bring voice control to this platform. I discuss not only why federated learning is theoretically useful on this platform, but also the technical challenges building alongside other tools in this nascent ecosystem. At the end of the paper, I discuss the implications of this work for the future of accessibility software
 
 # Introduction
 
@@ -353,8 +356,30 @@ SXMO, (Simple X Mobile), is the third major mobile Linux user interface. However
 
 At first glance, this seems to be even worse in accessibility than both Plasma Mobile and Phosh. However this is not the case due to a series of modifications over DWM. SXMO, instead of prioritizing touch input, uses a series of context menus to navigate around the system. For instance, when you are in the terminal you can press the volume up key to launch a menu with the following options
 
--
-- For context,SXMO was designed alongside many users using the pine phone. This device has relatively low end specifications and a touchscreen that is rather underwhelming. As a result SXMO decided to use the volume up,volume down, and power buttons as discrete navigation options. Instead of trying to mimic android and iOS it created its own mobile design philosophy. Namely, provide a way to launch menus with nested, configurable options. Then software developers can implement menu options for their application. Under the hood, it is simply controlling sets of shell scripts that the user can easily access.
+![](assets/2023-02-13-19-25-59.png)
+
+- Copy
+- Paste
+- Zoom In
+- Zoom Out
+- Scroll Up
+- Scroll Down
+- URL Mode
+- Hotkeys
+- System Menu
+- Close Menu
+
+The behavior of the different keys can be found at [https://git.sr.ht/~mil/sxmo-dmenu/tree/master/item/dmenu.c#L592](https://git.sr.ht/~mil/sxmo-dmenu/tree/master/item/dmenu.c#L592). We care about
+
+https://cgit.freedesktop.org/xorg/proto/x11proto/tree/XF86keysym.h
+
+```
+#define XF86XK_AudioLowerVolume	0x1008FF11   /* Volume control down        */
+#define XF86XK_AudioMute	0x1008FF12   /* Mute sound from the system */
+#define XF86XK_AudioRaiseVolume	0x1008FF13   /* Volume control up          */
+```
+
+For context,SXMO was designed alongside many users using the pine phone. This device has relatively low end specifications and a touchscreen that is rather underwhelming. As a result SXMO decided to use the volume up,volume down, and power buttons as discrete navigation options. Instead of trying to mimic android and iOS it created its own mobile design philosophy. Namely, provide a way to launch menus with nested, configurable options. Then software developers can implement menu options for their application. Under the hood, it is simply controlling sets of shell scripts that the user can easily access.
 
 As we discussed previously, voice controlled accessibility software works best with discrete, clear labels as well as building upon existing interfaces, not replacing them. SXMO does exactly this. For instance, when a menu shows up on the screen, a user has a distinct set of actions that they can perform. They can very clearly use a command like `five` to refer to the fifth element in the menu. This creates for not only a simple command to remember, but also one that is easier to train and later weight to run, compared to a general purpose voice recognition model.
 
@@ -374,7 +399,7 @@ Now that we have summarized the landscape of Linux mobile phones and explained t
 ## Voice Assistants and their Challenges
 
 When discussing accessibly software, we saw how one of the most important decisions is [knowing what sort of other non- accessibility software to pair it with](#build-upon-user-interfacesdont-create-new-ones).Thus,
-it is not enough to simply have a good model, but we must also understand the sorts of tasks that should be controlled and what software will pair well with voice control. With this in mind, I will now discuss the different options we have when designing for Linux mobile devices and what needs to be done in this ecosystem before bringing in federated learning systems.
+it is not enough to simply have a good model, but we must also understand the sorts of tasks that should be controlled and what software will pair well with voice control. With this in mind, I will now discuss the current tools we have when designing for Linux mobile devices and what needs to be done in this ecosystem before bringing in federated learning systems.
 
 Before I develop software that uses my federated learning models, I believe it is important to establish a series of other baseline functionalities: an API for a stream of non-blocking model inferences, variable vocabulary at runtime, and a simple programming language for writing user scripts. Given the fact that accessibility software is not useful if it is not practical, I found it most important to focus on these baseline practicality functions first.
 
@@ -388,9 +413,13 @@ For context, Vosk is a speech toolkit\footnote{\url{https://alphacephei.com/vosk
 
 With this context in mind, it makes sense why I want to build upon Numen first instead of building another tool from the ground up. When working with accessibility software it is extremely important to work with a central community that can support users in adapting to the software, and aggregate community scripts for voice control. This is what Talon has done on the desktop with the community repositories like [https://github.com/knausj85/knausj_talon](https://github.com/knausj85/knausj_talon)
 
-While my model made from federated leraning is not in the Vosk format, and is instead in the numpy .npz serialization format, in the future work can be done to transfer these weights between the two different formats. Given the fact that this paper is primarily focused on the training ecosystem, practical user experience, and HCI design of voice based accessibility software, I was content on using Vosk and Numen for the time being. In the future, work can be done regarding converting federated models into this Vosk format. However, I chose to prioritize the most impactful use of my time to contribute to the nascent Linux mobile accessibility ecosystem ( In in doing so hope to guide it with the principles I learned while using Talon).
+While my model made from federated learning is not in the Vosk format, and is instead in the numpy .npz serialization format, in the future work can be done to transfer these weights between the two different formats. Given the fact that this paper is primarily focused on the training ecosystem, practical user experience, and HCI design of voice based accessibility software, I was content on using Vosk and Numen for the time being. In the future, work can be done regarding converting federated models into this Vosk format. However, I chose to prioritize the most impactful use of my time to contribute to the nascent Linux mobile accessibility ecosystem ( In in doing so hope to guide it with the principles I learned while using Talon).
 
 ## Numen's Design Principles
+
+Despite the fact that Numen is a general purpose voice control program, it differs greatly from programs like Talon or Dragon.
+
+https://sources.debian.org/src/sxmo-utils/1.12.0-6/configs/default_hooks/three_button_touchscreen/sxmo_hook_inputhandler.sh/
 
 # Evaluation
 
