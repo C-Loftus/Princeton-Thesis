@@ -1,5 +1,6 @@
 #!/bin/bash
 set -e
+echo " Script running at $(pwd)"
 cd "$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"/
 
 # if -s is passed, run the server

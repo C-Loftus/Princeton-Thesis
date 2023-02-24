@@ -6,7 +6,7 @@ GEOM = geometry:margin=$(MARGIN)
 OUT_DIR = ./out
 FONT_SIZE = fontsize=12pt
 COLOR = urlcolor='[HTML]{ff5733}'
-# use one.five spacing
+# use double spacing
 SPACING = documentclass=report
 
 

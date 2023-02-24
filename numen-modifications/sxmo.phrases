@@ -1,54 +1,54 @@
 # numen does not have functions  or variables built into the phrase file, so we have to repeat some behavior and not have it be as terse as it could be
 
-toggle keyboard: /usr/share/sxmo/default_hooks/three_button_touchscreen/sxmo_hook_inputhandler.sh "voldown_one"
+toggle keyboard: eval /usr/share/sxmo/default_hooks/three_button_touchscreen/sxmo_hook_inputhandler.sh "voldown_one"
 
-toggle menu: /usr/share/sxmo/default_hooks/three_button_touchscreen/sxmo_hook_inputhandler.sh "volup_one"
+toggle menu: eval /usr/share/sxmo/default_hooks/three_button_touchscreen/sxmo_hook_inputhandler.sh "volup_one"
 
-launch terminal: /usr/share/sxmo/default_hooks/three_button_touchscreen/sxmo_hook_inputhandler.sh "powerbutton_three"
+launch terminal: eval  /usr/share/sxmo/default_hooks/three_button_touchscreen/sxmo_hook_inputhandler.sh "powerbutton_three"
 
-rotate screen: /usr/share/sxmo/default_hooks/three_button_touchscreen/sxmo_hook_inputhandler.sh "bottomrightcorner"
+rotate screen: eval /usr/share/sxmo/default_hooks/three_button_touchscreen/sxmo_hook_inputhandler.sh "bottomrightcorner"
 
-Next workspace: /usr/share/sxmo/default_hooks/three_button_touchscreen/sxmo_hook_inputhandler.sh "leftrightedge"
+Next workspace: eval  /usr/share/sxmo/default_hooks/three_button_touchscreen/sxmo_hook_inputhandler.sh "leftrightedge"
 
-Previous workspace: /usr/share/sxmo/default_hooks/three_button_touchscreen/sxmo_hook_inputhandler.sh "rightleftedge"
+Previous workspace: eval  /usr/share/sxmo/default_hooks/three_button_touchscreen/sxmo_hook_inputhandler.sh "rightleftedge"
 
-volume up: /usr/share/sxmo/default_hooks/three_button_touchscreen/sxmo_hook_inputhandler.sh "upleftedge"
+volume up: eval /usr/share/sxmo/default_hooks/three_button_touchscreen/sxmo_hook_inputhandler.sh "upleftedge"
 
-volume down: /usr/share/sxmo/default_hooks/three_button_touchscreen/sxmo_hook_inputhandler.sh "uprightedge"
+volume down: eval /usr/share/sxmo/default_hooks/three_button_touchscreen/sxmo_hook_inputhandler.sh "uprightedge"
 
-brightness up: /usr/share/sxmo/default_hooks/three_button_touchscreen/sxmo_hook_inputhandler.sh "righttopedge"
+brightness up: eval  /usr/share/sxmo/default_hooks/three_button_touchscreen/sxmo_hook_inputhandler.sh "righttopedge"
 
-brightness down: /usr/share/sxmo/default_hooks/three_button_touchscreen/sxmo_hook_inputhandler.sh "lefttopedge"
+brightness down: eval /usr/share/sxmo/default_hooks/three_button_touchscreen/sxmo_hook_inputhandler.sh "lefttopedge"
 
-go up: /usr/share/sxmo/default_hooks/three_button_touchscreen/sxmo_hook_inputhandler.sh "uprightedge"
+go up: eval /usr/share/sxmo/default_hooks/three_button_touchscreen/sxmo_hook_inputhandler.sh "uprightedge"
 
-go down: /usr/share/sxmo/default_hooks/three_button_touchscreen/sxmo_hook_inputhandler.sh "upleftedge"
+go down: eval /usr/share/sxmo/default_hooks/three_button_touchscreen/sxmo_hook_inputhandler.sh "upleftedge"
 
-select: /usr/bin/sxmo_type.sh -k Return
+select: eval /usr/bin/sxmo_type.sh -k Return
 
-go 1: for i in $(seq 1); do usr/share/sxmo/default_hooks/three_button_touchscreen/sxmo_hook_inputhandler.sh "upleftedge"; done
+go 1: eval for i in $(seq 1); do usr/share/sxmo/default_hooks/three_button_touchscreen/sxmo_hook_inputhandler.sh "upleftedge"; done
 
-go 2: for i in $(seq 2); do usr/share/sxmo/default_hooks/three_button_touchscreen/sxmo_hook_inputhandler.sh "upleftedge"; done
+go 2: eval for i in $(seq 2); do usr/share/sxmo/default_hooks/three_button_touchscreen/sxmo_hook_inputhandler.sh "upleftedge"; done
 
-go 3: for i in $(seq 3); do usr/share/sxmo/default_hooks/three_button_touchscreen/sxmo_hook_inputhandler.sh "upleftedge"; done
+go 3: eval for i in $(seq 3); do usr/share/sxmo/default_hooks/three_button_touchscreen/sxmo_hook_inputhandler.sh "upleftedge"; done
 
-go 4: for i in $(seq 4); do usr/share/sxmo/default_hooks/three_button_touchscreen/sxmo_hook_inputhandler.sh "upleftedge"; done
+go 4: eval for i in $(seq 4); do usr/share/sxmo/default_hooks/three_button_touchscreen/sxmo_hook_inputhandler.sh "upleftedge"; done
 
-go 5: for i in $(seq 5); do usr/share/sxmo/default_hooks/three_button_touchscreen/sxmo_hook_inputhandler.sh "upleftedge"; done
+go 5: eval for i in $(seq 5); do usr/share/sxmo/default_hooks/three_button_touchscreen/sxmo_hook_inputhandler.sh "upleftedge"; done
 
-go 6: for i in $(seq 6); do usr/share/sxmo/default_hooks/three_button_touchscreen/sxmo_hook_inputhandler.sh "upleftedge"; done
+go 6: eval for i in $(seq 6); do usr/share/sxmo/default_hooks/three_button_touchscreen/sxmo_hook_inputhandler.sh "upleftedge"; done
 
-pick 1: for i in $(seq 1); do usr/share/sxmo/default_hooks/three_button_touchscreen/sxmo_hook_inputhandler.sh "upleftedge"; done; /usr/bin/sxmo_type.sh -k Return
+pick 1: eval for i in $(seq 1); do usr/share/sxmo/default_hooks/three_button_touchscreen/sxmo_hook_inputhandler.sh "upleftedge"; done; /usr/bin/sxmo_type.sh -k Return
 
-pick 2: for i in $(seq 2); do usr/share/sxmo/default_hooks/three_button_touchscreen/sxmo_hook_inputhandler.sh "upleftedge"; done; /usr/bin/sxmo_type.sh -k Return
+pick 2: eval for i in $(seq 2); do usr/share/sxmo/default_hooks/three_button_touchscreen/sxmo_hook_inputhandler.sh "upleftedge"; done; /usr/bin/sxmo_type.sh -k Return
 
-pick 3: for i in $(seq 3); do usr/share/sxmo/default_hooks/three_button_touchscreen/sxmo_hook_inputhandler.sh "upleftedge"; done; /usr/bin/sxmo_type.sh -k Return
+pick 3: eval for i in $(seq 3); do usr/share/sxmo/default_hooks/three_button_touchscreen/sxmo_hook_inputhandler.sh "upleftedge"; done; /usr/bin/sxmo_type.sh -k Return
 
-pick 4: for i in $(seq 4); do usr/share/sxmo/default_hooks/three_button_touchscreen/sxmo_hook_inputhandler.sh "upleftedge"; done; /usr/bin/sxmo_type.sh -k Return
+pick 4: eval for i in $(seq 4); do usr/share/sxmo/default_hooks/three_button_touchscreen/sxmo_hook_inputhandler.sh "upleftedge"; done; /usr/bin/sxmo_type.sh -k Return
 
-pick 5: for i in $(seq 5); do usr/share/sxmo/default_hooks/three_button_touchscreen/sxmo_hook_inputhandler.sh "upleftedge"; done; /usr/bin/sxmo_type.sh -k Return
+pick 5: eval for i in $(seq 5); do usr/share/sxmo/default_hooks/three_button_touchscreen/sxmo_hook_inputhandler.sh "upleftedge"; done; /usr/bin/sxmo_type.sh -k Return
 
-pick 6: for i in $(seq 6); do usr/share/sxmo/default_hooks/three_button_touchscreen/sxmo_hook_inputhandler.sh "upleftedge"; done; /usr/bin/sxmo_type.sh -k Return
+pick 6: eval for i in $(seq 6); do usr/share/sxmo/default_hooks/three_button_touchscreen/sxmo_hook_inputhandler.sh "upleftedge"; done; /usr/bin/sxmo_type.sh -k Return
 
 
 

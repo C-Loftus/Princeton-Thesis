@@ -1,8 +1,11 @@
 ---
 bibliography: ["./citations.bib"]
-title: "Social Applications of Federated Machine Learning: Accessibility Software, Mobile Devices, and Beyond"
-# title: "New Paradigms in Voice Controlled Accessibility Software: Federated Learning, UX Design, and Linux Mobile Devices"
-header-includes: \usepackage{url}
+# title: " Federated Machine Learning: Accessibility Software, Mobile Devices, and Beyond"
+title: "New Opportunities with Voice Controlled Accessibility Software: Federated Learning and Linux Mobile Devices"
+header-includes:
+  - \usepackage{setspace}
+  - \doublespacing
+  - \usepackage{url}
 author: "Colton Loftus"
 ---
 
@@ -12,9 +15,9 @@ For individuals with disabilities, machine learning provides a powerful way to c
 
 However, many models related to specialty tasks suffer from a lack of data, well trained models, or an ecosystem through which to share them. Machine learning tasks for accessibility software often lack corporate incentives and thus depend upon community-led, manual solutions that potentially compromise privacy.
 
-In my paper, I describe a novel way to apply Federated Learning for voice-based accessibility software. This solution using federated learning allows models to be trained without exposing sensitive voice data to a central server. It applies user-centered design principles to reduce the complexity of the federated learning process for end users. My program allows users to use their data generated from existing accessibility software. This data can be used to build the backend for new voice control software on mobile devices. Throughout this paper,I describe the technical implementation of this solution and the user experience goals that informed my design.
+In my paper, I describe a novel way to apply Federated Learning for voice-based accessibility software. This solution using federated learning allows models to be trained without exposing sensitive voice data to a central server. It seeks to reduce the complexity of the federated learning process for end users and allows users to use their data generated from existing accessibility software. This data can be used to build the backend for new voice control software on mobile devices. Throughout this paper,I describe the technical implementation of this solution and the user experience goals that informed my design.
 
-Finally in the last section of the paper, I discuss the current landscape of Linux mobile devices and and how we can more effectively bring voice control to this platform. I discuss not only why federated learning is theoretically useful on this platform, but also the technical challenges building alongside other tools in this nascent ecosystem. At the end of the paper, I discuss the implications of this work for the future of accessibility software
+Finally in the last section of the paper, I discuss the current landscape of Linux mobile devices and and how we can more effectively bring voice control to this platform. I argue that the data sovereignty goals of Linux Mobile devices align well with those of federated learning. I discuss not only why federated learning is theoretically useful on this platform, but also the technical challenges building alongside other tools in this nascent ecosystem. At the end of the paper, I discuss the implications of this work for the future of accessibility software.
 
 # Introduction
 
@@ -183,6 +186,13 @@ With regards to the technical goal of this architecture, it was intended to make
 # Implementation
 
 With this background in mind, I will now proceed to discuss the implementation of my software and the various challenges I overcame. As stated previously, I sought to create a minimum viable product for implementing a full federated learning ecosystem. Each part of this ecosystem has a decoupled architecture which will allow new innovations to add features to specific parts of the system without needing to change others.
+
+## Codebase Walkthrough
+
+All of the code base for this paper can be found at [https://github.com/C-Loftus/Princeton-Thesis/](https://github.com/C-Loftus/Princeton-Thesis/).This code base is set up as a monorepo. `doc` holds all documentation including the code used to generate this thesis from its markdown source. `server` holds the code for the central federated learning server and all code for aggregating weights or controlling the system from its web API. `client` holds all the code that a user needs in order to do local training and interact with the server. `frontend` holds the React frontend for the central federated learning server. Finally, `numen-modifications` holds any code related to linux mobile devices and scripts to interact with them through
+voice, or modifications to existing software like `numen`.
+
+To build and replicate any software in this repository, there is either a makefile, `package.json` , or `pyproject.toml` file in each directory. A `.pythonversion` file specifies the proper version of python to use (python 3.8.14) and it is recommended to use pyenv to control python versions to match and avoid any version errors.
 
 ## Federated Learning Implementation
 
@@ -417,27 +427,161 @@ While my model made from federated learning is not in the Vosk format, and is in
 
 ## Numen's Design Principles
 
-Despite the fact that Numen is a general purpose voice control program, it differs greatly from programs like Talon or Dragon.
+Despite the fact that Numen is a general purpose voice control program, it differs greatly from programs like Talon or Dragon. Numen does not have an associated scripting language, but rather can call existing scripts on the user's device. As a result, it requires a more technical understanding, yet at the same time is lighter weight and easier to run on a low specification device. It is important that we understand numen's design principles since it shows something about not just Numen but also the general ecosystem of Linux mobile devices. In order to bring new federated models and machine learning ecosystems to a new platform, we first need to understand the user goals and existing communities.
+
+These are some examples of numen phrase scripts. On the left is a word and on the right is either a list of keys or the path to a shell command. In front of the word, there can also be words with the @ character. This character signifies a meta property that effects how the model parses the word. For instance reducing response time, or canceling a previous command that was said in the same phrase. In the phrasing of talon, the left would be a capture with some sort of capture modifier, and the right would be a command.
+
+```
+#  Press the control key
+troll:mod ctrl
+# Delete One Word to the Left
+clear left:press ctrl+BackSpace
+# Navigate to the window in the given direction
+@rapidoff west:unstick press super+Left
+# Transcribe a sentence
+# For example, "scribe please type this".
+@transcribe say:set fmt echo normal\
+localpen printf %s\\n "$NUMEN_TRANSCRIPT" | /usr/libexec/numen/phrases/fmt "$fmt"
+```
+
+As you can see from the default commands, numen generally tends to be lower level and more imperative than declarative. There are some benefits to this. For instance, if a user already knows many keyboard shortcuts, they don't need to learn a list of new declarative commands ( as they can simply say the key names). This aligns with the ui principles we described previously, namely: [designing around discrete inputs](#design-around-discrete-instead-of-continuous-inputs) as well as [building upon existing interfaces](#build-upon-user-interfacesdont-create-new-ones).
+
+Despite the fact that these are good principles, sometimes it does go too low level. Additionally, the program does not support some of the key features seen in other programs like talon. For instance, there is no notion of modes that separate commands based on a specific use case, or context based commands that only activate with certain programs focused. One example of such a mode that is seen in many voice control programs is sleep mode: namely where the model doesn't do anything until a certain wake command is heard.
 
 https://sources.debian.org/src/sxmo-utils/1.12.0-6/configs/default_hooks/three_button_touchscreen/sxmo_hook_inputhandler.sh/
 
+## My Additions to Numen
+
+The first additions I made to the code base were convering
+
+With all these additions now summarized, I believe Talon users and others interested in voice controlled accessibility software have a strong foundation to build upon.
+
 # Evaluation
+
+Given the fact that this project had both a technical machine learning implementation and a theory for its user experience design , I will be discussing the evaluation in two main parts: namely, the quantitative and qualitative aspects.
+
+## Quantitative Evaluation
+
+In this project, I built upon an existing M5 model architecture and the SpeechCommands dataset. These models and datasets have already had evaluation done on them. [@https://doi.org/10.48550/arxiv.1610.00087] For those interested in the more fundamental quantitative aspects of the model evaluation, that existing paper already answers many of those questions. Yet in addition to the fundamental model baseline, I also made a series of changes in the architecture and training process. I will first describe the changes in the architecture and how they impact model performance.
+
+By default, implementations of the M5 model used `stride=16` and `n_channel=32.` In order to accommodate for the variable length of Talon audio data, I changed these numbers to stride=8 and `n_channel=64`. I halved the stride, and doubled the channels if Talon audio data is being used for training. Dividing the stride by 2 makes it so there is less pooling, and multiplying the channels by two will increase the number of filters learned by each convolutional layer.
+
+![The default model architecture.  This was changed to accommodate for `stride=8` and `n_channel=64`](assets/2023-02-22-17-14-11.png)`
+
+```python
+def __init__(self, n_input=1, n_output=35, stride=16, n_channel=32, useTalon=False):
+  if useTalon:
+      stride=8
+      n_channel=64
+
+  print(f"n_input: {n_input}, n_output: {n_output}, stride: {stride}, n_channel: {n_channel}")
+  self.conv1 = nn.Conv1d(n_input, n_channel, kernel_size=80, stride=stride)
+  self.bn1 = nn.BatchNorm1d(n_channel)
+  self.pool1 = nn.MaxPool1d(4)
+  self.conv2 = nn.Conv1d(n_channel, n_channel, kernel_size=3)
+  self.bn2 = nn.BatchNorm1d(n_channel)
+  self.pool2 = nn.MaxPool1d(4)
+  self.conv3 = nn.Conv1d(n_channel, 2 * n_channel, kernel_size=3)
+  self.bn3 = nn.BatchNorm1d(2 * n_channel)
+  self.pool3 = nn.MaxPool1d(4)
+  self.conv4 = nn.Conv1d(2 * n_channel, 2 * n_channel, kernel_size=3)
+  self.bn4 = nn.BatchNorm1d(2 * n_channel)
+  self.pool4 = nn.MaxPool1d(4)
+  self.fc1 = nn.Linear(2 * n_channel, n_output)
+```
+
+Because of the fact that Talon data is very specific and it would require a long term user study to carry out a large federated learning training process, we cannot directly compare differences in training loss and model performance. Despite this, we can infer some general principles.
+
+The baseline script to run a sample test can be found in the monorepo for this project at [client/scripts/test.client.sh](../client/scripts/test.client.sh). This script starts the server
+
+For instance,
+
+The next main difference in the machine learning aspect comes from weight aggregation. as we spoke of and [" our section on federated learning trading strategies"](#federated-learning-aggregation-strategies), after each client trains on their local data, the weights are then sent to the central server where they are aggregated. As a result, the final model will not be
+
+## Qualitative Evaluation
+
+In this section of the paper, I will be discussing a qualitative evaluation of my federated learning system and the software tools I built upon for Linux Mobile devices.
+
+As a result, I will focus on qualitative evaluation metrics that draw upon literature in the field of HCI. This is since throughout my software project, one of my primary goals was making federated learning broadly accessible and more easily implemented for grassroots organizations. HCI metrics can help to better understand
+
+There are many perspectives regarding HCI evaluation. MacDonald and Atwood argue that historically, HCI evaluation metrics developed from simpler quantitative metrics to more dynamic qualitative ones as computers became used by more diverse people. During the user performance and usability phase (Where computers began to become used by more general audiences), HCI metrics for tools like keyboards and mice "were speed ease of learning error rate accuracy and satisfaction." [@10.1145/2468356.2468714]. MacDonald and Atwood argue that now we have entered the user experience (UX) phase, where there are more dynamic design considerations then simply designing for the absence of pain.
+
+`A major challenge facing evaluators is the lack of a
+shared conceptual framework for UX, although several
+models have been proposed. For example, Hassenzahl
+[30] proposed a model in which products have
+pragmatic attributes (e.g., an ability to help users
+achieve behavioral goals) and hedonic attributes (e.g.,
+an ability to evoke feelings of pleasure, allow for self-
+expression, and provoke memories). Similarly, Norman
+[57] described three levels of “emotional design” that
+consist of visceral, behavioral, and reflective
+experiences
+`
 
 ##
 
 # Future Work
 
+In this paper, I hope to have shown not only a useful way to implement new methodologies of federated learning and voice accessibility software, but also the next steps for building upon these technologies. In this section of the paper I will elaborate more on the next steps and what needs to be done to not only advance this subject matter academically, but also achieve success for everyday users.
+
+## Connect flwr, vosk, npz, and kaldi
+
+Currently, most federated learning frameworks support general purpose machine learning libraries like PyTorch, Keras, and Tensorflow. However, as we saw earlier in the paper, this is not the case for higher level toolkits for training specialty models like speech recognition. As a result, there is a disconnect between these two ecosystems. In the future, if more work is done on uniting them, the model in this paper could perhaps be converted into the Vosk format. As we saw with new software like Numen, this format would allow it to be queried in a more flexible way for higher level software.
+
 ## User Studies
 
-In the future, it would be useful to extend this technical research by seeking out users with disabilities to participate in a user study.
+In the future, it would be useful to extend this technical research by seeking out users with disabilities to participate in a user study. We would use their sources of Talon data to train up larger and more accurate federated learning models.
 
-## Preventing Bad Actors
+While this would be a fruitful project, it is also important to clarify why such a project was out of the scope of this paper and thus will be a matter for future work.
 
-Throughout this paper, there was the general assumption that users in federated learning would not be trying to take advantage of the system by purposefully using mislabeled training data. In the case of voice controlled accessibility software, it can be assumed that this would probably be a relatively insignificant issue given the lack of incentive for hackers.
+- As a researcher it takes a significant amount of time and trust to convince people in vulnerable backgrounds do want to take part in an academic study
+  - Users need to be able to trust the federated learning system and the fact it will preserve their privacy. ( Talon records every single dictated phrase if the option to save recordings is turned on)
+- The community of Talon users generally has either significant health issues or permanent disabilities, and as such may not have the time or inclination to participate
+- Finally, The Talon community itself is not particularly large compare to other online communities ( For instance such as those in more general programming, online gaming, or digital art. All fields which can benefit from accessibility software, but would not be appropriate for this current study)
 
-Despite this, if attackers did such a thing and there is a small enough sample size, it would significantly decrease the performance of the model after the final aggregation.
+To summarize, user studies would absolutely be useful and worthwhile, but it is important to set expectations beforehand. Such a study would take at least multiple months to recruit, build rapport, and perform the actual study.
+
+## Preventing Bad Actors and User Mistakes
+
+Throughout this paper, there was the general assumption that users in federated learning would not be trying to take advantage of the system by purposefully using mislabeled training data or altering their training scripts. This is since in the case of voice controlled accessibility software, there is little incentive for hackers. There is no direct profit to be gained or information to be extracted.
+
+Despite this, if attackers did such a thing and there is a small enough sample size, it would significantly decrease the performance of the model after the final aggregation. However, this is still a topic worth pursuing further, especially if federated learning systems ever emerge at the national level as a way of aggregating data between hospitals. If this is the case, we would benefit from existing papers on preventing the impact of attackers in federated learning [@10.1145/3556557.3557951].
 
 # Conclusion
+
+## Summary
+
+In this paper, I hope to have surveyed the landscape, resolved issues and advanced research in three main areas: the general landscape of voice controlled accessibility software, an example way to leverage federated learning when training voice models for this task, and the future ecosystem of Linux Mobile devices that will benefit from these models.
+
+As we saw at the start of the paper , federated learning is a promising new way to solve machine learning problems in data restricted tasks like healthcare or accessibility software. Despite this, until now federated learning has often been abstracted away from users, only to be used in industrial contexts. Much of its potential for grassroots software communities has yet to be realized. Additionally, federation as a general software methodology has struggled in recent years with the growing centralization of the internet. Despite this, I suggest reasons why federated learning should make us optimistic given its practicality for many specialty machine learning tasks. For instance, Current accessibility software like Talon provides a convenient way for users who are already using voice controlled software to generate new datasets.
+
+The software project I created in this paper takes advantage of these user generated datasets as the backbone for a full stack federated learning ecosystem. This ecosystem includes a central server to control the federation process, clients to convert data and use it for training, and front ends to control it in an accessible way for users of all abilities. Throughout the software development process one of my main goals was helping to turn federated learning from a complex industrial algorithm, into a easily understood methodology for powering the future of grassroots data sharing and online organizations.
+
+Finally, in the last part of this paper I discussed the landscape of Linux Mobile Devices. New platforms like these are often the platforms that are in most need of accessibility software. Before we port our models onto these new platforms, I described some of the preliminary work that must be done beforehand. This includes a series of core accessibility design principles, as well as more specific characteristics of the current user interface options on Linux mobile devices.
+
+<!-- I will now summarize each section in more detail:
+
+## A General Overview of Voice Controlled Accessibility Software
+
+Talon, Dragon, LipSurf, and Numen all have unique approaches to providing hands free computer accessibility.
+
+<!-- prettier-ignore-start -->
+<!-- Software         Description   Pro                Con
+----             ----         -----------        -------
+Talon "General purpose voice control across platforms" -->
+
+<!-- prettier-ignore-end -->
+<!--
+| Software | left                      | Center |  Right |
+| -------- | :------------------------ | :----: | -----: | --- |
+| High     | Cat dfssssssssssssssssss1 |   A    | 100.00 |
+| High     | Cat 2                     |   B    |  85.50 |
+| Low      | Cat 3                     |   C    |  80.00 | --> | -->
+
+## General Takeaways
+
+As we have seen throughout this paper, when designing for healthcare and accessibility, the lines between quantitative and qualitative problems become blurred.
 
 # Acknowledgements
 

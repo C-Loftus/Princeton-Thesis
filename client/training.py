@@ -235,12 +235,12 @@ class FlowerClient(fl.client.NumPyClient):
         return loss, len(self.test_loader.dataset), {"accuracy": accuracy}
 
 
-def main_training():
+def main_training(useTalon=True):
 
     # global is fine since each client is a separate process and no state is updated
     # makes functions cleaner with fewer hyperparams to pass
     global tc
-    tc = TRAINING_CONFIG(useTalon=True)
+    tc = TRAINING_CONFIG(useTalon)
 
     print("Starting flower client")
     # Start Flower client
@@ -252,4 +252,12 @@ def main_training():
 
 
 if __name__ == "__main__":
-    main_training()
+
+    #  read the first argument in   
+    import sys
+    useTalon = False
+    if len(sys.argv) > 1:
+        useTalon = sys.argv[1] == "talon" or sys.argv[1] == "Talon" or sys.argv[1] == "-t" or sys.argv[1] == "--talon"
+    print(f'Training with {"talon" if useTalon else "out talon, and instead using the default speech commands dataset."}')
+
+    main_training(useTalon)
