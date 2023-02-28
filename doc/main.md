@@ -362,11 +362,22 @@ While much more could be said about both of these user interfaces, the fact is t
 
 SXMO, (Simple X Mobile), is the third major mobile Linux user interface. However, it takes a significantly different design approach regarding both the user experience and the underlying software that powers it.SXMO is designed to be minimalist in nature and closer to the unix philosophy of simple distinct minimal programs.SXMO is not built on either Gnome or KDE but rather a highly modified version of DWM .DWM is a dynamic tiling window manager Linux desktops. This means that it automatically fits new windows to a grid or workspace as they are spawned.Traditionally this software has been primarily used by Linux enthusiasts looking for a lightweight and hackable desktop. ( For instance, there is no config file. To make any custom changes you need to edit the source code itself.)
 
-![' An example of the interface with a menu opened.'](assets/2023-02-11-14-47-48.png)
-
 At first glance, this seems to be even worse in accessibility than both Plasma Mobile and Phosh. However this is not the case due to a series of modifications over DWM. SXMO, instead of prioritizing touch input, uses a series of context menus to navigate around the system. For instance, when you are in the terminal you can press the volume up key to launch a menu with the following options
 
-![](assets/2023-02-13-19-25-59.png)
+<!-- <div style="display: flex;" markdown="1">
+
+![An example of the interface with a menu opened.](assets/2023-02-11-14-47-48.png){width=50%}
+![An example of a menu for a specific application](assets/2023-02-13-19-25-59.png){width=50%}
+
+</div> -->
+
+<div style="display: flex;">
+![An example of the interface with a menu opened.](assets/2023-02-11-14-47-48.png){width=50%}
+</div>
+
+<div style="display: flex;">
+![An example of a menu for a specific application](assets/2023-02-13-19-25-59.png){width=50%}
+</div>
 
 - Copy
 - Paste
@@ -490,13 +501,33 @@ def __init__(self, n_input=1, n_output=35, stride=16, n_channel=32, useTalon=Fal
   self.fc1 = nn.Linear(2 * n_channel, n_output)
 ```
 
-Because of the fact that Talon data is very specific and it would require a long term user study to carry out a large federated learning training process, we cannot directly compare differences in training loss and model performance. Despite this, we can infer some general principles.
+Because of the fact that Talon data is very specific and it would require a long term user study to carry out a large federated learning training process, we cannot directly compare differences in training loss and model performance. Despite this, we can none the less conclude general principles by running tests and extrapolating the consequences.
 
-The baseline script to run a sample test can be found in the monorepo for this project at [client/scripts/test.client.sh](../client/scripts/test.client.sh). This script starts the server
+The baseline script to run a sample test can be found in the monorepo for this project at [client/scripts/test.client.sh](../client/scripts/test.client.sh). This script starts the server, and runs a sample federated learning experiment. The aggregated weights can be found in `server/round-${ROUND_NUM}-weights.npz` where `${ROUND_NUM}` represents one individual round of federated learning.
 
-For instance,
+I was then able to build upon this script to test the difference is between the Talon data in its associated architecture changes, verses the default model and the associated speech commands dataset. The script for this test can be found at `client/scripts/test.model.size.sh`. This script takes. the difference between the two implementations and compares the resulting models. It also compares the differences in the sizes of the two models.
 
-The next main difference in the machine learning aspect comes from weight aggregation. as we spoke of and [" our section on federated learning trading strategies"](#federated-learning-aggregation-strategies), after each client trains on their local data, the weights are then sent to the central server where they are aggregated. As a result, the final model will not be
+As a baseline, I first tested the model and federation with the SpeechCommands dataset. This is useful to simulate training with a cleaned dataset without missing values. When running the tests I spawned ten different clients with
+
+```
+for i in `seq 0 1 10`; do
+   echo "Starting client $i"
+   sleep 1
+   ../.venv/bin/python ../training.py $args &
+done
+```
+
+After completing training with a batch_size of 256 and 2 epochs, I was left with a model with 71% accuracy on the test data. This initially was a bit surprising given the initial accuracy rates listed in the paper describing the model. For instance, they write "The test accuracy improves with increasing network depth for M5, M11, and M18. Our best model M18 reaches 71.68% accuracy that is competitive with the reported test accuracy of CNNs on spectrogram input using the same dataset. The performance increases cannot be simply attributed to the larger number of parameters in the deep models. For example, M5-big has 2.2M parameters but only achieves 63.30% accuracy, compared with the 69.07% by M11 (1.8M parameters)" [@https://doi.org/10.48550/arxiv.1610.00087]
+This increase in performance is likely due to the fact that we have ten clients and by default are using the aggregation algorithm `FedAvgM` which uses a momentum term to help the algorithm converge to a better solution. Thus it is to be expected that we would have better performance, given our aggregation of many different trials. Yet at the same time, it is important to know that we are potentially at risk for overfitting given the fact we have high homogeneity within the training data. ( The speech of a given speaker may be present in multiple clients, whereas with talon data everyone will have their own distinct voice transcriptions).
+At the end of training, we were left with a model of size 0.405581 megabytes when serialized in the numpy npz weight format. This relatively small size is to be expected, given the fact that the model architecture is meant to be used on embedded devices.
+
+Now that we have a baseline, the next part of the quantitative evaluation was to evaluate a federated learning training cycle with Talon data exclusively. The first part was to simulate how long it would take for a user to generate a high quality dataset.I did this by using talon for at least three hours of computer work every day for a week. At the end of this week I ran my audio dataset generation script: `client/scripts/parse_talon.py`. 
+
+
+
+The next main difference in the machine learning aspect comes from weight aggregation. By default, the M5 model was not designed with federation in mind and thus was not evaluated with a federated learning aggregation algorithm.
+
+As we spoke of in [our section on federated learning trading strategies](#federated-learning-aggregation-strategies), after each client trains on their local data, the weights are then sent to the central server where they are aggregated. In [that section on strategies](#federated-learning-aggregation-strategies), we described how our default algorithm is `FedAvgM`. As result, even though the user has many options for aggregation, we will prioritize evaluating this one.
 
 ## Qualitative Evaluation
 
@@ -525,13 +556,15 @@ experiences
 
 In this paper, I hope to have shown not only a useful way to implement new methodologies of federated learning and voice accessibility software, but also the next steps for building upon these technologies. In this section of the paper I will elaborate more on the next steps and what needs to be done to not only advance this subject matter academically, but also achieve success for everyday users.
 
-## Connect flwr, vosk, npz, and kaldi
+## Connect `flwr` to more ML Libraries
 
-Currently, most federated learning frameworks support general purpose machine learning libraries like PyTorch, Keras, and Tensorflow. However, as we saw earlier in the paper, this is not the case for higher level toolkits for training specialty models like speech recognition. As a result, there is a disconnect between these two ecosystems. In the future, if more work is done on uniting them, the model in this paper could perhaps be converted into the Vosk format. As we saw with new software like Numen, this format would allow it to be queried in a more flexible way for higher level software.
+Currently, `flwr` and most other federated learning frameworks primarily support general purpose machine learning libraries like PyTorch, Keras, and Tensorflow. However, as we saw earlier in the paper, `flwr`'s output format, `.npz` weights,don't directly map to higher level toolkits for training specialty models like speech recognition. As a result, there is more work to be done to bridge between these two ecosystems. In the future, if more work is done on uniting them, the model in this paper could be converted into the Vosk format, and perhaps be used as a alternative backend for existing accessibility software.
 
 ## User Studies
 
 In the future, it would be useful to extend this technical research by seeking out users with disabilities to participate in a user study. We would use their sources of Talon data to train up larger and more accurate federated learning models.
+
+To be able to run more local tests and evaluate the model with larger datasets, it could also be useful to simply collect more raw Talon audio data. This would obviously not be in a federated manner, but would be done in such a way to test and prepare for larger federated learning projects. If we want to run many different test iterations,that may not be practical, even if we get users to train locally on their own devices. During the prototyping process, local centralized to data is still undoubtedly useful
 
 While this would be a fruitful project, it is also important to clarify why such a project was out of the scope of this paper and thus will be a matter for future work.
 
@@ -546,7 +579,11 @@ To summarize, user studies would absolutely be useful and worthwhile, but it is 
 
 Throughout this paper, there was the general assumption that users in federated learning would not be trying to take advantage of the system by purposefully using mislabeled training data or altering their training scripts. This is since in the case of voice controlled accessibility software, there is little incentive for hackers. There is no direct profit to be gained or information to be extracted.
 
-Despite this, if attackers did such a thing and there is a small enough sample size, it would significantly decrease the performance of the model after the final aggregation. However, this is still a topic worth pursuing further, especially if federated learning systems ever emerge at the national level as a way of aggregating data between hospitals. If this is the case, we would benefit from existing papers on preventing the impact of attackers in federated learning [@10.1145/3556557.3557951].
+Despite this, if attackers did such a thing and there is a small enough sample size, it would significantly decrease the performance of the model after the final aggregation. However, this is still a topic worth pursuing further, especially if federated learning systems ever emerge at the national level for related healthcare tasks. For instance, training models across hospitals.
+
+If this is the case, we would benefit from existing papers on preventing the impact of attackers in federated learning [@10.1145/3556557.3557951].
+
+## Work Towards Standardization
 
 # Conclusion
 
@@ -554,11 +591,11 @@ Despite this, if attackers did such a thing and there is a small enough sample s
 
 In this paper, I hope to have surveyed the landscape, resolved issues and advanced research in three main areas: the general landscape of voice controlled accessibility software, an example way to leverage federated learning when training voice models for this task, and the future ecosystem of Linux Mobile devices that will benefit from these models.
 
-As we saw at the start of the paper , federated learning is a promising new way to solve machine learning problems in data restricted tasks like healthcare or accessibility software. Despite this, until now federated learning has often been abstracted away from users, only to be used in industrial contexts. Much of its potential for grassroots software communities has yet to be realized. Additionally, federation as a general software methodology has struggled in recent years with the growing centralization of the internet. Despite this, I suggest reasons why federated learning should make us optimistic given its practicality for many specialty machine learning tasks. For instance, Current accessibility software like Talon provides a convenient way for users who are already using voice controlled software to generate new datasets.
+As we saw at the start of the paper , federated learning is a promising new way to solve machine learning problems in data restricted tasks like healthcare or accessibility software. Despite this, until now federated learning has often been abstracted away from users, only to be used in industrial contexts. Much of its potential for grassroots software communities has yet to be realized. Additionally, federation as a general software methodology has struggled in recent years with the growing centralization of the internet. Despite this, I suggest reasons why federated learning should make us optimistic given its practicality for many specialty machine learning tasks. For instance, current accessibility software like Talon provides a convenient way for users who are already using voice controlled software to generate new datasets. Federated learning provides a unique solution to this problem and sharing sensitive voice transcription data can prove particularly difficult to ensure privacy otherwise.
 
-The software project I created in this paper takes advantage of these user generated datasets as the backbone for a full stack federated learning ecosystem. This ecosystem includes a central server to control the federation process, clients to convert data and use it for training, and front ends to control it in an accessible way for users of all abilities. Throughout the software development process one of my main goals was helping to turn federated learning from a complex industrial algorithm, into a easily understood methodology for powering the future of grassroots data sharing and online organizations.
+The software project I created in this paper takes advantage of these user generated datasets as the backbone for a full stack federated learning ecosystem. This ecosystem includes a central server to control the federation process, clients to convert data and use it for training, and front ends to control it in an accessible way for users of all abilities. Throughout the software development process, one of my main goals was helping to turn federated learning from a complex industrial algorithm, into a easily understood methodology for powering the future of grassroots data sharing and online organizations.
 
-Finally, in the last part of this paper I discussed the landscape of Linux Mobile Devices. New platforms like these are often the platforms that are in most need of accessibility software. Before we port our models onto these new platforms, I described some of the preliminary work that must be done beforehand. This includes a series of core accessibility design principles, as well as more specific characteristics of the current user interface options on Linux mobile devices.
+Finally, in the last part of this paper I discussed the landscape of Linux Mobile Devices. New platforms like these are often the platforms that are in most need of accessibility software. Numen is one example of a voice control program on this platform, but it is still relatively new and lacking in some features. Before we port our models onto these new platforms, I described some of the preliminary work that must be done beforehand. This includes a series of core accessibility design principles, as well as more specific characteristics of the current user interface options on Linux mobile devices.
 
 <!-- I will now summarize each section in more detail:
 
@@ -577,11 +614,13 @@ Talon "General purpose voice control across platforms" -->
 | -------- | :------------------------ | :----: | -----: | --- |
 | High     | Cat dfssssssssssssssssss1 |   A    | 100.00 |
 | High     | Cat 2                     |   B    |  85.50 |
-| Low      | Cat 3                     |   C    |  80.00 | --> | -->
+| Low      | Cat 3                     |   C    |  80.00 | -->
 
 ## General Takeaways
 
-As we have seen throughout this paper, when designing for healthcare and accessibility, the lines between quantitative and qualitative problems become blurred.
+As we have seen throughout this paper, when designing machine learning systems for healthcare or accessibility, the lines between quantitative and qualitative problems become blurred. On one hand we need efficient training algorithms and well tested model architectures to power our voice controlled accessibility software. Yet at the same time, as we have shown in our discussion of existing industrial federated learning implementations, these properties do nothing to reduce the complexity or usability for the end user.
+
+Additionally, as we have seen in the case of Linux mobile devices, before a model can be used effectively, it needs to have an existing accessible UI. A voice controlled accessibility program is only as useful as the underlying software it attempts to control.
 
 # Acknowledgements
 

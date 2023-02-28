@@ -1,4 +1,4 @@
-# This file contains code from the link below that has been forked,changed and extended. 
+# This file contains code from the link below that has been forked,changed and extended.
 #  All referenced code is use under a BSD License
 # https://github.com/pytorch/tutorials/blob/master/intermediate_source/speech_command_classification_with_torchaudio_tutorial.py
 
@@ -11,11 +11,13 @@ import torch.nn.functional as F
 class M5(nn.Module):
     def __init__(self, n_input=1, n_output=35, stride=16, n_channel=32, useTalon=False):
         if useTalon:
-            stride=8
-            n_channel=64
+            stride = 8
+            n_channel = 64
 
         super().__init__()
-        print(f"n_input: {n_input}, n_output: {n_output}, stride: {stride}, n_channel: {n_channel}")
+        print(
+            f"n_input: {n_input}, n_output: {n_output}, stride: {stride}, n_channel: {n_channel}"
+        )
         self.conv1 = nn.Conv1d(n_input, n_channel, kernel_size=80, stride=stride)
         self.bn1 = nn.BatchNorm1d(n_channel)
         self.pool1 = nn.MaxPool1d(4)
@@ -28,7 +30,7 @@ class M5(nn.Module):
         self.conv4 = nn.Conv1d(2 * n_channel, 2 * n_channel, kernel_size=3)
         self.bn4 = nn.BatchNorm1d(2 * n_channel)
         self.pool4 = nn.MaxPool1d(4)
-        self.fc1 = nn.Linear(2 * n_channel, n_output) 
+        self.fc1 = nn.Linear(2 * n_channel, n_output)
 
     def forward(self, x):
         x = self.conv1(x)
@@ -49,7 +51,7 @@ class M5(nn.Module):
         return F.log_softmax(x, dim=2)
 
     # def forward(self, x):
-    #     # Do the same thing as above but  print the output shape at each layer            
+    #     # Do the same thing as above but  print the output shape at each layer
     #     print(f"input shape: {x.shape}")
     #     x = self.conv1(x)
     #     print(f"conv1 shape: {x.shape}")
@@ -85,27 +87,34 @@ class M5(nn.Module):
 
 
 class SubsetSC(SPEECHCOMMANDS):
-    def __init__(self, subset: str = None, downloadDataset: bool = True, useTalon: bool = False):
+    def __init__(
+        self, subset: str = None, downloadDataset: bool = True, useTalon: bool = False
+    ):
         root_dir = os.path.join(os.path.dirname(os.path.realpath(__file__)), "data")
-        super().__init__(root_dir, download= downloadDataset)
+        super().__init__(root_dir, download=downloadDataset)
 
         def load_list(filename):
             if useTalon:
                 # generate relative path from string
-                filepath = os.path.join(os.path.dirname(os.path.realpath(__file__)), "data")
+                filepath = os.path.join(
+                    os.path.dirname(os.path.realpath(__file__)), "data"
+                )
                 filepath = os.path.join(filepath, "talon-conversion")
                 filepath = os.path.join(filepath, filename)
 
             else:
                 filepath = os.path.join(self._path, filename)
             with open(filepath) as fileobj:
-                return [os.path.normpath(os.path.join(self._path, line.strip())) for line in fileobj]
+                return [
+                    os.path.normpath(os.path.join(self._path, line.strip()))
+                    for line in fileobj
+                ]
 
         if subset == "validation":
             self._walker = load_list("validation_list.txt")
         elif subset == "testing":
             self._walker = load_list("testing_list.txt")
-         # the speech commands data set does not have an explicit training list
+        # the speech commands data set does not have an explicit training list
         elif subset == "training" and not useTalon:
             excludes = load_list("validation_list.txt") + load_list("testing_list.txt")
             excludes = set(excludes)
@@ -114,7 +123,9 @@ class SubsetSC(SPEECHCOMMANDS):
         elif subset == "training" and useTalon:
             self._walker = load_list("training_list.txt")
 
+
 if __name__ == "__main__":
-     # print the full path of this script
+    # print the full path of this script
+
     print(os.path.realpath(__file__))
     sc = SubsetSC(subset="training", downloadDataset=False, useTalon=True)
