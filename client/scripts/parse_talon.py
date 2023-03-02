@@ -1,24 +1,39 @@
-import os, random
+import os, random, datetime
 import concurrent.futures
 import requests,sys
 import subprocess, random
-
+import matplotlib.pyplot as plt
+import numpy as np
+ 
 RECORDING_PATH = os.path.expanduser("~/.talon/recordings")
 SCRIPT_PATH = os.path.dirname(os.path.realpath(__file__))
-data_dir = os.path.join(SCRIPT_PATH, "../data")
-
-OUTPUT_PATH = os.path.join(SCRIPT_PATH, data_dir, "talon-conversion")
-hostname = os.uname()[1]
-USER_ID = hash(hostname)  % 10000
+DATA_DIR = os.path.join(SCRIPT_PATH, "../data")
+HOSTNAME = os.uname()[1]
+OUTPUT_PATH = os.path.join(SCRIPT_PATH, DATA_DIR, "talon-conversion")
+USER_ID = hash(HOSTNAME)  % 10000
 MIN_NUM_SAMPLES = 4
+REMOTE_SERVER = "http://localhost:5000"
 
 parseCmd = lambda filename: filename.split("-")[0]
+
+def plot_data_collection(data):
+ 
+    x_values = list(data.keys())
+    y_values = list(data.values())
+    #  plot all the data and do a line of best fit
+    plt.plot(x_values, y_values, 'o', color='black')
+    z = np.polyfit(x_values, y_values, 1)
+    p = np.poly1d(z)
+    plt.plot(x_values,p(x_values),"r--")
+
+    plt.savefig(os.path.join(SCRIPT_PATH, "../../doc/assets/talon_collection.png"))
+
 
 def validForTraining(filename, cmd) -> bool:
 
     # Send a web request to the server to get the list of commands
 
-    result= requests.get("http://localhost:5000/commands")
+    result= requests.get(REMOTE_SERVER + "/commands")
     try:
         training_commands = result.json()['detail']
     except Exception as e:
@@ -47,6 +62,7 @@ def parse():
     commands = []
     timesSaid = {}
 
+    collection_pattern = {}
 
     for filename in os.listdir(RECORDING_PATH):
 
@@ -57,7 +73,9 @@ def parse():
             timesSaid[cmd] = timesSaid.get(cmd, -1) + 1
         
             command_path = makeCmdDir(cmd)
-            # 
+    
+            file_creation_date = datetime.datetime.fromtimestamp(os.path.getctime(os.path.join(RECORDING_PATH, filename)))
+            collection_pattern[file_creation_date] = collection_pattern.get(file_creation_date, 0) + 1
 
             output_name = f'{USER_ID}_nohash_{timesSaid[cmd]}.wav'
 
@@ -107,6 +125,8 @@ def parse():
             for filename in test_filenames:
                 f.write(f'{filename}\n')
         print(commands[-1])
+
+        plot_data_collection(collection_pattern)
 
 
 if __name__ == "__main__":

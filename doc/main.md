@@ -300,13 +300,16 @@ Now that we have described the entire backend and machine learning implementatio
 
 The front end for this project was implemented using React
 
+![The web interface as it appears before training.  Note the small "hats" over each web element which allow for voice based interaction without the keyboard.](assets/frontend.png)
+
+
 ## Packaging and Distribution
 
 As stated previously the goal of this project is not only to implement a full stack federated learning application from a technical standpoint, but also do it in such a way that is intuitive and user friendly. One of the core challenges confederated learning can also be viewed from a DevOps perspective: namely, packaging and distributing machine learning code to users with many different environments.
 
 One of the advantages of building for Linux devices is that there are already multiple options for packaging and software distribution. I had a few main goals when distributing my software. While machine learning dependencies are often very large,
 
-## HCI and UX
+## Qualitative Design Choices and Accessibility
 
 As stated in the [introduction](#introduction), one of the main goals of this project was to implement federated learning in a way that would be accessible for users of all backgrounds. It wasn't enough to simply make federated learning more transparent and user friendly. It also had to be done in a way that supported users that rely upon assistive technology.
 
@@ -521,9 +524,7 @@ After completing training with a batch_size of 256 and 2 epochs, I was left with
 This increase in performance is likely due to the fact that we have ten clients and by default are using the aggregation algorithm `FedAvgM` which uses a momentum term to help the algorithm converge to a better solution. Thus it is to be expected that we would have better performance, given our aggregation of many different trials. Yet at the same time, it is important to know that we are potentially at risk for overfitting given the fact we have high homogeneity within the training data. ( The speech of a given speaker may be present in multiple clients, whereas with talon data everyone will have their own distinct voice transcriptions).
 At the end of training, we were left with a model of size 0.405581 megabytes when serialized in the numpy npz weight format. This relatively small size is to be expected, given the fact that the model architecture is meant to be used on embedded devices.
 
-Now that we have a baseline, the next part of the quantitative evaluation was to evaluate a federated learning training cycle with Talon data exclusively. The first part was to simulate how long it would take for a user to generate a high quality dataset.I did this by using talon for at least three hours of computer work every day for a week. At the end of this week I ran my audio dataset generation script: `client/scripts/parse_talon.py`. 
-
-
+Now that we have a baseline, the next part of the quantitative evaluation was to evaluate a federated learning training cycle with Talon data exclusively. The first part was to simulate how long it would take for a user to generate a high quality dataset.I did this by using talon for at least three hours of computer work every day for a week. At the end of this week I ran my audio dataset generation script: `client/scripts/parse_talon.py`.
 
 The next main difference in the machine learning aspect comes from weight aggregation. By default, the M5 model was not designed with federation in mind and thus was not evaluated with a federated learning aggregation algorithm.
 
@@ -531,10 +532,9 @@ As we spoke of in [our section on federated learning trading strategies](#federa
 
 ## Qualitative Evaluation
 
-In this section of the paper, I will be discussing a qualitative evaluation of my federated learning system and the software tools I built upon for Linux Mobile devices.
+In this section of the paper, I will be discussing a qualitative evaluation of my federated learning system and the related software I built to implement it. As stated previously, one of my central goals in the project was to turn a sophisticated machine learning technology into a more intuitive and less opaque tool for grassroots communities. As such in order to evaluate my design goals, I can use a series of evaluation metrics taken from the field of human-computer-interaction (HCI).
 
-As a result, I will focus on qualitative evaluation metrics that draw upon literature in the field of HCI. This is since throughout my software project, one of my primary goals was making federated learning broadly accessible and more easily implemented for grassroots organizations. HCI metrics can help to better understand
-
+ Before I discuss my project itself, it is useful to give a brief background regarding HCI evaluation more generally.
 There are many perspectives regarding HCI evaluation. MacDonald and Atwood argue that historically, HCI evaluation metrics developed from simpler quantitative metrics to more dynamic qualitative ones as computers became used by more diverse people. During the user performance and usability phase (Where computers began to become used by more general audiences), HCI metrics for tools like keyboards and mice "were speed ease of learning error rate accuracy and satisfaction." [@10.1145/2468356.2468714]. MacDonald and Atwood argue that now we have entered the user experience (UX) phase, where there are more dynamic design considerations then simply designing for the absence of pain.
 
 `A major challenge facing evaluators is the lack of a
@@ -625,3 +625,11 @@ Additionally, as we have seen in the case of Linux mobile devices, before a mode
 # Acknowledgements
 
 I would like to thank my advisor, Professor Kyle Jamieson at Princeton University for his advice and insight throughout the research process.
+
+Any existing code adapted for this project was fairly used in accordance with the terms of the Apache, GPL, or MIT licenses. Relevant licensing information is at the top of the corresponding file. When implementing the technical algorithms and general structure of this monorepo, I used adapted and modified code and structure from
+
+[https://pytorch.org/tutorials/intermediate/speech_command_recognition_with_torchaudio.html](https://testdriven.io/blog/fastapi-react/)
+
+[https://flower.dev/docs/quickstart-pytorch.html](https://testdriven.io/blog/fastapi-react/)
+
+[https://testdriven.io/blog/fastapi-react/](https://testdriven.io/blog/fastapi-react/)

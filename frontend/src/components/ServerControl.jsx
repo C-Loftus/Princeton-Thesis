@@ -67,7 +67,7 @@ export default function ServerForm(props) {
             aria-invalid={errors.strategy ? "true" : "false"}
           >
             <option value="FedAvg">FedAvg</option>
-            <option value="FedAvgM">FedAvgM</option>
+            <option value="FedAvgM">Fast Convergence: FedAvgM</option>
             <option value="QFedAvg">QFedAvg</option>
             <option value="FaultTolerantFedAvg">FaultTolerantFedAvg</option>
             <option value="FedOpt">FedOpt</option>
@@ -94,7 +94,7 @@ export default function ServerForm(props) {
       <Input
         type="submit"
         onClick={onToggle}
-        value={`Turn the Federate Learning Server ${isRunning ? "off" : "on"}`}
+        value={`Turn the Federated Learning Server ${isRunning ? "off" : "on"}`}
       />
     </form>
   );
