@@ -1,13 +1,14 @@
 import threading
 import PySimpleGUIWeb as sg
 from training import main_training
-import requests
+from scripts.parse_talon import parse
+import requests,os 
 from contextlib import redirect_stdout
-import io
 
-sg.theme('DarkAmber')
 import shelve
+sg.theme('DarkAmber')
 IP="http://localhost:8080"
+RECORDING_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data/talon-conversion")
 
 
 global db
@@ -15,11 +16,31 @@ db = shelve.open("client.db")
 db["url"] = "None" if "url" not in db else db["url"]
 db["training"] = False
 
+def valid_talon_data():
+
+    def directory_exists():
+        os.path.exists(RECORDING_PATH) and os.path.isdir(RECORDING_PATH)
+
+    def has_training_data():
+        for root, dirs, files in os.walk(RECORDING_PATH):
+            for file in files:
+                if file.endswith(".wav"):
+                    return True
+        return False
+
+    def has_split_lists():
+        # Check that training_list.txt exists   
+        return os.path.exists(os.path.join(RECORDING_PATH, "training_list.txt")) and \
+            os.path.exists(os.path.join(RECORDING_PATH, "validation_list.txt")) and \
+            os.path.exists(os.path.join(RECORDING_PATH, "testing_list.txt"))
+    
+    return directory_exists() and has_training_data() and has_split_lists()
+
 
 def training_manager(window):
     window["-RESPONSE-"].update("Starting the training process. This will take a while...")
     db["training"] = True
-    main_training()
+    main_training(useTalon=valid_talon_data())
     db["training"] = False
     window["-RESPONSE-"].update("Finished training process")
 
@@ -30,14 +51,16 @@ def create_ui():
             [sg.Text(f'Saved Server URL: {db["url"] if "url" in db else "None"}', key="-URL-")],
             [sg.Text("Update Server URL:"), sg.Input(), sg.Button("Update", key="-UPDATE-")], 
             [sg.Button("Ping Server", key="-STATUS-")],
-            [sg.Button("Start Federated Training Process", key="-START-")],
-            [sg.Button("Stop Federation Training Process", key="-STOP-")],
+            [sg.Button("Start Federated Training on Your Data", key="-START-")],
             [sg.Button("Convert Talon Data", key="-CONVERT-")],
             [sg.Text("Response:", size=(15, 1)), sg.Multiline(size=(40, 10), key="-RESPONSE-")]]
 
     window = sg.Window("Connection", layout)
 
     while True:
+        if db["training"]:
+            window["-START-"].update("Stop Federated Training Process")
+
         event, values = window.read()
 
         if event and db["training"]:
@@ -63,12 +86,26 @@ def create_ui():
             finally:
                 window["-RESPONSE-"].update(msg)
 
-        elif event == "-START-":
+        elif event == "-START-" and db["training"] == False:
             try:
                 handle = threading.Thread(target=training_manager, args=(window,))
                 handle.start()
+                msg = f'Running training process on {db["url"]} {"without" if not valid_talon_data() else "with"} Talon data'
             except Exception as e:
                 window["-RESPONSE-"].update(str(e))
+        elif event == "-START-" and db["training"] == True:
+            window["-RESPONSE-"].update("Training in progress. Please wait until it is finished.")
+
+        elif event == "-CONVERT-":
+            try:
+                with open("convert.log", "w") as f:
+                    with redirect_stdout(f):
+                        window["-RESPONSE-"].update("Converting Talon data. This may take a while and use a lot of resources...")
+                        parse()
+                window["-RESPONSE-"].update("Successfully converted Talon data")
+            except Exception as e:
+                window["-RESPONSE-"].update(str(e))
+
 
     window.close()
 

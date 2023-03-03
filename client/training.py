@@ -1,14 +1,12 @@
 # This file contains code from the link below that has been forked,changed and extended.
-#  All referenced code is use under a BSD License
+#  All referenced code is used fairly under a BSD License
 # https://github.com/pytorch/tutorials/blob/master/intermediate_source/speech_command_classification_with_torchaudio_tutorial.py
-
 
 import torch
 import torch.nn.functional as F
 import torch.optim as optim
 import torchaudio
-from torch import Tensor
-from collections import OrderedDict, defaultdict
+from collections import OrderedDict
 import flwr as fl
 from architecture import SubsetSC, M5
 
@@ -152,6 +150,7 @@ def train(model, epoch, log_interval):
         try:
             loss = F.nll_loss(output.squeeze(), target)
         except:
+            #  we need this try except block to manage restoring a model from a checkpoint
             try:
                 if output.shape != target.shape:
                     target = target.expand(output.shape)
@@ -191,6 +190,8 @@ def test(model, epoch):
     print(
         f"\nTest Epoch: {epoch}\tAccuracy: {correct}/{len(tc.test_loader.dataset)} ({100. * correct / len(tc.test_loader.dataset):.0f}%)\n"
     )
+    #  special case for when we are restoring a model that was partially trained
+    #  and has no losses recorded
     if len(tc.losses) == 0:
         loss = float(sum(tc.losses)) 
     else:
@@ -216,7 +217,7 @@ class FlowerClient(fl.client.NumPyClient):
         self.train_loader = train_loader
         self.test_loader = test_loader
 
-    def get_parameters(self, config):
+    def get_parameters(self):
         return [val.cpu().numpy() for _, val in self.net.state_dict().items()]
 
     def set_parameters(self, parameters):
@@ -224,12 +225,12 @@ class FlowerClient(fl.client.NumPyClient):
         state_dict = OrderedDict({k: torch.tensor(v) for k, v in params_dict})
         self.net.load_state_dict(state_dict, strict=True)
 
-    def fit(self, parameters, config):
+    def fit(self, parameters):
         self.set_parameters(parameters)
         train(self.net, 1, 100)
         return self.get_parameters(config={}), len(self.train_loader.dataset), {}
 
-    def evaluate(self, parameters, config):
+    def evaluate(self, parameters):
         self.set_parameters(parameters)
         loss, accuracy = test(self.net, self.test_loader)
         return loss, len(self.test_loader.dataset), {"accuracy": accuracy}
@@ -238,7 +239,7 @@ class FlowerClient(fl.client.NumPyClient):
 def main_training(useTalon=True):
 
     # global is fine since each client is a separate process and no state is updated
-    # makes functions cleaner with fewer hyperparams to pass
+    # this training config makes functions cleaner with fewer hyperparams to pass
     global tc
     tc = TRAINING_CONFIG(useTalon)
 

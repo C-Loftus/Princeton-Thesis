@@ -49,7 +49,7 @@ Essentially what this means is that the server never sees the data, and thus, it
 
 Currently within industry, federated learning has been successful particularly with mobile computing like smartphones or IoT devices. Companies like Google and Apple have been able to leverage federated learning to train models on datasets like keyboard data that would be otherwise sensitive to train on. Datasets like these have allowed for useful predictive typing models that are personalized to the individual user. However, as of right now, federated learning is still an emerging research area and usually is abstracted away from end-users.
 
-## accessibility Application
+## Relation to the Field of Computer Accessibility
 
 While there are many domains that will benefit from this paradigm of data sharing, one of the most promising and the focus of this paper is voice controlled accessibility software. This software allows users without the use of their hands to control their computer without typing or using the mouse. For this type of software, it often relies upon huge voice datasets. While these models have good performance in general use, users may want to fine-tune them for specific applications that would otherwise not be contained in a general-purpose dataset. For instance, Mozilla's Common Voice \footnote{\url{https://commonvoice.mozilla.org/en}} is a great data set for general voice recognition, but may not be enough to support user with a particular accent, speech impediment, job specific technical vocabulary.
 
@@ -296,18 +296,38 @@ With regards to technical features, the wrapper over `flwr` is relatively simple
 
 ## Webserver and Client Frontends
 
-Now that we have described the entire backend and machine learning implementation, it is useful to describe the front ends that control it. Once again, when creating different front end technologies, there was not only the question of feature richness and visual design,
+Now that we have described the entire backend and machine learning implementation, it is useful to describe the front ends that control it. Once again, when creating different front end technologies, there was not only the question of feature richness and software efficiency, but also the question of how to communicate a complicated machine learning technique to a general audience.
 
-The front end for this project was implemented using React
+Much has been written regarding how to make machine learning more intuitive for general audiences. [@10.1145/3334480.3375051] [@10.1145/3173574.3173704] However, much of this literature does not generalize to federated learning where average users are expected to invest a larger part in the process, and in doing so gain greater data autonomy and privacy. We need to emphasize these distinctions in data sharing and user expectations in order to get the best user outcomes and final models.
 
+Thus, I had a few fundamental goals when designing my interfaces
+
+- **Clearly specify when federated learning is taking place.**
+- **Include technical terminology but do not rely upon it**
+- **Design with the understanding that machine learning training is inherently error prone**
+
+In a traditional machine learning application we often don't need to worry about what information is coming from machine learning models, verses traditional imperative algorithms. For instance, it makes little difference to a user on a shopping website whether the recommendations are coming from linear regression, a neural net, or an internal database. All major computation will be happening on the backend. This is obviously not the case in federated learning, and training takes up a significant amount of user resources for a significant amount of time. This is especially the case with large data like audio or video.
+
+As such, federated learning is a technique that should not be abstracted away fully, even for relatively novice users. Otherwise, they may assume something to be wrong when their device's resource usage becomes abnormally high. Examples of this can be seen in screenshots of my user interfaces, both for the web server and for the individual clients. In both of these images, there's a clear distinction when training is occurring. I also make sure to explicitly use terminology like the client server distinction, and explicitly refer to the technique of federated learning by name.
+
+## Server Interface
+
+The frontend for the central server was implemented using React as this framework has preexisting tools for accessible user interface design. The library I used for this was Chakra UI. In a centralized machine learning paradigm, usually central server has to have a complicated control panel for managing the training process. However, in federated learning since training is occurring on client devices,the server knows relatively little about the process until the finalized weights are sent to be aggregated centrally. As such, the central front end does not need sophisticated functionality. The most important info is that which is provided to the client through the underlying web server, not the administrator through the graphical interface.
 ![The web interface as it appears before training.  Note the small "hats" over each web element which allow for voice based interaction without the keyboard.](assets/frontend.png)
 
+## Client Interface
+
+In this second image you can see the client interface. Once again, I sought to make it simple yet not overly abstracted. The conversion of talon data gets its own button because it is highly resource intensive for large datasets. We do not want to implicitly do this without the user explicitly asking for it. Additionally, federated learning has its own button and is explicitly called by its name. Importantly, all other log information is passed through a response textbox to the user. This allows the central server to send custom messages and the user to easily see any training errors without needing to go into a terminal. This is important since machine learning training can often have dependency issues that require the technical logs to resolve.
+
+![The client interface as it appears before training. It shows info regarding the conversion of Talon data and the status of the server regarding the time left in training.](assets/client.png)
+
+Both of these interfaces use simple high contrast visual styles in single page applications. Importantly, all state is stored in a local `shelve` Python database (this is a simple database module built into the Python standard library). This makes it so the federated learning process will not be disrupted if the user interface is refreshed.
+
+Finally, as mentioned in our section regarding [HCI and Design Work](#hci-and-design-work), both of these user interfaces used the browser. By building them on this platform, we can use cross platform accessibility extensions like
 
 ## Packaging and Distribution
 
 As stated previously the goal of this project is not only to implement a full stack federated learning application from a technical standpoint, but also do it in such a way that is intuitive and user friendly. One of the core challenges confederated learning can also be viewed from a DevOps perspective: namely, packaging and distributing machine learning code to users with many different environments.
-
-One of the advantages of building for Linux devices is that there are already multiple options for packaging and software distribution. I had a few main goals when distributing my software. While machine learning dependencies are often very large,
 
 ## Qualitative Design Choices and Accessibility
 
@@ -534,7 +554,7 @@ As we spoke of in [our section on federated learning trading strategies](#federa
 
 In this section of the paper, I will be discussing a qualitative evaluation of my federated learning system and the related software I built to implement it. As stated previously, one of my central goals in the project was to turn a sophisticated machine learning technology into a more intuitive and less opaque tool for grassroots communities. As such in order to evaluate my design goals, I can use a series of evaluation metrics taken from the field of human-computer-interaction (HCI).
 
- Before I discuss my project itself, it is useful to give a brief background regarding HCI evaluation more generally.
+Before I discuss my project itself, it is useful to give a brief background regarding HCI evaluation more generally.
 There are many perspectives regarding HCI evaluation. MacDonald and Atwood argue that historically, HCI evaluation metrics developed from simpler quantitative metrics to more dynamic qualitative ones as computers became used by more diverse people. During the user performance and usability phase (Where computers began to become used by more general audiences), HCI metrics for tools like keyboards and mice "were speed ease of learning error rate accuracy and satisfaction." [@10.1145/2468356.2468714]. MacDonald and Atwood argue that now we have entered the user experience (UX) phase, where there are more dynamic design considerations then simply designing for the absence of pain.
 
 `A major challenge facing evaluators is the lack of a
