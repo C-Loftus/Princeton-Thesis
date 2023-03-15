@@ -13,9 +13,14 @@ from architecture import SubsetSC, M5
 # Define all constants, datasets and hyper parameters for training
 class TRAINING_CONFIG:
     def __init__(self, useTalon: bool = False):
-        self.batch_size = 256
-        self.log_interval = 20
-        self.n_epoch = 2
+
+        if useTalon:
+            self.batch_size = 8
+            self.n_epoch = 10
+        else:
+            self.batch_size = 256
+            self.n_epoch = 2
+        self.log_interval = 20  
         self.new_sample_rate = 8000
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
@@ -217,20 +222,20 @@ class FlowerClient(fl.client.NumPyClient):
         self.train_loader = train_loader
         self.test_loader = test_loader
 
-    def get_parameters(self):
+    def get_parameters(self, config):
         return [val.cpu().numpy() for _, val in self.net.state_dict().items()]
 
-    def set_parameters(self, parameters):
+    def set_parameters(self, parameters, config=None):
         params_dict = zip(self.net.state_dict().keys(), parameters)
         state_dict = OrderedDict({k: torch.tensor(v) for k, v in params_dict})
         self.net.load_state_dict(state_dict, strict=True)
 
-    def fit(self, parameters):
+    def fit(self, parameters, config=None):
         self.set_parameters(parameters)
         train(self.net, 1, 100)
         return self.get_parameters(config={}), len(self.train_loader.dataset), {}
 
-    def evaluate(self, parameters):
+    def evaluate(self, parameters, config=None):
         self.set_parameters(parameters)
         loss, accuracy = test(self.net, self.test_loader)
         return loss, len(self.test_loader.dataset), {"accuracy": accuracy}
@@ -256,9 +261,40 @@ if __name__ == "__main__":
 
     #  read the first argument in   
     import sys
-    useTalon = True
+    useTalon = False
     if len(sys.argv) > 1:
         useTalon = sys.argv[1] == "talon" or sys.argv[1] == "Talon" or sys.argv[1] == "-t" or sys.argv[1] == "--talon"
     print(f'Training with {"talon" if useTalon else "out talon, and instead using the default speech commands dataset."}')
 
     main_training(useTalon)
+
+# DEBUG flwr 2023-03-15 17:39:41,287 | connection.py:38 | ChannelConnectivity.READY
+#   File "<string>", line 1
+    # print(1678916381.750501571 - )
+
+    '''
+
+    ouch', 'wipe']
+
+Starting flower client
+INFO flwr 2023-03-15 18:03:09,909 | grpc.py:50 | Opened insecure gRPC connection (no certificates were passed)
+DEBUG flwr 2023-03-15 18:03:09,958 | connection.py:38 | ChannelConnectivity.IDLE
+DEBUG flwr 2023-03-15 18:03:09,976 | connection.py:38 | ChannelConnectivity.READY
+  File "<string>", line 1
+    print(1678917790.731357867 - )
+                                 ^
+SyntaxError: invalid syntax
+(federated speechcommands-py3.8) host@computer ~/P/thesis (master) [1]> Training with talon
+Training with talon
+n_input: 1, n_output: 30, stride: 8, n_channel: 64
+Number of parameters: 96158
+
+Number of training examples: 1888
+
+Number of testing examples: 237
+
+Number of classes: 30
+
+Length of training set: 118, length of validation set: 15
+
+'''

@@ -495,6 +495,18 @@ I was then able to build upon this script to test the difference is between the 
 
 As a baseline, I first tested the model and federation with the SpeechCommands dataset. This is useful to simulate training with a cleaned dataset without missing values. When running the tests I spawned ten different clients with the training script mentioned above.
 
+```
+Number of parameters: 26915
+
+Number of training examples: 84843
+
+Number of testing examples: 11005
+
+Number of classes: 35
+
+Length of training set: 332, length of validation set: 43
+```
+
 After completing training with a batch_size of 256 and 2 epochs, I was left with a model with 71% accuracy on the test data. This initially was a bit surprising given the initial accuracy rates listed in the paper describing the model. For instance, they write "The test accuracy improves with increasing network depth for M5, M11, and M18. Our best model M18 reaches 71.68% accuracy that is competitive with the reported test accuracy of CNNs on spectrogram input using the same dataset. The performance increases cannot be simply attributed to the larger number of parameters in the deep models. For example, M5-big has 2.2M parameters but only achieves 63.30% accuracy, compared with the 69.07% by M11 (1.8M parameters)" [@https://doi.org/10.48550/arxiv.1610.00087]
 This increase in performance is likely due to the fact that we have ten clients and by default are using the aggregation algorithm `FedAvgM` which uses a momentum term to help the algorithm converge to a better solution. As stated in the paper that initially described this strategy, it "runs an accumulation of the gradient history to dampen oscillations." [@https://doi.org/10.48550/arxiv.1909.06335] Thus it is to be expected that we would have better performance, given our aggregation of many different trials and no extreme outliers in our dataset that would drastically impact gradient trends. Yet at the same time, it is important to know that we are potentially at risk for overfitting given the fact we have high homogeneity within the training data. ( The speech of a given speaker may be present in multiple clients, whereas with talon data everyone will have their own distinct voice transcriptions).
 At the end of training, we were left with a model of size 0.4055 megabytes when serialized in the numpy npz weight format. This relatively small size is to be expected, given the fact that the model architecture is meant to be used on embedded devices.
@@ -507,13 +519,46 @@ As stated previously in the paper, Talon can generate a user dataset by saving r
 ![The Top 30 Commands generated from my Talon dataset](assets/top30cmds.png)
 
 The analysis done on the dataset can be found at `client/scripts/dataset-analysis.ipynb`
-As one can see in the figure, the top 30 commands had an average of roughly 80 occurrences, some with much more. Given the fact that we are only using commands, it is important to note that there will be high variance between workflows. For instance, a by user that does lots of emails may not have a good dataset,given the fact that much of their dictation is done in long sentences, not short commands. In my experience I averaged around 170 commands a day that were valid to be used for training. However, it is important to note that when we begin training, we only use the top thirty labels so the model has suitable properties for a federated learning task \footnote{Namely, shorter training time and small resulting model size}
+As one can see in the figure, the top 30 commands had an average of roughly 80 occurrences, some with much more. Given the fact that we are only using commands, it is important to note that there will be high variance between workflows. For instance, a by user that does lots of emails may not have a good dataset,given the fact that much of their dictation is done in long sentences, not short commands. In my experience I averaged around 170 commands a day that were valid to be used for training. However, it is important to note that when we begin training, we only use the top thirty labels so the model has suitable properties for a federated learning task \footnote{Namely, we want just 30 audio commands so we can have shorter training time and small resulting model size}
 
-Now with this dataset, we can begin to explore training.
-
-The next main difference in the machine learning aspect comes from weight aggregation. By default, the M5 model was not designed with federation in mind and thus was not evaluated with a federated learning aggregation algorithm.
+Now with this dataset, we can begin to explore training and the differences that result from federated weight aggregation and the fact that we are never explicitly labeling data manually. By default, the M5 model was not designed with federation in mind and thus was not evaluated with a federated learning aggregation algorithm.
 
 As we spoke of in [our section on federated learning trading strategies](#federated-learning-aggregation-strategies), after each client trains on their local data, the weights are then sent to the central server where they are aggregated. In [that section on strategies](#federated-learning-aggregation-strategies), we described how our default algorithm is `FedAvgM`. As result, even though the user has many options for aggregation, we will prioritize evaluating this one.
+
+
+```
+Number of parameters: 96158
+
+Number of training examples: 1888
+
+Number of testing examples: 237
+
+Number of classes: 30
+
+Length of training set: 118, length of validation set: 15
+
+Labels: ['air', 'bat', 'blender', 'box', 'cap', 'cleft', 'coma', 'comma', 'crunch', 'dot', 'each', 'enter', 'equals', 'equation', 'escape', 'fine', 'fly', 'home', 'hooks', 'jury', 'last', 'near', 'period', 'pit', 'r', 'sit', 'space', 'tab', 'touch', 'wipe']
+```
+At 2 epochs with a batch size of 256, the Model performs poorly with only an accuracy of 23%.
+
+After increasing to `"self.batch_size = 16` and `self.n_epoch = 8"`
+
+`Accuracy: 115/237 (49%)`
+
+After increasing to batch `size = 8` and `n_epoch = 12`
+
+`Accuracy: 120/237 (51%)`
+
+After this point, one can continue to decrease the batch size and increase the number of epochs, but the risk of overfitting increases. While this may initially appear as a low accuracy, it is important to keep in context the size of the dataset. Our talon data has been all automatically generated and automatically labeled. It is also only from two weeks of usage and the SpeechCommands benchmark dataset is almost 45 times larger. Finally, the data from Talon was all generated using a fifteen dollar pair of wired earbuds, not a professional or expensive microphone.
+
+```
+Size of SpeechCommands verses Talon after a week of automatic dataset generation
+
+Number of training examples: 84843 vs 1888
+Number of testing examples: 11005 vs 237
+```
+
+With this context in mind, the quantitative performance is actually quite promising and is likely to improve further with more data and aggregating weights between more people during Federation.
 
 ## Qualitative Evaluation
 
