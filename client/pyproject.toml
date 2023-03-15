@@ -14,6 +14,7 @@ PySimpleGUIWeb = "^0.39.0"
 torch = "^1.13.1"
 torchaudio = "^0.13.1"
 matplotlib = "^3.7.0"
+seaborn = "^0.12.2"
 
 [tool.poe.tasks]
 test = "kitty"

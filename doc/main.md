@@ -17,11 +17,53 @@ However, many models related to specialty tasks suffer from a lack of data, well
 
 In my paper, I describe a novel way to apply Federated Learning for voice-based accessibility software. This solution using federated learning allows models to be trained without exposing sensitive voice data to a central server. It seeks to reduce the complexity of the federated learning process for end users and allows users to use their data generated from existing accessibility software. This data can be used to build the backend for new voice control software on mobile devices. Throughout this paper,I describe the technical implementation of this solution and the user experience goals that informed my design.
 
-Finally in the last section of the paper, I discuss the current landscape of Linux mobile devices and and how we can more effectively bring voice control to this platform. I argue that the data sovereignty goals of Linux Mobile devices align well with those of federated learning. I discuss not only why federated learning is theoretically useful on this platform, but also the technical challenges building alongside other tools in this nascent ecosystem. At the end of the paper, I discuss the implications of this work for the future of accessibility software.
+Finally in the last section of the paper, I discuss a new platform where voice control is sorely lacking and how we can integrate new ecosystems such as my own software. I argue that the data sovereignty goals of Linux Mobile devices align well with those of federated learning. I discuss not only why federated learning is theoretically useful on this platform, but also the technical challenges of building accessibility software within new platforms. At the end of the paper, I discuss the implications of this work for the future of accessibility software.
 
 # Introduction
 
-In recent years, machine learning has created significant advances in patient care across the healthcare industry. Sophisticated machine learning applications have emerged for drug discovery, accessibility accommodations, patient monitoring services, and much more. [@10.1145/3167486.3167551] Advances in reinforcement-learning now allows for vital healthcare applications to be deployed even in novel environments.[@10.1145/3477600] New ways of optimizing and distributing training has allowed for models to be trained in restrictive environments with limited data sets [@10.1145/3427796.3433935].
+With the advent of smartphones and higher powered personal computers, everyday individuals now have access to a huge amount of personal data. While this can be used for malevolent advertising purposes, it can also be used for community-driven data sharing and the creation of new machine learning datasets. Health data from fitness apps or recordings from voice dictation software are both sensitive data sets that could provide significant benefits to the greater public. However to use this type of data, we need not only new machine learning algorithms that preserve privacy, but also ways in which users can share this data in a trustworthy and intuitive way.
+
+Despite this potential, many new machine learning techniques or ways of privately aggregating data remain completely abstracted away from the end user. The technical goals are thus prioritized over any social or user experience goals.
+
+My goal is to change this and bring the privacy preserving machine learning technique known as federated learning in conversation with the fields of human computer interaction (HCI) and accessibility software. HCI and user experience design can better teach us how to make intuitive software for people of all abilities and backgrounds. Accessibility software is a field that is in sore need of free, public datasets and new machine learning strategies to preserve privacy among contributors. By combining these two fields we can create software that is both highly practical for the end user and innovative with regards to machine learning research.
+
+Thus, my goal is to create a full federated learning ecosystem with machine learning model for voice controlled accessibility software, a central server for controlling the software, and a client for training on local data. A community can implement this software and thus take advantage of these new privacy preserving machine learning models. Instead of abstracting away federated learning, it can be intuitively presented in such a way that invites people of all backgrounds to participate in new data sharing technologies.
+
+At the end of the paper, I discuss Linux mobile devices as a case study for how to bring federated learning and accessibility software to a new platform.
+
+With this outline in mind, it is useful to give a brief introduction in more detail to the three fields that I will expand upon in my thesis: Federated learning, computer accessibility, and User Experience Design.
+
+## Federated Learning
+
+Federated Learning is a machine learning paradigm that seeks to solve many of the issues regarding privacy in traditional machine learning. In traditional training, clients are required to send their data to a centralized server and trust it will take the appropriate protections to anonymize it. However,in Federated Learning, all training is done on user devices. Then after training is finished, only the model weights are sent the central server. The training data itself stays on user devices.
+
+Essentially what this means is that the server never sees the data, and thus, it is not subject to the same privacy concerns as traditional machine learning. This is a particularly useful paradigm for healthcare. It allows data autonomy without needing to compromise on the use of large-scale datasets. Users can share data with non-profits and community initiatives without having to worry about the security of their data.
+
+Currently within industry, federated learning has been successful particularly with mobile computing like smartphones or IoT devices. Companies like Google and Apple have been able to leverage federated learning to train models on datasets like keyboard data that would be otherwise too sensitive to train on. [@federated-personalization] [@flair] Models like these are the backbone for predictive typing software that can be personalized to the individual user. However, as of right now, federated learning is still an emerging research area and usually is abstracted away from end-users. Within companies, there is little incentive to give users autonomy over their data, much less for technical federated learning. However this is exactly where innovation needs to occur if we wish to fully take advantage of user data and create new specialized accessibility software.
+
+## Relation to the Field of Computer Accessibility
+
+While there are many domains that will benefit from this paradigm of data sharing, one of the most promising and the focus of this paper is voice controlled accessibility software. This software allows users without the use of their hands to control their computer without typing or using the mouse. For this type of software, it often relies upon huge voice datasets. While these models have good performance in general use, users may want to fine-tune them for specific applications that would otherwise not be contained in a general-purpose dataset. For instance, Mozilla's Common Voice \footnote{\url{https://commonvoice.mozilla.org/en}} is a great data set for general voice recognition, but may not be enough to train models for users with a particular accent, speech impediment, or job specific technical vocabulary.
+
+As of right now, accessibility applications often are supported through grassroots communities with economies of sharing. Within such social arrangements, there is often a compromise regarding either efficiency or privacy. If telemetry data is automatically collected and sent to a central server, it may compromise sensitive information. A user may also not feel comfortable sending data to a central server in general, given it could be resold without their knowledge. However, if we rely upon users to filter out their own data and only send a labeled dataset, this may be too slow and provided too little data.
+
+As a result, the fact that no data whatsoever needs to be sent to a central server makes federated learning particularly useful for voice controlled accessibility software. In theory, it solves both the issue of efficiency and privacy at once.
+
+## HCI and Design Work
+
+In addition to the technical, algorithmic side of federated learning, there are a series of new design challenges for accessibility engaging users of all backgrounds. Since we are looking to build models for voice based accessibility,we need to make sure that the training clients for the users are also accessible entirely via voice.
+
+For those without full use of their hands, many types of software interaction can be difficult or annoying to navigate with voice controlled software. For instance, not all programs expose an accessibility tree or have good keyboard shortcuts. \footnote{\url{https://acrobat.uservoice.com/forums/590923-acrobat-for-windows-and-mac/suggestions/39448096-acrobat-reader-for-mac-does-not-expose-an-accessib}} As a result, I wanted to build all my user interfaces with a web ui. Internet browsers have much more accessibility tooling built in and are generally more accessible. For instance, tools like Rango\footnote{\url{https://github.com/david-tejada/rango/}} and Vimium \footnote{\url{https://vimium.github.io/}} allow the user to navigate the web with just voice, or just the keyboard, respectively. Thus by creating my user interface for the web, I can take advantage of these already existing tools for better accessibility.
+
+In addition to the accessibility aspects of our design for federated learning paradigms, we will also need to ensure ease-of-use. Most users are not accustomed to dealing with data in a decentralized way. Even among tech enthusiasts, most people are unfamiliar with federated learning. For the end user, they may think something is wrong when local training is in process and uses lots of system resources. We need to make it abundantly clear who has control of what data and during which parts of the process. This helps to explain federated learning, foster a general ethic of data autonomy,and encourage more community driven federated learning models.
+
+# Background
+
+Before discussing my work, it is useful to give an overview of the existing field of voice-controlled accessibility software, federated learning frameworks, and the design principles that inform them both. This context will help to better explain the overall architecture and the specific choices I made while developing my software. My software seeks to address problems in the existing federated learning and voice controlled accessibility ecosystems.
+
+## Existing Impediments
+
+In recent years, machine learning has created significant advances across healthcare and accessibility. Sophisticated machine learning applications have emerged for drug discovery, disability accommodations, patient monitoring services, and much more. [@10.1145/3167486.3167551] Advances in reinforcement-learning now allows for vital healthcare applications to be deployed even in novel environments and [@10.1145/3477600] new ways of optimizing and distributing training has allowed for models to be trained with limited data sets [@10.1145/3427796.3433935].
 
 Despite these algorithmic advances, the logistics of healthcare data continues to make it one of the most challenging data sources for machine learning. It is subject to particularly strict legal regulations and the stakes for user privacy are often much higher than other social data. For instance, in the case of automatic diagnostic software, even if the model performs well, steps must be taken to ensure patient privacy throughout the training process.
 
@@ -43,50 +85,25 @@ Thus in summary, our key challenge for machine learning in healthcare is preserv
 
 ## Federated Learning
 
-Federated Learning is a machine learning paradigm that seeks to solve these issues. In traditional machine learning, clients are required to send their data to a centralized server and trust it will take the appropriate protections to anonymize it. However,in Federated Learning, all training is done on user devices. Then after training is finished, all that is transferred to the server are the model weights. The data itself stays on user devices.
-
-Essentially what this means is that the server never sees the data, and thus, it is not subject to the same privacy concerns as traditional machine learning. This is a particularly useful paradigm for healthcare. It allows data autonomy without needing to compromise on the use of large-scale datasets. Users can share data with non-profits and community initiatives without having to worry about the security of their data. This is because the data never leaves the user's device.
-
-Currently within industry, federated learning has been successful particularly with mobile computing like smartphones or IoT devices. Companies like Google and Apple have been able to leverage federated learning to train models on datasets like keyboard data that would be otherwise sensitive to train on. Datasets like these have allowed for useful predictive typing models that are personalized to the individual user. However, as of right now, federated learning is still an emerging research area and usually is abstracted away from end-users.
-
-## Relation to the Field of Computer Accessibility
-
-While there are many domains that will benefit from this paradigm of data sharing, one of the most promising and the focus of this paper is voice controlled accessibility software. This software allows users without the use of their hands to control their computer without typing or using the mouse. For this type of software, it often relies upon huge voice datasets. While these models have good performance in general use, users may want to fine-tune them for specific applications that would otherwise not be contained in a general-purpose dataset. For instance, Mozilla's Common Voice \footnote{\url{https://commonvoice.mozilla.org/en}} is a great data set for general voice recognition, but may not be enough to support user with a particular accent, speech impediment, job specific technical vocabulary.
-
-accessibility applications often are supported through grassroots communities with economies of sharing. Within such social arrangements, there is often a compromise regarding either efficiency or privacy.
-
-## HCI and Design Work
-
-In addition to the technical, algorithmic side of federated learning, there are a series of new design challenges for accessibility engaging users of all backgrounds.
-For those without full use of their hands, many types of software interaction can be difficult or annoying to navigate with voice controlled software. For instance, not all programs expose an accessibility tree or have good keyboard shortcuts. This is even the case for some popular applications like Adobe Acrobat\footnote{\url{https://acrobat.uservoice.com/forums/590923-acrobat-for-windows-and-mac/suggestions/39448096-acrobat-reader-for-mac-does-not-expose-an-accessib}} As result, a user may be forced to use the mouse or an eye tracker which is a less than ideal solution. As a result, I wanted to build all my user interfaces with a web ui. Internet browsers have much more accessibility tooling built in and are generally more accessible. For instance, tools like Rango\footnote{\url{https://github.com/david-tejada/rango/}} and Vimium \footnote{\url{https://vimium.github.io/}} allow the user to navigate the web with just voice, or just the keyboard, respectively. Thus by creating my user interface for the web, I can take advantage of these already existing tools for better accessibility.
-
-In addition to the accessibility aspects of our design for federated learning paradigms, we will also need to ensure ease-of-use. Most users are not accustomed to dealing with data in a decentralized way. Even among tech enthusiasts,
-
-# Background
-
-Before discussing my work, it is useful to give an overview of the existing field of voice-controlled accessibility software, Federated Learning frameworks, and the design principles that inform them both. This context will help to better explain the overall architecture and the specific choices I made while developing my software. For context, I specifically wanted to create a federated learning solution that could help to address some of the existing issues in both federated software and voice-based accessibility software.
-
-## Federated Learning
-
-Before discussing voice-based accessibility software it is useful to describe the current general landscape of federated learning and federated software. This will allow us to see its shortcomings, and potential for innovation. When we discuss accessibility software, it will give us a better perspective on how to integrate the two.
+Before discussing voice-based accessibility software it is useful to describe the current general landscape of federated learning, federated software more generally, and how they are currently implemented. This will allow us to see its shortcomings, and potential for innovation. When we discuss accessibility software, it will give us a better perspective on how to integrate the two.
 
 Federated Learning, despite being such a new and promising field, is based upon a much simpler and older one: federation. Federation as a general concept in computing is a backbone to many of the essential software tools we use every day. Email and git are two great examples of fundamental software technologies that are built upon federation. Anyone can start their own email or git server, control their own mail inbox or code repositories respectively, and choose to communicate with other servers of the same type. Despite the fact that these technologies are built upon federation, in reality the majority of individuals depend upon highly centralized applications (Gmail and Github, being two examples, respectively). As a result, if we want federated learning to break this general trend within federated software, we need both incentives and intuitive tooling to support independent communities.
 
-For examples of this, we can look to recent studies regarding the behavior of users in other federated networks such as Mastodon. Mastodon is an alternative social media platform that anyone can self-host and federate with other instances. This allows for decentralized data sharing and moderation- However, even though the software is designed for decentralization, users often congregate towards centralized servers. [@10.1145/3355369.3355572] After Elon Musk bought twitter and caused many users to seek alternative platforms, Mastodon saw a huge influx of new users. However, many of these users were confused regarding which instance to use, and how their data was being retained. \small\footnote{\url{{https://www.newyorker.com/culture/infinite-scroll/what-fleeing-twitter-users-will-and-wont-find-on-mastodon}}}
+For examples of user behavior with federated software, we can look to recent studies regarding the behavior of users in other federated networks such as Mastodon. Mastodon is an alternative social media platform that anyone can self-host and federate with other instances. This allows for decentralized data sharing and moderation- However, even though the software is designed for decentralization, users often congregate towards centralized servers. [@10.1145/3355369.3355572] After Elon Musk bought Twitter and caused many users to seek alternative platforms, Mastodon saw a huge influx of new users. However, many of these users were confused regarding which instance to use, and how their data was being retained. \small\footnote{\url{{https://www.newyorker.com/culture/infinite-scroll/what-fleeing-twitter-users-will-and-wont-find-on-mastodon}}}
 
 Thus even though Mastodon is a social network and not a machine learning toolkit, it is a good example of how users are not accustomed to dealing with federated systems and decentralized data. When implementing new forms of data sharing we need not only new technical solutions, but also new design strategies. After all, our goal is to share data in a way that is both efficient and democratic. Little will be accomplished at scale if only power users and hobby hackers participate.
 
-With regards to federated learning specifically, often programmers completely abstract away the federation process. For instance, in the case of mobile phones, it is assumed that a beneficent central company will train models in the background, and the user can benefit without needing to understand the process. Many, even technical users, are not aware that their phone passively trains such models at nighttime.
-
-Thus, many papers in federated learning follow suit and do not deal with the social or design aspects of the the technology. They are primarily focused with attributes like energy efficiency or fault tolerance [@10.1145/3554980] [@10.1145/3556557.3557952]. While these are undoubtedly important attributes, it is certainly not the entire story. Given the fact that so much of the internet's monetization model is based around data collection, changing the way data is shared at scale could have significant social and economic consequences.
+With regards to federated machine learning specifically, programmers often completely abstract away the federation process. Despite the fact that nearly most mobile phones use some sort of federated learning techniques, it is usually always abstracted away [@federated-personalization]. Under this understanding, federated learning is viewed simply in a technical light, and as a result the technical algorithm is considered too complicated for the average user.
+Many papers in federated learning follow suit and do not deal with the social or design aspects of the the technology. They are primarily focused with attributes like energy efficiency or fault tolerance [@10.1145/3554980] [@10.1145/3556557.3557952]. While these are undoubtedly important attributes, it is certainly not the entire story. Given the fact that so much of the internet's monetization model is based around data collection, changing the way data is shared at scale could have significant social and economic consequences.
 
 As we design for the future, it is important not to abstract away the decentralized and community driven potential for federated learning. As a result, when designing new applications we should not only focus on the technical aspects, but also trying to make it intuitive for users of all abilities and organizations of all sizes. This is one of the key aspects missing in current federated learning literature: there is not a clear vision for how to apply it beyond large companies, explain federation as a concept, and get non-technical users involved.
 We will need to overcome these challenges for Federated learning to go beyond just industry adoption and eventually see it come to fruition in non-profits, online groups, and community organizations.
 
 ## Accessibility Software
 
-Now that we have the general background of federated software and federated learning more specifically, it is useful to survey the general landscape of voice based accessibility software. Unlike federated learning, lots of the cutting edge and most used accessibility software does not come from academic research. See for instance cursorless \footnote{\url{https://www.cursorless.org/}}}, a community driven solution for voice programming that is significantly more efficient than other hands free offerings.
-To summarize, within voice controlled accessibility software, many of the design philosophies behind different programs can be grouped into two main categories. Namely, application specific or general purpose accessibility software
+Now that we have the general background of federated software and federated learning more specifically, it is useful to survey the general landscape of voice based accessibility software. Unlike federated learning, lots of the cutting edge and most used accessibility software does not come from academic research. See for instance the software project, Cursorless \footnote{\url{https://www.cursorless.org/}}, a community driven solution for voice programming that is significantly more efficient than other hands free offerings. As a result, it is most useful to give a summary of the different programs available and the design philosophies that inform them.
+
+In general, within voice controlled accessibility software, many of the design philosophies behind different programs can be grouped into two main categories. Namely, application specific or general purpose accessibility software.
 
 ### Application-Specific Accessibility Software
 
@@ -109,9 +126,17 @@ One such other tool is Talon. \footnote{\url{https://talonvoice.com}} Talon is a
 Talon has a large user community with specific user scripts for doing nearly anything you would want on your desktop, anything from coding by voice to playing video games. These solutions are often more customizable and efficient given the fact that their designers are often also part of the Talon community as users.
 One of the benefits of Talon is that you can enable the option 'Save Recordings.' This will create an annotated dataset of user recordings for every command. Thus it is very easy to generate a personalized dataset when using talon.
 
-While both of these voice control solutions work well for many, each has a downside. Both Dragon-Naturally-Speaking and Talon (here referring to the voice parser,not the user scripts) are closed source. This may be a downside for privacy conscious individuals, even though many extensions are nonetheless open source and community developed. Dragon-Naturally-Speaking is also not free, and the cost may be a significant impediment to many users. Finally, Talon Voice and Dragon do not support mobile devices and lack a way of automatically sharing data in its ecosystem. In Talon, contributing data to use for future model training involves a manual process of sending recorded data to the developer.\footnote{\url{https://noise.talonvoice.com}}
+The most commonly used commands in Talon are the phonetic alphabet, key names, and numbers. As such, it can be expected that many users have a large dataset of these sorts of commands and thus they are the default labels in the server. The alphabet is so commonly use given the fact that it is an easy way to refer to discrete elements on the screen. ( For instance the program `Rango` which builds upon Talon labels each HTML element with a unique combination of letters that allows the user to select by simply saying the letter). This alphabet is distinct from the NATO phonetic alphabet in order to be quicker for voice commands. In contrast, the NATO phonetic alphabet typically has words with multiple syllables and as a result slows down commands. As a result, these commonly used commands in Talon also share our goals for training and future machine learning models.
 
-As a result there arenumerous research opportunities in voice controlled accessibility software. Everything from developing new open source voice parsers for mobile devices, to new ways of sharing community customizations and data, all have great potential to dramatically help not only current users, but also future users on devices and architectures that have yet to be commonly adopted.
+![ Each word in the Talon alphabet with the letter that it represents.  Credit: https://whalequench.club/assets/alphabet.png](https://whalequench.club/assets/alphabet.png)
+
+From more info regarding the design of Talon and it's basic functionality, see the following sources: \footnote{\url{https://whalequench.club/blog/2019/09/03/learning-to-speak-code.html}} \footnote{\url{https://www.joshwcomeau.com/blog/hands-free-coding/}}
+
+##### Current Challenges in Voice Controlled Accessibility Software
+
+While both of these voice control solutions work well for many, each has a downside. Both Dragon-Naturally-Speaking and Talon (here referring to the voice parser,not the user scripts) are closed source. This may be a downside for privacy conscious individuals, or users working in restricted environments like government or healthcare. Dragon-Naturally-Speaking is also not free, and the license cost may be a significant impediment to many users. Finally, Talon Voice and Dragon do not support mobile devices and lack a way of automatically sharing data in its ecosystem. In Talon, contributing data to use for future model training involves a manual process of sending recorded data to the developer.\footnote{\url{https://noise.talonvoice.com}}
+
+As a result there are numerous research opportunities in voice controlled accessibility software. Everything from developing new open source voice control for mobile devices, to new ways of sharing community customizations and data, all have great potential. New developments would not only help current users, but also future users on devices and architectures that have yet to be commonly adopted.
 
 ## Linux Mobile Devices
 
@@ -121,8 +146,7 @@ As a result, for my research, I was specifically interested in targeting Linux s
 
 By building for a new ecosystem like Linux mobile devices,I wanted to not only solve an existing problem in the voice controlled accessibility ecosystem, but also anticipate future issues that wall come about due to a lack of accessibility support on new ARM mobile devices.
 
-Finally, as previously stated, Linux mobile devices can more easily run existing Linux software than alternatives like Android or IOS. First of all, this will allow me to experiment with a wide variety of user interfaces on top of my model. For instance, I can
-use and or adapt my previous research developing an open source voice parser for linux \footnote{\url{https://github.com/C-Loftus/Starling}}. This will allow me to lay the groundwork not only for new community based federated learning solutions,but also the interfaces and higher level accessibility software that will build on top of it .
+Finally, as previously stated, Linux mobile devices can more easily run existing Linux software than alternatives like Android or IOS. First of all, this will allow me to experiment with a wide variety of user interfaces on top of my model. For instance, I can use and or adapt my previous research developing an open source voice parser for Linux \footnote{\url{https://github.com/C-Loftus/Starling}}. This will allow me to lay the groundwork not only for new community based federated learning solutions,but also the interfaces and higher level accessibility software that will build on top of it .
 
 # Approach to Architecture Design
 
@@ -138,50 +162,9 @@ With this in mind, I split up the technical implementation of my project into fi
 - GUI Client for participating in federated learning and converting talon data
 - Packaging and Distribution
 
-A visual description of each part can be seen in the diagram below.
+![A visual representation of my federated learning system](assets/diagram.png)
 
-$$
- \forall{talon\_data}_1^{|talon\_data| := N}
-$$
-
-```{.mermaid format=svg .mermaid loc=assets}
-erDiagram
-    TALON_DATA_1 ||--|| TRAINING_CLIENT_1: converts
-    TALON_DATA_1 {
-        origin client_1_desktop
-    }
-    TALON_DATA_2 ||--|| TRAINING_CLIENT_2: converts
-    TALON_DATA_2 {
-        origin client_2_desktop
-    }
-    TALON_DATA_N ||--|| TRAINING_CLIENT_N: converts
-    TALON_DATA_N {
-        origin client_N_desktop
-    }
-    TRAINING_CLIENT_1 ||--|| FLOWER_SERVER : federates_with
-    TRAINING_CLIENT_1   {
-        platform desktop
-    }
-    TRAINING_CLIENT_2 ||--|| FLOWER_SERVER: federates_with
-    TRAINING_CLIENT_2 {
-        platform desktop
-    }
-    TRAINING_CLIENT_N ||--|| FLOWER_SERVER: federates_with
-    TRAINING_CLIENT_N {
-        platform desktop
-    }
-    FLOWER_SERVER ||--|| SPEECH_COMMANDS_MODEL: creates
-    SPEECH_COMMANDS_MODEL  ||--|| LINUX_ACCESSIBILITY_CLIENT : powers
-    LINUX_ACCESSIBILITY_CLIENT {
-        platform mobile
-    }
-
-    REACT_FRONTEND ||--|| FAST_API_ENDPOINT: interacts_with
-    FAST_API_ENDPOINT ||--|| FLOWER_SERVER: controls
-
-```
-
-With regards to the technical goal of this architecture, it was intended to make it so both a server administrator ( the person that will eventually get the final trained model ) and existing Talon users can easily start a federated learning training process . They should be able to do this without needing to have any knowledge of coding. In addition to the user experience goals, the technical design is loosely coupled and is thus easier to build upon in the future. For instance, since the federated learning process can be controlled through a web API,users can develop their own clients or integrate their own ways of parsing Talon user data. My architecture provides a useful default client but is by no means required.
+With regards to the technical goal of this architecture, it was intended to make it so both a server administrator ( the person that will eventually get the final trained model ) and existing Talon users can easily start a federated learning training process . They should be able to do this without needing to have any knowledge of coding. In addition to the user experience goals, the technical design is loosely coupled and is thus easier to build upon in the future. For instance, since the federated learning process can be controlled through a web API,users can develop their own clients or integrate their own ways of parsing Talon user data. My architecture provides a useful default client but users can design their own interfaces as well.
 
 # Implementation
 
@@ -312,8 +295,10 @@ As such, federated learning is a technique that should not be abstracted away fu
 
 ## Server Interface
 
-The frontend for the central server was implemented using React as this framework has preexisting tools for accessible user interface design. The library I used for this was Chakra UI. In a centralized machine learning paradigm, usually central server has to have a complicated control panel for managing the training process. However, in federated learning since training is occurring on client devices,the server knows relatively little about the process until the finalized weights are sent to be aggregated centrally. As such, the central front end does not need sophisticated functionality. The most important info is that which is provided to the client through the underlying web server, not the administrator through the graphical interface.
-![The web interface as it appears before training.  Note the small "hats" over each web element which allow for voice based interaction without the keyboard.](assets/frontend.png)
+The frontend for the central server was implemented using React as this framework has preexisting tools for accessible user interface design. The library I used for this was Chakra UI. In a centralized machine learning paradigm, usually the central server has to have a complicated control panel for managing the training process. However, in federated learning since training is occurring on client devices,the server knows relatively little about the process until the finalized weights are sent to be aggregated centrally. As such, the central front end does not need sophisticated functionality. The only info that is necessary is the aggregation strategy, the amount of clients, and the labels that all clients agree to train with. Thus as a result, the core principle of federated learning remains easily visible, but any technical details regarding machine learning algorithms can be completely abstracted away. For individuals who wish to learn more, "?" icons provide a place to learn more by hovering over them with the mouse.
+![The web interface as it appears before training.](assets/frontend.png)
+
+<!-- NOTE: TODO:  make this image smaller to try and make it valid right now you can't see any comments blow it -->
 
 ## Client Interface
 
