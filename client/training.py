@@ -256,7 +256,7 @@ if __name__ == "__main__":
 
     #  read the first argument in   
     import sys
-    useTalon = False
+    useTalon = True
     if len(sys.argv) > 1:
         useTalon = sys.argv[1] == "talon" or sys.argv[1] == "Talon" or sys.argv[1] == "-t" or sys.argv[1] == "--talon"
     print(f'Training with {"talon" if useTalon else "out talon, and instead using the default speech commands dataset."}')

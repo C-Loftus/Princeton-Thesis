@@ -1,4 +1,4 @@
-import os, random, datetime
+import os, random, collections
 import concurrent.futures
 import requests,sys
 import subprocess, random
@@ -13,26 +13,29 @@ OUTPUT_PATH = os.path.join(SCRIPT_PATH, DATA_DIR, "talon-conversion")
 USER_ID = hash(HOSTNAME)  % 10000
 MIN_NUM_SAMPLES = 4
 REMOTE_SERVER = "http://localhost:5000"
+# settings = " -ar 16000 -b:a 256k -minrate 256k -maxrate 256k -y"
+# settings = '-ss 0 -t 1 -f lavfi -i anullsrc=channel_layout=stereo -filter_complex
+# "[1][0]concat=n=2:v=0:a=1[out]" -map "[out]" -c:a pcm_s16le'
+#  Settings to  convert to 16 bit 16khz wav for training with torch
+SETTINGS = ' -ss 0 -t 1 -af "apad=pad_len=1" -c:a pcm_s16le'
 
 parseCmd = lambda filename: filename.split("-")[0]
 
-
-
-def validForTraining(filename, cmd) -> bool:
-
-    # Send a web request to the server to get the list of commands
-
+def top30FromServer():
+        # Send a web request to the server to get the list of commands
     result= requests.get(REMOTE_SERVER + "/commands")
     try:
         training_commands = result.json()['detail']
     except Exception as e:
         print(" Error getting commands from the server. Is the server running?")
         sys.exit(1)
+    return training_commands
+
+def validForTraining(filename, cmd) -> bool:
         
     words_in_command = len(cmd.split(" "))
     return filename.endswith(".flac") and \
             words_in_command == 1 and \
-            cmd in training_commands and \
             len([f for f in os.listdir(RECORDING_PATH) if parseCmd(f) == cmd]) > MIN_NUM_SAMPLES
 
 def makeCmdDir(cmd):
@@ -42,38 +45,40 @@ def makeCmdDir(cmd):
     return command_path
 
 
-def parse():
-    # create training directory if it doesn't exist 
-    if not os.path.exists(OUTPUT_PATH):
-        os.makedirs(OUTPUT_PATH)
+def parse(getLabelsFromServer):
 
     wav_files = []
     commands = []
     timesSaid = {}
 
+    def top30Locally():
+
+        for filename in os.listdir(RECORDING_PATH):
+            cmd = parseCmd(filename)
+            if validForTraining(filename, cmd):
+                timesSaid[cmd] = timesSaid.get(cmd, -1) + 1
+
+        return dict(collections.Counter(timesSaid).most_common(30))
+
+    top30Cmds = top30FromServer() if getLabelsFromServer else top30Locally()
+
+    print("Top 30 commands: ", top30Cmds)
+
     for filename in os.listdir(RECORDING_PATH):
 
-        cmd = parseCmd(filename)
+        cmdName = parseCmd(filename)
 
-        if validForTraining(filename, cmd):
+        if cmdName in top30Cmds:
 
-            timesSaid[cmd] = timesSaid.get(cmd, -1) + 1
+            timesSaid[cmdName] = timesSaid.get(cmdName, -1) + 1
         
-            command_path = makeCmdDir(cmd)
+            command_path = makeCmdDir(cmdName)
     
-            file_creation_date = datetime.datetime.fromtimestamp(os.path.getctime(os.path.join(RECORDING_PATH, filename)))
+            output_name = f'{USER_ID}_nohash_{timesSaid[cmdName]}.wav'
 
-            output_name = f'{USER_ID}_nohash_{timesSaid[cmd]}.wav'
-
-            # settings = " -ar 16000 -b:a 256k -minrate 256k -maxrate 256k -y"
-            # settings = '-ss 0 -t 1 -f lavfi -i anullsrc=channel_layout=stereo -filter_complex "[1][0]concat=n=2:v=0:a=1[out]" -map "[out]" -c:a pcm_s16le'
-            
-            #  Settings to  convert to 16 bit 16khz wav for training with torch
-            settings = ' -ss 0 -t 1 -af "apad=pad_len=1" -c:a pcm_s16le'
-            command = f'ffmpeg -i {RECORDING_PATH}/{filename} {settings} -y {command_path}/{output_name}'
-
-
-            commands.append(command)
+            commands.append(
+             f'ffmpeg -i {RECORDING_PATH}/{filename} {SETTINGS} -y {command_path}/{output_name}'
+            )
 
             full_path = os.path.join(OUTPUT_PATH, command_path, output_name)
 
@@ -115,4 +120,8 @@ def parse():
 
 
 if __name__ == "__main__":
-    parse()
+    getLabelsFromServer = sys.argv[1] == "-s" if len(sys.argv) > 1 else False
+    if not os.path.exists(OUTPUT_PATH):
+        os.makedirs(OUTPUT_PATH)
+
+    parse(getLabelsFromServer)

@@ -481,55 +481,35 @@ Given the fact that this project had both a technical machine learning implement
 
 ## Quantitative Evaluation
 
-In this project, I built upon an existing M5 model architecture and the SpeechCommands dataset. These models and datasets have already had evaluation done on them. [@https://doi.org/10.48550/arxiv.1610.00087] For those interested in the more fundamental quantitative aspects of the model evaluation, that existing paper already answers many of those questions. Yet in addition to the fundamental model baseline, I also made a series of changes in the architecture and training process. I will first describe the changes in the architecture and how they impact model performance.
+In this project, I built upon an existing M5 model architecture and the SpeechCommands dataset. These models and datasets have already had evaluation done on them. [@https://doi.org/10.48550/arxiv.1610.00087] For those interested in the more fundamental quantitative aspects of the model evaluation, that existing paper already answers many of those questions. Yet in addition to the fundamental model baseline, I also made a series of changes in the architecture, data sets, and training process. I will first describe the changes in the architecture and how they impact model performance.
 
-By default, implementations of the M5 model used `stride=16` and `n_channel=32.` In order to accommodate for the variable length of Talon audio data, I changed these numbers to stride=8 and `n_channel=64`. I halved the stride, and doubled the channels if Talon audio data is being used for training. Dividing the stride by 2 makes it so there is less pooling, and multiplying the channels by two will increase the number of filters learned by each convolutional layer.
+By default, implementations of the M5 model used `stride=16` and `n_channel=32.` In order to accommodate for the variable length of Talon audio data, I halved the stride, and doubled the channels if Talon audio data is being used for training. Thus these numbers became `stride=8` and `n_channel=64`. Dividing the stride by 2 makes it so there is less pooling, and multiplying the channels by two will increase the number of filters learned by each convolutional layer.
 
 ![The default model architecture.  This was changed to accommodate for `stride=8` and `n_channel=64`](assets/2023-02-22-17-14-11.png)`
 
-```python
-def __init__(self, n_input=1, n_output=35, stride=16, n_channel=32, useTalon=False):
-  if useTalon:
-      stride=8
-      n_channel=64
+Because of the fact that Talon data is very specific and it would require a long term user study to carry out a large federated learning training process, we cannot directly run large experiments to compare differences in training loss and model performance. Despite this, we can none the less conclude general principles by running tests and extrapolating the consequences.
 
-  print(f"n_input: {n_input}, n_output: {n_output}, stride: {stride}, n_channel: {n_channel}")
-  self.conv1 = nn.Conv1d(n_input, n_channel, kernel_size=80, stride=stride)
-  self.bn1 = nn.BatchNorm1d(n_channel)
-  self.pool1 = nn.MaxPool1d(4)
-  self.conv2 = nn.Conv1d(n_channel, n_channel, kernel_size=3)
-  self.bn2 = nn.BatchNorm1d(n_channel)
-  self.pool2 = nn.MaxPool1d(4)
-  self.conv3 = nn.Conv1d(n_channel, 2 * n_channel, kernel_size=3)
-  self.bn3 = nn.BatchNorm1d(2 * n_channel)
-  self.pool3 = nn.MaxPool1d(4)
-  self.conv4 = nn.Conv1d(2 * n_channel, 2 * n_channel, kernel_size=3)
-  self.bn4 = nn.BatchNorm1d(2 * n_channel)
-  self.pool4 = nn.MaxPool1d(4)
-  self.fc1 = nn.Linear(2 * n_channel, n_output)
-```
+The baseline script to run a sample test can be found in the monorepo for this project at `client/scripts/test.client.sh`. This script starts the server, and runs a sample federated learning experiment. The aggregated weights can be found in `server/round-${ROUND_NUM}-weights.npz` where `${ROUND_NUM}` represents a particular individual round of federated learning.
 
-Because of the fact that Talon data is very specific and it would require a long term user study to carry out a large federated learning training process, we cannot directly compare differences in training loss and model performance. Despite this, we can none the less conclude general principles by running tests and extrapolating the consequences.
+I was then able to build upon this script to test the difference is between the Talon data in its associated architecture changes, verses the default model and the associated speech commands dataset. The script for this test can be found at `client/scripts/test.model.size.sh`. This script takes the difference between the two implementations and compares the resulting models. It also compares the differences in the sizes of the two models.
 
-The baseline script to run a sample test can be found in the monorepo for this project at [client/scripts/test.client.sh](../client/scripts/test.client.sh). This script starts the server, and runs a sample federated learning experiment. The aggregated weights can be found in `server/round-${ROUND_NUM}-weights.npz` where `${ROUND_NUM}` represents one individual round of federated learning.
-
-I was then able to build upon this script to test the difference is between the Talon data in its associated architecture changes, verses the default model and the associated speech commands dataset. The script for this test can be found at `client/scripts/test.model.size.sh`. This script takes. the difference between the two implementations and compares the resulting models. It also compares the differences in the sizes of the two models.
-
-As a baseline, I first tested the model and federation with the SpeechCommands dataset. This is useful to simulate training with a cleaned dataset without missing values. When running the tests I spawned ten different clients with
-
-```
-for i in `seq 0 1 10`; do
-   echo "Starting client $i"
-   sleep 1
-   ../.venv/bin/python ../training.py $args &
-done
-```
+As a baseline, I first tested the model and federation with the SpeechCommands dataset. This is useful to simulate training with a cleaned dataset without missing values. When running the tests I spawned ten different clients with the training script mentioned above.
 
 After completing training with a batch_size of 256 and 2 epochs, I was left with a model with 71% accuracy on the test data. This initially was a bit surprising given the initial accuracy rates listed in the paper describing the model. For instance, they write "The test accuracy improves with increasing network depth for M5, M11, and M18. Our best model M18 reaches 71.68% accuracy that is competitive with the reported test accuracy of CNNs on spectrogram input using the same dataset. The performance increases cannot be simply attributed to the larger number of parameters in the deep models. For example, M5-big has 2.2M parameters but only achieves 63.30% accuracy, compared with the 69.07% by M11 (1.8M parameters)" [@https://doi.org/10.48550/arxiv.1610.00087]
-This increase in performance is likely due to the fact that we have ten clients and by default are using the aggregation algorithm `FedAvgM` which uses a momentum term to help the algorithm converge to a better solution. Thus it is to be expected that we would have better performance, given our aggregation of many different trials. Yet at the same time, it is important to know that we are potentially at risk for overfitting given the fact we have high homogeneity within the training data. ( The speech of a given speaker may be present in multiple clients, whereas with talon data everyone will have their own distinct voice transcriptions).
-At the end of training, we were left with a model of size 0.405581 megabytes when serialized in the numpy npz weight format. This relatively small size is to be expected, given the fact that the model architecture is meant to be used on embedded devices.
+This increase in performance is likely due to the fact that we have ten clients and by default are using the aggregation algorithm `FedAvgM` which uses a momentum term to help the algorithm converge to a better solution. As stated in the paper that initially described this strategy, it "runs an accumulation of the gradient history to dampen oscillations." [@https://doi.org/10.48550/arxiv.1909.06335] Thus it is to be expected that we would have better performance, given our aggregation of many different trials and no extreme outliers in our dataset that would drastically impact gradient trends. Yet at the same time, it is important to know that we are potentially at risk for overfitting given the fact we have high homogeneity within the training data. ( The speech of a given speaker may be present in multiple clients, whereas with talon data everyone will have their own distinct voice transcriptions).
+At the end of training, we were left with a model of size 0.4055 megabytes when serialized in the numpy npz weight format. This relatively small size is to be expected, given the fact that the model architecture is meant to be used on embedded devices.
 
-Now that we have a baseline, the next part of the quantitative evaluation was to evaluate a federated learning training cycle with Talon data exclusively. The first part was to simulate how long it would take for a user to generate a high quality dataset.I did this by using talon for at least three hours of computer work every day for a week. At the end of this week I ran my audio dataset generation script: `client/scripts/parse_talon.py`.
+### Training with Talon Data
+
+Now that we have a baseline, the next part of the quantitative evaluation was to evaluate a federated learning training cycle with Talon data exclusively. The first part of this evaluated requires simulating how long it would take for a user to generate a high quality dataset. I did this by using talon for at least three hours of computer work every day for 2 weeks. At the end of this week I ran my audio dataset generation script: `client/scripts/parse_talon.py`.
+As stated previously in the paper, Talon can generate a user dataset by saving recordings and labeling them according to the inferences from the talon voice parser. While these inferences are not always perfect, Talon uses the conformer model architecture from Nvidia.According to the paper in which this model was first described, it achieves a word error rate of less than 5% on the LibriSpeech benchmark. Since we are only looking to generate a dataset of short commands, we can be confident that there is high accuracy in our training data.\footnote{Talon also restricts potential labels during runtime, thus further decreasing the probability of incorrect recognition due to commands that are not appropriate in a particular context or application}
+
+![The Top 30 Commands generated from my Talon dataset](assets/top30cmds.png)
+
+The analysis done on the dataset can be found at `client/scripts/dataset-analysis.ipynb`
+As one can see in the figure, the top 30 commands had an average of roughly 80 occurrences, some with much more. Given the fact that we are only using commands, it is important to note that there will be high variance between workflows. For instance, a by user that does lots of emails may not have a good dataset,given the fact that much of their dictation is done in long sentences, not short commands. In my experience I averaged around 170 commands a day that were valid to be used for training. However, it is important to note that when we begin training, we only use the top thirty labels so the model has suitable properties for a federated learning task \footnote{Namely, shorter training time and small resulting model size}
+
+Now with this dataset, we can begin to explore training.
 
 The next main difference in the machine learning aspect comes from weight aggregation. By default, the M5 model was not designed with federation in mind and thus was not evaluated with a federated learning aggregation algorithm.
 

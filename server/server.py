@@ -63,8 +63,6 @@ def reset_db():
     db['server_running'] = '0'
 
 # on startup, start the database
-
-
 @app.on_event("startup")
 async def startup_event():
     global db
@@ -131,7 +129,7 @@ async def host_ip():
     return {"detail": ipAndPort}
 
 
-@app.get("/ip")
+@app.get("/flwr_ip")
 async def get_ip():
     return {"detail": "127.0.0.1:8080"}
 

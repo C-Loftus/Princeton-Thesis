@@ -13,7 +13,7 @@ import {
   Tooltip,
   Button,
   HStack,
-  Spacer
+  Spacer,
 } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
@@ -72,14 +72,17 @@ export default function ServerForm(props) {
       {!isRunning && (
         <div>
           <HStack>
-
-          <Tooltip hasArrow label=" These labels need to be present in the users' Talon training data. The final model will only include these labels." paddingTop={12} paddingBlock={10}>
-          <Badge ml="1" fontSize="0.8em" colorScheme="green">
-              ?
-            </Badge>
-          </Tooltip>
-          <h5> Input the Strategy for Training </h5>
-
+            <Tooltip
+              hasArrow
+              label=" These labels need to be present in the users' Talon training data. The final model will only include these labels."
+              paddingTop={12}
+              paddingBlock={10}
+            >
+              <Badge ml="1" fontSize="0.8em" colorScheme="green">
+                ?
+              </Badge>
+            </Tooltip>
+            <h5> Input the Strategy for Training </h5>
           </HStack>
           <Select
             {...register("strategy", { required: true })}
@@ -96,34 +99,37 @@ export default function ServerForm(props) {
           </Select>
           <Text paddingTop={12} />
 
-          <HStack>
-          
-          <Tooltip hasArrow label=" These labels need to be present in the users' Talon training data. The final model will only include these labels." paddingTop={12}>
-          <Badge ml="1" fontSize="0.8em" colorScheme="green">
-              ?
-            </Badge>
-          </Tooltip>
-        
-          <h5> Input the list of commands you want in the final model </h5>
+          {/* <HStack>
+            <Tooltip
+              hasArrow
+              label=" These labels need to be present in the users' Talon training data. The final model will only include these labels."
+              paddingTop={12}
+            >
+              <Badge ml="1" fontSize="0.8em" colorScheme="green">
+                ?
+              </Badge>
+            </Tooltip>
+
+            <h5> Input the list of commands you want in the final model </h5>
           </HStack>
           <Textarea
             padding={3}
             type="commands"
             {...register("commands", { required: false })}
-          />
+          /> */}
 
-
-      <Text paddingTop={12} />
+          <Text paddingTop={12} />
           <HStack>
-          <Tooltip hasArrow label="4 is the minimum. The more the better if you can find enough people.">
-          <Badge ml="1" fontSize="0.8em" colorScheme="green">
-              ?
-            </Badge>
-          </Tooltip>
+            <Tooltip
+              hasArrow
+              label="4 is the minimum. The more the better if you can find enough people."
+            >
+              <Badge ml="1" fontSize="0.8em" colorScheme="green">
+                ?
+              </Badge>
+            </Tooltip>
 
-
-
-          <h5>     Input the number of clients to require </h5>
+            <h5> Input the number of clients to require </h5>
           </HStack>
           <Input
             type="clients"
