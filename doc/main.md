@@ -31,6 +31,8 @@ Thus, my goal is to create a full federated learning ecosystem with machine lear
 
 At the end of the paper, I discuss Linux mobile devices as a case study for how to bring federated learning and accessibility software to a new platform.
 
+All of the code for this paper and project can be found at [https://github.com/C-Loftus/Princeton-Thesis/](https://github.com/C-Loftus/Princeton-Thesis/).
+
 With this outline in mind, it is useful to give a brief introduction in more detail to the three fields that I will expand upon in my thesis: Federated learning, computer accessibility, and User Experience Design.
 
 ## Federated Learning
@@ -172,7 +174,7 @@ With this background in mind, I will now proceed to discuss the implementation o
 
 ## Codebase Walkthrough
 
-All of the code base for this paper can be found at [https://github.com/C-Loftus/Princeton-Thesis/](https://github.com/C-Loftus/Princeton-Thesis/).This code base is set up as a monorepo. `doc` holds all documentation including the code used to generate this thesis from its markdown source. `server` holds the code for the central federated learning server and all code for aggregating weights or controlling the system from its web API. `client` holds all the code that a user needs in order to do local training and interact with the server. `frontend` holds the React frontend for the central federated learning server. Finally, `numen-modifications` holds any code related to linux mobile devices and scripts to interact with them through
+All of the code for this paper and project can be found at [https://github.com/C-Loftus/Princeton-Thesis/](https://github.com/C-Loftus/Princeton-Thesis/).This code base is set up as a monorepo. `doc` holds all documentation including the code used to generate this thesis from its markdown source. `server` holds the code for the central federated learning server and all code for aggregating weights or controlling the system from its web API. `client` holds all the code that a user needs in order to do local training and interact with the server. `frontend` holds the React frontend for the central federated learning server. Finally, `numen-modifications` holds any code related to linux mobile devices and scripts to interact with them through
 voice, or modifications to existing software like `numen`.
 
 To build and replicate any software in this repository, there is either a makefile, `package.json` , or `pyproject.toml` file in each directory. A `.pythonversion` file specifies the proper version of python to use (python 3.8.14) and it is recommended to use pyenv to control python versions to match and avoid any version errors.
@@ -493,17 +495,14 @@ The baseline script to run a sample test can be found in the monorepo for this p
 
 I was then able to build upon this script to test the difference is between the Talon data in its associated architecture changes, verses the default model and the associated speech commands dataset. The script for this test can be found at `client/scripts/test.model.size.sh`. This script takes the difference between the two implementations and compares the resulting models. It also compares the differences in the sizes of the two models.
 
-As a baseline, I first tested the model and federation with the SpeechCommands dataset. This is useful to simulate training with a cleaned dataset without missing values. When running the tests I spawned ten different clients with the training script mentioned above.
+As a baseline, I first tested the model and federation with the SpeechCommands dataset. This is useful to simulate training with a cleaned dataset without missing values. When running the tests I spawned ten different clients with the training script mentioned above. The statistics for the model during training are as follows:
 
 ```
+  SpeechCommands Training Statistics
 Number of parameters: 26915
-
 Number of training examples: 84843
-
 Number of testing examples: 11005
-
 Number of classes: 35
-
 Length of training set: 332, length of validation set: 43
 ```
 
@@ -513,82 +512,68 @@ At the end of training, we were left with a model of size 0.4055 megabytes when 
 
 ### Training with Talon Data
 
-Now that we have a baseline, the next part of the quantitative evaluation was to evaluate a federated learning training cycle with Talon data exclusively. The first part of this evaluated requires simulating how long it would take for a user to generate a high quality dataset. I did this by using talon for at least three hours of computer work every day for 2 weeks. At the end of this week I ran my audio dataset generation script: `client/scripts/parse_talon.py`.
-As stated previously in the paper, Talon can generate a user dataset by saving recordings and labeling them according to the inferences from the talon voice parser. While these inferences are not always perfect, Talon uses the conformer model architecture from Nvidia.According to the paper in which this model was first described, it achieves a word error rate of less than 5% on the LibriSpeech benchmark. Since we are only looking to generate a dataset of short commands, we can be confident that there is high accuracy in our training data.\footnote{Talon also restricts potential labels during runtime, thus further decreasing the probability of incorrect recognition due to commands that are not appropriate in a particular context or application}
+Now that we have a baseline, the next part of the quantitative evaluation was to evaluate a federated learning training cycle with Talon data exclusively. The first part of this evaluated requires simulating how long it would take for a user to generate a high quality dataset. I did this by using Talon for at least three hours of computer work every day for 2 weeks. At the end of this week I ran my audio dataset generation script: `client/scripts/parse_talon.py`.
+As stated previously in the paper, Talon can generate a user dataset by saving recordings and labeling them according to the inferences from the talon voice parser. While these inferences are not always perfect, Talon uses the conformer model architecture from Nvidia. According to the paper in which this model was first described, the Conformer model achieves a word error rate of less than 5% on the LibriSpeech benchmark. [@https://doi.org/10.48550/arxiv.2005.08100] Since we are only looking to generate a dataset of short commands, we can be confident that there is high accuracy in our training data.\footnote{Talon also restricts potential labels during runtime, thus further decreasing the probability of incorrect recognition due to commands that are not appropriate in a particular context or application}
 
 ![The Top 30 Commands generated from my Talon dataset](assets/top30cmds.png)
 
 The analysis done on the dataset can be found at `client/scripts/dataset-analysis.ipynb`
-As one can see in the figure, the top 30 commands had an average of roughly 80 occurrences, some with much more. Given the fact that we are only using commands, it is important to note that there will be high variance between workflows. For instance, a by user that does lots of emails may not have a good dataset,given the fact that much of their dictation is done in long sentences, not short commands. In my experience I averaged around 170 commands a day that were valid to be used for training. However, it is important to note that when we begin training, we only use the top thirty labels so the model has suitable properties for a federated learning task \footnote{Namely, we want just 30 audio commands so we can have shorter training time and small resulting model size}
+As one can see in the figure, the top 30 commands had an average of roughly 80 occurrences, some with much more. Given the fact that Talon is so highly customizable, it is important to note that there will be high variance between workflows. For instance, a user that dictates lots of emails may not have a good dataset,given the fact that much of their dictation is done in long sentences, not short commands. In my experience I averaged around 170 commands a day that were valid to be used for training. However, it is important to note that when we begin training, we only use the 30 most common commands as our labels. This is so the model has suitable properties for a federated learning task. Namely, we want just 30 audio commands so we can have shorter training time and small resulting model size.
 
-Now with this dataset, we can begin to explore training and the differences that result from federated weight aggregation and the fact that we are never explicitly labeling data manually. By default, the M5 model was not designed with federation in mind and thus was not evaluated with a federated learning aggregation algorithm.
+Now that we have described this dataset, we can begin to explore training and the differences that result from federated weight aggregation. By default, the M5 model was not designed with federation in mind and thus was not evaluated with a federated learning aggregation algorithm.
 
-As we spoke of in [our section on federated learning trading strategies](#federated-learning-aggregation-strategies), after each client trains on their local data, the weights are then sent to the central server where they are aggregated. In [that section on strategies](#federated-learning-aggregation-strategies), we described how our default algorithm is `FedAvgM`. As result, even though the user has many options for aggregation, we will prioritize evaluating this one.
+As we spoke of in [our section on federated learning trading strategies](#federated-learning-aggregation-strategies), after each client trains on their local data, the weights are then sent to the central server where they are aggregated. In [our section on strategies](#federated-learning-aggregation-strategies), we described how our default algorithm for aggregation is `FedAvgM`. As result, even though the user has many options for aggregation, we will prioritize evaluating with `FedAvgM` in this evaluation section.
 
+To begin this discussion of evaluation with Talon data, it is useful to first provide the general statistics of our training data, as the data set is significantly different than the SpeechCommands dataset we used as a benchmark.
 
 ```
+  Talon Data Training Statistics After Two Weeks
 Number of parameters: 96158
-
 Number of training examples: 1888
-
 Number of testing examples: 237
-
 Number of classes: 30
-
 Length of training set: 118, length of validation set: 15
-
-Labels: ['air', 'bat', 'blender', 'box', 'cap', 'cleft', 'coma', 'comma', 'crunch', 'dot', 'each', 'enter', 'equals', 'equation', 'escape', 'fine', 'fly', 'home', 'hooks', 'jury', 'last', 'near', 'period', 'pit', 'r', 'sit', 'space', 'tab', 'touch', 'wipe']
-```
-At 2 epochs with a batch size of 256, the Model performs poorly with only an accuracy of 23%.
-
-After increasing to `"self.batch_size = 16` and `self.n_epoch = 8"`
-
-`Accuracy: 115/237 (49%)`
-
-After increasing to batch `size = 8` and `n_epoch = 12`
-
-`Accuracy: 120/237 (51%)`
-
-After this point, one can continue to decrease the batch size and increase the number of epochs, but the risk of overfitting increases. While this may initially appear as a low accuracy, it is important to keep in context the size of the dataset. Our talon data has been all automatically generated and automatically labeled. It is also only from two weeks of usage and the SpeechCommands benchmark dataset is almost 45 times larger. Finally, the data from Talon was all generated using a fifteen dollar pair of wired earbuds, not a professional or expensive microphone.
-
-```
-Size of SpeechCommands verses Talon after a week of automatic dataset generation
-
-Number of training examples: 84843 vs 1888
-Number of testing examples: 11005 vs 237
 ```
 
-With this context in mind, the quantitative performance is actually quite promising and is likely to improve further with more data and aggregating weights between more people during Federation.
+To begin, I trained with the same epochs and batch size as our baseline SpeechCommands data set benchmark test. At 2 epochs with a batch size of 256, the model performs poorly with only an accuracy of 23%.
+This is to be expected since we have a much smaller dataset
+
+After decreasing the batch size to 16 and increasing the number of epochs to 8, we achieve accuracy: 115/237 (49%).
+
+Finally after once more decreasing the batch size to 8 and increasing the number of epochs to 12, we achieve accuracy: 120/237 (51%).
+
+After this point, one can continue to decrease the batch size and increase the number of epochs, but the risk of overfitting increases. While this may initially appear as a low accuracy, it is important to keep in context the size of the dataset. Our Talon data has been all automatically generated and automatically labeled. It is also only from two weeks of usage and the SpeechCommands benchmark dataset is almost **45 times larger**. Finally, the data from Talon was all generated using a fifteen dollar pair of wired earbuds, not a professional or expensive microphone. To summarize in comparison, one can see the table below.
+
+| Dataset               | Training Examples | Testing Examples |
+| --------------------- | :---------------- | :--------------: |
+| Talon after two weeks | 1888              |       237        |
+| SpeechCommands        | 84843             |      11005       |
+
+With this context in mind, the quantitative performance is actually quite promising and is likely to improve further. The process simply needs access to more data and aggregating weights between more people during Federation. Finally, better audio equipment would also likely result in better performance. While these requirements may seem like a challenge, this would most likely all be present in a real life federated learning trial, given the fact that we would have many more people. This would provide much more data, and more weights to aggregate.
 
 ## Qualitative Evaluation
 
-In this section of the paper, I will be discussing a qualitative evaluation of my federated learning system and the related software I built to implement it. As stated previously, one of my central goals in the project was to turn a sophisticated machine learning technology into a more intuitive and less opaque tool for grassroots communities. As such in order to evaluate my design goals, I can use a series of evaluation metrics taken from the field of human-computer-interaction (HCI).
+In this section of the evaluation, I will be discussing a qualitative evaluation of my federated learning system and the software I built to implement it. As stated previously, one of my central goals in the project was to turn a sophisticated machine learning technology into a more intuitive and less opaque tool for grassroots communities. As such, in order to evaluate my design goals, I can use a series of evaluation metrics taken from the field of human-computer-interaction (HCI).
 
-Before I discuss my project itself, it is useful to give a brief background regarding HCI evaluation more generally.
-There are many perspectives regarding HCI evaluation. MacDonald and Atwood argue that historically, HCI evaluation metrics developed from simpler quantitative metrics to more dynamic qualitative ones as computers became used by more diverse people. During the user performance and usability phase (Where computers began to become used by more general audiences), HCI metrics for tools like keyboards and mice "were speed ease of learning error rate accuracy and satisfaction." [@10.1145/2468356.2468714]. MacDonald and Atwood argue that now we have entered the user experience (UX) phase, where there are more dynamic design considerations then simply designing for the absence of pain.
+Before I discuss my project itself, it is useful to give a brief background regarding HCI evaluation more generally. Many researchers have argued that as a field, HCI evaluation has progressed from simple binary metrics into more complex notions of dynamic user experiences [@10.1145/2468356.2468714]. For instance, HCI is no longer about simply whether an interface is performant and intuitive, but also dynamic ideas of user satisfaction, product desirability, and accessibility. MacDonald and Atwood argue that in this paradigm, "A major challenge facing evaluators is the lack of a shared conceptual framework for UX, even though several models have been proposed."
 
-`A major challenge facing evaluators is the lack of a
-shared conceptual framework for UX, although several
-models have been proposed. For example, Hassenzahl
-[30] proposed a model in which products have
-pragmatic attributes (e.g., an ability to help users
-achieve behavioral goals) and hedonic attributes (e.g.,
-an ability to evoke feelings of pleasure, allow for self-
-expression, and provoke memories). Similarly, Norman
-[57] described three levels of “emotional design” that
-consist of visceral, behavioral, and reflective
-experiences
-`
+Despite this, it is generally the case that evaluations for user experience fall into two distinct categories. Usability inspections and usability testing \footnote{Nielsen, Jakob. Usability Inspection Methods. New York, NY: John Wiley and Sons, 1994}\footnote{ Nielsen, J. (1994). Usability Engineering, Academic Press Inc, p 165} In the former,a software product is evaluated using standardized metrics and criteria.  In the latter,the product is evaluated through user feedback. 
+
+
+### Accessibility
+ <!-- is this rehashing too much? -->
+ In this category we will evaluate how easily our software can be used for individuals with accessibility software. 
+
+### Software Intelligibility
+
+In this category we will evaluate how easily
+
 
 ##
 
 # Future Work
 
 In this paper, I hope to have shown not only a useful way to implement new methodologies of federated learning and voice accessibility software, but also the next steps for building upon these technologies. In this section of the paper I will elaborate more on the next steps and what needs to be done to not only advance this subject matter academically, but also achieve success for everyday users.
-
-## Connect `flwr` to more ML Libraries
-
-Currently, `flwr` and most other federated learning frameworks primarily support general purpose machine learning libraries like PyTorch, Keras, and Tensorflow. However, as we saw earlier in the paper, `flwr`'s output format, `.npz` weights,don't directly map to higher level toolkits for training specialty models like speech recognition. As a result, there is more work to be done to bridge between these two ecosystems. In the future, if more work is done on uniting them, the model in this paper could be converted into the Vosk format, and perhaps be used as a alternative backend for existing accessibility software.
 
 ## User Studies
 
@@ -605,6 +590,10 @@ While this would be a fruitful project, it is also important to clarify why such
 
 To summarize, user studies would absolutely be useful and worthwhile, but it is important to set expectations beforehand. Such a study would take at least multiple months to recruit, build rapport, and perform the actual study.
 
+## Connect `flwr` to more ML Libraries
+
+Currently, `flwr` and most other federated learning frameworks primarily support general purpose machine learning libraries like PyTorch, Keras, and Tensorflow. However, as we saw earlier in the paper, `flwr`'s output format, `.npz` weights,don't directly map to higher level toolkits for training specialty models like speech recognition. As a result, there is more work to be done to bridge between these two ecosystems. In the future, if more work is done on uniting them, the model in this paper could be converted into the Vosk format, and perhaps be used as a alternative backend for existing accessibility software.
+
 ## Preventing Bad Actors and User Mistakes
 
 Throughout this paper, there was the general assumption that users in federated learning would not be trying to take advantage of the system by purposefully using mislabeled training data or altering their training scripts. This is since in the case of voice controlled accessibility software, there is little incentive for hackers. There is no direct profit to be gained or information to be extracted.
@@ -612,8 +601,6 @@ Throughout this paper, there was the general assumption that users in federated 
 Despite this, if attackers did such a thing and there is a small enough sample size, it would significantly decrease the performance of the model after the final aggregation. However, this is still a topic worth pursuing further, especially if federated learning systems ever emerge at the national level for related healthcare tasks. For instance, training models across hospitals.
 
 If this is the case, we would benefit from existing papers on preventing the impact of attackers in federated learning [@10.1145/3556557.3557951].
-
-## Work Towards Standardization
 
 # Conclusion
 

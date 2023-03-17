@@ -44,6 +44,23 @@ def makeCmdDir(cmd):
         os.makedirs(command_path)
     return command_path
 
+def cleanupDir():
+    # remove all folders in the output path
+    for filename in os.listdir(OUTPUT_PATH):
+        path = os.path.join(OUTPUT_PATH, filename)
+        if os.path.isdir(path):
+            for wav in os.listdir(path):
+                os.remove(os.path.join(path, wav))
+            print("Removing directory: ", path)
+            os.rmdir(path)
+
+    # remove all .txt files in the output path
+    for filename in os.listdir(OUTPUT_PATH):
+        path = os.path.join(OUTPUT_PATH, filename)
+        if os.path.isfile(path) and path.endswith(".txt"):
+            print("Removing file: ", path)
+            os.remove(path)
+
 
 def parse(getLabelsFromServer):
 
@@ -124,4 +141,6 @@ if __name__ == "__main__":
     if not os.path.exists(OUTPUT_PATH):
         os.makedirs(OUTPUT_PATH)
 
+    # clean up old data from previous runs
+    cleanupDir()
     parse(getLabelsFromServer)
