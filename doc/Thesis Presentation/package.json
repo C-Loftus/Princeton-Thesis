@@ -1,0 +1,19 @@
+{
+  "name": "thesis-presentation",
+  "private": true,
+  "scripts": {
+    "build": "slidev build",
+    "dev": "slidev --open",
+    "export": "slidev export"
+  },
+  "dependencies": {
+    "@slidev/cli": "^0.40.3",
+    "@slidev/theme-default": "*",
+    "@slidev/theme-seriph": "*",
+    "slidev-theme-penguin": "^1.6.1"
+  },
+  "devDependencies": {
+    "@iconify-json/logos": "^1.1.23",
+    "sass": "^1.59.3"
+  }
+}
