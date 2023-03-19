@@ -338,49 +338,53 @@ Hence for this reason I chose to build the server frontend in React and used Pys
 
 With accessibility software, it is generally understood that the goal is to make computers usable for people of all backgrounds. However, to achieve this goal, some may go beyond and try to create software specifically for voice control. For instance, some users have created desktop environments \footnote{\url{https://git.sr.ht/~geb/tiles}} specifically for voice. While this is laudable work, we should also recognize that we can build alongside existing mainstream software. This also makes it easier for users to transition in and out of their accessibility software setups ( in case of varying health). Thus, the ideal accessibility software ecosystem is symbiotic: software should work well without voice, even better with it, and be easily decoupled if needed. This is yet another reason why building around the web with its robust ecosystem of extensions and developer tools is yet another good idea for accessibility software.
 
-# Bringing Accessibility Software to Linux Mobile Devices
+# The Next Step for Accessibility Software: Linux Mobile Devices
 
-At this point, we have created a system for creating datasets from Talon, training models with federated learning, and controlling it all through an intuitive web interface. With this in mind, it is now useful to begin a discussion regarding how voice accessibility software will integrate into new platforms. These discussions are important since a model is only as useful as the software querying it. It is important to have case studies regarding how to bring federated models into production for users. This is especially the case on bleeding edge platforms like Linux mobile devices. While we may think that a voice control model can quickly be pushed to production, this may not be the case without prior accessibility software infrastructure.
+At this point, we have created a system for creating datasets from Talon, training models with federated learning, and controlling it all through an intuitive web interface. With this in mind, it is now useful to begin a discussion regarding how voice accessibility software will integrate into new platforms. These discussions are important since accessibility software is only as useful as the broader software system it supports. It is not enough to simply have good performance in our machine learning models.
 
-As stated previously, new platforms like Linux mobile devices are not only interesting from a research perspective, but once we accomplish the necessary software foundations, it has a greater potential impact. This is since Android and iOS already have voice control options. As such, the platform has a need for better accessibility software, and a technical userbase that is more likely to participate in federated learning.
+This is especially the case on bleeding edge platforms like Linux mobile devices. While we may think that a voice control model can quickly be pushed to production, we first need to consider the fundamental accessibility software infrastructure.
 
-Just like on the Linux desktop, there are many options for mobile Linux phones each with their own design philosophies, technical tools, and target demographics. In general, Linux mobile phones are a relatively recent phenomenon and have nowhere near as much support as the desktop Linux community. As a result much of the development is entirely grassroots and community driven with very little corporate funding or academic sponsorship. Thus, I believe that this is even more of a reason why it is so important to develop accessibility tools as soon as possible for the platform. Without these tools, entire demographics of users will be left out from this new software revolution. Before going into detail regarding what needs to be done to accommodate new accessibility solutions into Linux mobile devices,it's useful to give a brief overview of the platform in general and some of its key properties.
+Finally, as stated previously, new platforms like Linux mobile devices are not only interesting from a research perspective, but the platform is built upon social goals that overlap with those from our own federated learning project. For instance, most Linux mobile users tend to be tinkerers or privacy conscious individuals who care about data autonomy and are willing to use experimental software for these goals. Given the fact that the platform currently does not have an established accessibility solution, there is greater incentive to innovate and develop for this platform.
 
-## Open and Private by Default
+Just like on the Linux desktop, there are many options for mobile Linux phones each with their own design philosophies, technical tools, and target demographics. In general, Linux mobile phones are a relatively recent phenomenon and have nowhere near as much support as the desktop Linux community. As a result much of the development is entirely grassroots and community driven with very little corporate funding or academic sponsorship. Thus, I believe that this is even more of a reason why it is so important to develop accessibility tools as soon as possible for the platform. Without these tools, entire demographics of users will be left out from this new software revolution.
+
+With this in mind, it is useful to begin a brief overview of the platform and its key properties.
+
+## Open Source and Private by Default
 
 Linux smartphones are unique in the fact that they are designed to be open source at all levels.
-While Android can be rooted and custom roms can be installed on popular phones, none of this process is encouraged by manufacturers. In this case, there is a clear divide between the hardware and software developers. While many people point out how android is open source, the size and monolithic nature of the code base makes it prohibitively difficult for average users to make contributions. For instance in order to make any sort of fundamental changes, it requires the user to download the entire one hundred gigabyte codebase and have roughly sixteen gigabytes of ram to recompile from source. Finally most hardware manufacturers patch their own close sore software on top of stock android, effectively undermining any sort of claims of user freedom.
+While Android can be rooted and custom roms can be installed on popular phones, this process is often difficult and not encouraged by developers. While many people point out how Android is open source, the size and monolithic nature of the code base makes it prohibitively difficult for average users to make contributions.
 
-With Linux smartphones, the user has essentially any freedom they would have on the desktop. Specific hardware manufacturers have also arisen that align themselves with the same goals as the software community. One such company is Pine64. Their Linux smartphone called the PinePhone was used for all Linux mobile testing and development for this project. this device is relatively ubiquitous for the Linux mobile software community and as a result it supports nearly all software in the ecosystem( This is not always a given given the wide variety of mobile specific hardware like cameras, modems, and environment sensors)
+With Linux smartphones, the user has essentially any freedom they would have on the desktop. Specific hardware manufacturers have also arisen that align themselves with the same goals as the software community. One such company is Pine64. Their Linux smartphone called the `PinePhone` was used for all Linux mobile testing and development in this project. This device is relatively ubiquitous for the Linux mobile software community and as a result it supports nearly all software in the ecosystem. This is importance as it is not always a given given the wide variety of mobile devices, with unique hardware like cameras, modems, and environmental sensors.
 
 ## Multiple Options for User Interfaces
 
-Given the fact that lots of existing desktop software can be ported to mobile, there are both many options for both the OS itself, as well as the user interfaces. For context, these are analogous to what would be the desktop environments on a desktop Linux computer. I choose not to use the term desktop environment when speaking about mobile devices, just for clarity. While discussing the many intricacies of the different mobile operating systems is not of particular relevance to this paper, the different user interface options on the other hand have significant relevance to user experience and the design of voice controlled accessibility software.
+Given the fact that a substantial amount of existing desktop software can be ported to mobile, there are many options for both the OS itself, as well as the user interfaces. For context, these are analogous to what would be the desktop environments on a desktop Linux computer. While discussing the many intricacies of the different mobile operating systems is not of particular relevance to this paper, the different user interface options on the other hand have direct relevance to user experience and the design of voice controlled accessibility software. Each has a different philosophy regarding application GUIs, scripting, and user input.
 
-Just as we did previously when discussing different types of voice controlled accessibility software, it is helpful to provide a brief overview of the state of mobile Linux user interfaces. There are three main options: Phosh,Plasma Mobile and SXMO. By enumerating their strengths and weaknesses it will help to contextualize the design of my voice control client.
+Just as we did previously when discussing different types of voice controlled accessibility software, it is helpful to provide a brief overview of the state of mobile Linux user interfaces. There are three main options: Phosh,Plasma Mobile and SXMO. By enumerating their strengths and weaknesses it will help to contextualize the design of my federated learning system and why I chose a model for dictated commands like M5.
 
-#### Phosh & Plasma Mobile
+#### Phosh
 
-Phosh It's a mobile Linux user interface based upon Gnome.Given the fact that many Gnome applications already support devices with small screen resolutions, many apps transfer over well with few modifications necessary. Generally speaking, the user experience seeks to mimic earlier versions of android. There's a app drawer with app logos, menus that are accessed from swiping down at the top of the screen, and a gallery of running applications. As such it is relatively user friendly and has already shipped on some commercial smartphones like the Librem 5 from Purism. Given the fact that Linux smartphones are still in their infancy,Phosh has gained much support simply due to the fact that it is more stable and/or lighter weight than many other interface options.
+Phosh is a mobile Linux user interface based upon Gnome.Given the fact that many Gnome applications already support devices with small screen resolutions, many apps transfer over well with few modifications necessary. Generally speaking, the user experience seeks to mimic earlier versions of Android. There is an app drawer with graphical logos, menus that are accessed from swiping down at the top of the screen, and a gallery of running applications. As such, it is relatively user friendly and has already shipped on some commercial smartphones like the `Librem 5` from Purism. Given the fact that Linux smartphones are still in their infancy,Phosh has gained much support simply due to the fact that it is particularly stable and intuitive for those familiar with desktop Linux.
 ![An example of phosh](assets/2023-02-07-23-14-25.png)
 
-The next main Linux user interface is Plasma Mobile. Plasma Mobile has a similar design philosophy to Phosh, except for the fact that it is based on KDE, not Gnome. Once again it borrows a significant amount of its design philosophy from android and iOS. Plasma mobile has a standard home screen of applications with GUI menus and homescreen widgets.
+#### Plasma Mobile
+
+The next main Linux user interface is Plasma Mobile. Plasma Mobile has a similar design philosophy to Phosh, except for the fact that it is based on KDE, not Gnome. Once again it borrows a significant amount of its design philosophy from Android and iOS. Plasma mobile has a standard home screen of applications with GUI menus and homescreen widgets.
 
 ![An example of plasma mobile](assets/2023-02-07-23-22-09.png)
 
-While much more could be said about both of these user interfaces, the fact is that they are largely seeking to mimic existing designed principles. They are primarily touch focused and have a familiar focus upon a homescreen with Gui applications. However, neither of these interfaces have had the time or money to develop in the same way as android or iOS. as a result, Linux accessibility on mobile is sorely lacking. as stated previously, talon and dragon do not run on these devices and given the fact they are totally centered around touch input, they are essentially unusable for people with accessibility issues. However come of this does not have to be the case. How can we rethink user interface design to design accessible systems, even in a constrained environment?
+While much more could be said about both Plasma Mobile and Phosh, the fact is that they are largely seeking to mimic existing designed principles. They are primarily touch focused and have a familiar focus upon a homescreen with GUI applications. However, neither of these interfaces have had the time or money to develop to the level of Android or iOS. As a result, Linux accessibility on these mobile interfaces is sorely lacking. As stated previously, Talon and Dragon do not run on these devices. As we have seen as well, they are both entirely centered around touch input. They are essentially unusable for people with accessibility issues affecting the use of the hands. However, this is not the case for all user interfaces.
 
 #### SXMO
 
-SXMO, (Simple X Mobile), is the third major mobile Linux user interface. However, it takes a significantly different design approach regarding both the user experience and the underlying software that powers it.SXMO is designed to be minimalist in nature and closer to the unix philosophy of simple distinct minimal programs.SXMO is not built on either Gnome or KDE but rather a highly modified version of DWM .DWM is a dynamic tiling window manager Linux desktops. This means that it automatically fits new windows to a grid or workspace as they are spawned.Traditionally this software has been primarily used by Linux enthusiasts looking for a lightweight and hackable desktop. ( For instance, there is no config file. To make any custom changes you need to edit the source code itself.)
+SXMO, (Simple X Mobile), is the third major mobile Linux user interface. However, it takes a significantly different design approach regarding both the user experience and the underlying software that powers it.SXMO is designed to be minimalist in nature and closer to the unix philosophy of simple, distinct, minimal programs. SXMO is not built on top of either Gnome or KDE. Rather it uses a highly modified version of DWM \footnote{\url{https://dwm.suckless.org/}} .DWM is a dynamic tiling window manager Linux desktops. This means that it automatically fits new windows to a grid or workspace as they are spawned.Traditionally this software has been primarily used by Linux enthusiasts looking for a lightweight and hackable desktop. For instance, there is no config file. To make any custom changes you need to edit the source code itself.
 
-At first glance, this seems to be even worse in accessibility than both Plasma Mobile and Phosh. However this is not the case due to a series of modifications over DWM. SXMO, instead of prioritizing touch input, uses a series of context menus to navigate around the system. For instance, when you are in the terminal you can press the volume up key to launch a menu with the following options
+At first glance, this seems to be even worse in accessibility than both Plasma Mobile and Phosh. However this is not the case due to a series of modifications over DWM. SXMO, instead of prioritizing touch input, uses a series of context menus to navigate around the system. For instance, when you are in the terminal you can press the volume up key to launch a menu with application specific options. This provides a discrete, navigable interface that is easy to script, including with voice.
 
 <!-- <div style="display: flex;" markdown="1">
-
 ![An example of the interface with a menu opened.](assets/2023-02-11-14-47-48.png){width=50%}
 ![An example of a menu for a specific application](assets/2023-02-13-19-25-59.png){width=50%}
-
 </div> -->
 
 <div style="display: flex;">
@@ -390,8 +394,7 @@ At first glance, this seems to be even worse in accessibility than both Plasma M
 <div style="display: flex;">
 ![An example of a menu for a specific application](assets/2023-02-13-19-25-59.png){width=50%}
 </div>
-
-- Copy
+<!-- - Copy
 - Paste
 - Zoom In
 - Zoom Out
@@ -400,9 +403,9 @@ At first glance, this seems to be even worse in accessibility than both Plasma M
 - URL Mode
 - Hotkeys
 - System Menu
-- Close Menu
+- Close Menu -->
 
-The behavior of the different keys can be found at [https://git.sr.ht/~mil/sxmo-dmenu/tree/master/item/dmenu.c#L592](https://git.sr.ht/~mil/sxmo-dmenu/tree/master/item/dmenu.c#L592). We care about
+<!-- The behavior of the different keys can be found at [https://git.sr.ht/~mil/sxmo-dmenu/tree/master/item/dmenu.c#L592](https://git.sr.ht/~mil/sxmo-dmenu/tree/master/item/dmenu.c#L592). We care about
 
 https://cgit.freedesktop.org/xorg/proto/x11proto/tree/XF86keysym.h
 
@@ -410,33 +413,36 @@ https://cgit.freedesktop.org/xorg/proto/x11proto/tree/XF86keysym.h
 #define XF86XK_AudioLowerVolume	0x1008FF11   /* Volume control down        */
 #define XF86XK_AudioMute	0x1008FF12   /* Mute sound from the system */
 #define XF86XK_AudioRaiseVolume	0x1008FF13   /* Volume control up          */
-```
+``` -->
 
-For context,SXMO was designed alongside many users using the pine phone. This device has relatively low end specifications and a touchscreen that is rather underwhelming. As a result SXMO decided to use the volume up,volume down, and power buttons as discrete navigation options. Instead of trying to mimic android and iOS it created its own mobile design philosophy. Namely, provide a way to launch menus with nested, configurable options. Then software developers can implement menu options for their application. Under the hood, it is simply controlling sets of shell scripts that the user can easily access.
+For context, SXMO was designed alongside many users using the `PinePhone`. This device has relatively low end specifications and a touchscreen that is rather underwhelming. As a result SXMO decided to use the volume up,volume down, and power buttons as discrete navigation options. Instead of trying to mimic Android and iOS it created its own mobile design philosophy. Namely, it provides a way to launch menus and navigate the device through with nested, configurable options. Then software developers can implement menu options for their application. Under the hood, it is simply controlling sets of shell scripts that the user can easily access.
 
-As we discussed previously, voice controlled accessibility software works best with discrete, clear labels as well as building upon existing interfaces, not replacing them. SXMO does exactly this. For instance, when a menu shows up on the screen, a user has a distinct set of actions that they can perform. They can very clearly use a command like `five` to refer to the fifth element in the menu. This creates for not only a simple command to remember, but also one that is easier to train and later weight to run, compared to a general purpose voice recognition model.
+As we discussed [previously](#qualitative-design-choices-and-accessibility), voice controlled accessibility software works best with discrete, clear labels as well as building upon existing interfaces, not replacing them. SXMO does exactly this. For instance, when a menu shows up on the screen, a user can give a specific input pattern to navigate to it. For instance, if they want to select the fifth item in a menu, they can click down five times, or if they have accessibility software activated, use a command like `five` to go down five times. (And of course they can still use the touch screen as well) This meny system makes it easy to navigate via scripting, and thus easy to navigate via voice. Since we are navigating through menus, we can use short voice commands and not need to train and entire general purpose voice recognition model. Thus, our federated learning system with the M5 model fits well alongside these design goals
 
-Another key element of SXMO is the fact that it is meant to be hackable. This means that menu actions can easily be edited in distinct shell scripts and it is easy to extend the behavior even of relatively fundamental aspects of the user interface, such as the desktop itself.SSH is also well supported which makes the device feel like a small Linux desktop, more than a distinct mobile device. while this flexibility will require lots of development work to bring it to fruition, the fact of the matter is that SXMO has a fundamentally different way about thinking about mobile computing.
+Another key element of SXMO is the fact that it is meant to be hackable. This means that menu actions can easily be edited in distinct shell scripts. It is even easy to extend the behavior of fundamental aspects of the user interface, such as the desktop itself.SSH is also well supported which makes the device feel like a small Linux desktop, more than a distinct mobile device. While this flexibility can be a challenge at times, the fact of the matter is that SXMO has a an exciting and unique way of thinking about mobile computing.
 
-To summarize SXMO's design philosophy:
+Thus, to summarize SXMO's design philosophy:
 
-- make it hackable and transparent
+- make the system hackable and transparent
 - don't harshly distinguish between mobile and the desktop
-- don't use unnecessarily complicated software
-- try simple analog input options before complex touchscreen ones
+- try simple discrete input options before complex touchscreen ones
 
-All these properties make SXMO a particularly exciting platform for experimenting with the next generation of accessibility software and alternative HCI ideals. SXMO isn't trying to mimic iOS or android, and that is exactly what makes it special. SXMO Provides a lightweight and transparent way of controlling all the essentials of your phone, Yet at the same time being designed in such a way that can be extended ( in this case, with accessibility software)
+All these properties make SXMO a particularly exciting platform for research. It allows us to experiment with the next generation of accessibility software and alternative HCI perspectives. SXMO isn't trying to mimic iOS or Android, and that is exactly what makes it special, and in our case particularly suited for new forms of voice controlled accessibility software.( And the federated learning systems like our own that will support them)
 
-Now that we have summarized the landscape of Linux mobile phones and explained the User interface properties that are desirable, I will explain the prices of actually bringing voice control to Linux mobile devices.
+Now that we have summarized the landscape of Linux mobile phones and explained the user interface properties that are desirable, I will explain what needs to be done to bring voice control to SXMO and create voice clients on Linux mobile devices generally.
 
-## Voice Assistants and their Challenges
+## Developing a Client to Query the Model
 
-When discussing accessibly software, we saw how one of the most important decisions is [knowing what sort of other non- accessibility software to pair it with](#build-upon-user-interfacesdont-create-new-ones).Thus,
-it is not enough to simply have a good model, but we must also understand the sorts of tasks that should be controlled and what software will pair well with voice control. With this in mind, I will now discuss the current tools we have when designing for Linux mobile devices and what needs to be done in this ecosystem before bringing in federated learning systems.
+`numen-modifications/model-query.py`
 
-Before I develop software that uses my federated learning models, I believe it is important to establish a series of other baseline functionalities: an API for a stream of non-blocking model inferences, variable vocabulary at runtime, and a simple programming language for writing user scripts. Given the fact that accessibility software is not useful if it is not practical, I found it most important to focus on these baseline practicality functions first.
+## Integrating with Voice Toolkits
 
-As a result, I chose to build upon the voice accessibility software, numen.
+When discussing accessibly software, we saw how one of the most important decisions is knowing what [other software to pair it with](#build-upon-user-interfacesdont-create-new-ones).Thus,
+it is not enough to simply have a good model, but we must also understand the sorts of tasks that should be controlled and what software will pair well with voice control.
+
+To create a more useful client, I believe it is important to establish a series of other baseline functionalities: an API for a stream of non-blocking model inferences, variable vocabulary at runtime, and a simple programming language for writing user scripts.
+
+As a result, I chose to build upon an new, experimental accessibility software solution called `Numen`.
 
 ## Numen
 
@@ -450,9 +456,9 @@ While my model made from federated learning is not in the Vosk format, and is in
 
 ## Numen's Design Principles
 
-Despite the fact that Numen is a general purpose voice control program, it differs greatly from programs like Talon or Dragon. Numen does not have an associated scripting language, but rather can call existing scripts on the user's device. As a result, it requires a more technical understanding, yet at the same time is lighter weight and easier to run on a low specification device. It is important that we understand numen's design principles since it shows something about not just Numen but also the general ecosystem of Linux mobile devices. In order to bring new federated models and machine learning ecosystems to a new platform, we first need to understand the user goals and existing communities.
+Despite the fact that Numen is a general purpose voice control program like [Talon](#talon), it differs in many distinct ways. Numen does not have an associated scripting language, but rather can call existing scripts on the user's device. As a result, it requires a more technical understanding, yet at the same time is lighter weight and can run on ARM devices with low specs (Talon cannot run on ARM in general). It is important that we understand Numen's design principles since it elucidates not just Numen but also the general research currently being done within this emerging platform.
 
-These are some examples of numen phrase scripts. On the left is a word and on the right is either a list of keys or the path to a shell command. In front of the word, there can also be words with the @ character. This character signifies a meta property that effects how the model parses the word. For instance reducing response time, or canceling a previous command that was said in the same phrase. In the phrasing of talon, the left would be a capture with some sort of capture modifier, and the right would be a command.
+In the code block below there are a few examples of Numen phrase scripts. On the left is a phrase and on the right is in associated command that will be executed. This can be either a list of keys or the path to a shell command. In front of the word, there can also be words with the @ character. This character signifies a meta property that effects how the model parses the word. For instance reducing response time, or canceling a previous command that was said in the same phrase. For those familiar with Talon and its associated terminology, the left would be a capture with some sort of capture modifier, and the right would be a command.
 
 ```
 #  Press the control key
@@ -467,11 +473,11 @@ clear left:press ctrl+BackSpace
 localpen printf %s\\n "$NUMEN_TRANSCRIPT" | /usr/libexec/numen/phrases/fmt "$fmt"
 ```
 
-As you can see from the default commands, numen generally tends to be lower level and more imperative than declarative. There are some benefits to this. For instance, if a user already knows many keyboard shortcuts, they don't need to learn a list of new declarative commands ( as they can simply say the key names). This aligns with the ui principles we described previously, namely: [designing around discrete inputs](#design-around-discrete-instead-of-continuous-inputs) as well as [building upon existing interfaces](#build-upon-user-interfacesdont-create-new-ones).
+As you can see from the default commands, Numen generally tends to be lower level and more imperative than declarative. There are some benefits to this. For instance, if a user already knows many keyboard shortcuts, they don't need to learn a list of new declarative commands. They can simply say the key names. This aligns with the ui principles we described previously, namely: [designing around discrete inputs](#design-around-discrete-instead-of-continuous-inputs) as well as [building upon existing interfaces](#build-upon-user-interfacesdont-create-new-ones).
 
-Despite the fact that these are good principles, sometimes it does go too low level. Additionally, the program does not support some of the key features seen in other programs like talon. For instance, there is no notion of modes that separate commands based on a specific use case, or context based commands that only activate with certain programs focused. One example of such a mode that is seen in many voice control programs is sleep mode: namely where the model doesn't do anything until a certain wake command is heard.
+Despite the fact that these are good principles, sometimes it may be too low level. Additionally, the program does not support some of the key features seen in other programs like Talon. For instance, there is no notion of modes that separate commands based on a specific use case, or context based commands that only activate with certain programs focused. One example of such a mode that is seen in many voice control programs is sleep mode: namely where the model doesn't do anything until a certain wake command is heard. As such, I wanted to make a few key additions to Numen given what I have learned from studying other voice control solutions.
 
-https://sources.debian.org/src/sxmo-utils/1.12.0-6/configs/default_hooks/three_button_touchscreen/sxmo_hook_inputhandler.sh/
+<!-- https://sources.debian.org/src/sxmo-utils/1.12.0-6/configs/default_hooks/three_button_touchscreen/sxmo_hook_inputhandler.sh/ -->
 
 ## My Additions to Numen
 

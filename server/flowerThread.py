@@ -1,4 +1,5 @@
 import threading
+# source: https://stackoverflow.com/questions/47912701/python-how-can-i-implement-a-stoppable-thread
 
 class StoppableThread(threading.Thread):
     """Thread class with a stop() method. The thread itself has to check

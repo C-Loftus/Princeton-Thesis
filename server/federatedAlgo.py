@@ -6,6 +6,10 @@ from flowerThread import StoppableThread, threading
 
 ADDR = "127.0.0.1:8080"
 
+# Code influenced by the following sources, used with permission and attribution:
+# source: https://github.com/adap/flower/issues/487
+# source: https://flower.dev/docs/save-progress.html
+
 def fit_config(server_round: int) -> Dict[str, fl.common.Scalar]:
     config: Dict[str, fl.common.Scalar] = {
         "epoch_global": str(server_round),
@@ -13,7 +17,6 @@ def fit_config(server_round: int) -> Dict[str, fl.common.Scalar]:
         "batch_size": str(32),
     }
     return config
-
 
 
 def serverThread(userStrategy, clientManager, requiredClients):

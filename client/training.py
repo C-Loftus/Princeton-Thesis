@@ -84,7 +84,7 @@ class TRAINING_CONFIG:
         )
         self.scheduler = optim.lr_scheduler.StepLR(
             self.optimizer, step_size=20, gamma=0.1
-        )  # reduce the learning after 20 epochs by a factor of 10
+        ) 
         # # The transform needs to live on the same device as the model and the data.
         self.transform = self.transform.to(self.device)
 
@@ -116,6 +116,17 @@ def count_parameters(model):
     return sum(p.numel() for p in model.parameters() if p.requires_grad)
 
 
+def negative_log_tensor_reverse(tensor):
+    # Return the negative log of the tensor
+    return -tensor.log()
+
+def adam_lr_scheduler(optimizer, epoch, lr):
+    # Decay learning rate by a factor of 0.1 every 7 epochs
+    if epoch % 7 == 0 and epoch:
+        for param_group in optimizer.param_groups:
+            param_group["lr"] *= 0.1
+    return optimizer
+
 def collate_fn(batch):
     def label_to_index(
         word,
@@ -123,12 +134,8 @@ def collate_fn(batch):
         # Return the position of the word in labels
         return torch.tensor(tc.labels.index(word))
 
-    # A data tuple has the form:
-    # waveform, sample_rate, label, speaker_id, utterance_number
-
     tensors, targets = [], []
 
-    # Gather in lists, and encode labels as indices
     for waveform, _, label, *_ in batch:
         tensors += [waveform]
         targets += [label_to_index(label)]
@@ -154,13 +161,14 @@ def train(model, epoch, log_interval):
         # negative log-likelihood for a tensor of size (batch x 1 x n_output)
         try:
             loss = F.nll_loss(output.squeeze(), target)
-        except:
+        except: # When we have a checkpoint and the model is not the same as the one we are trying to restore
+
             #  we need this try except block to manage restoring a model from a checkpoint
             try:
                 if output.shape != target.shape:
                     target = target.expand(output.shape)
                 loss = F.nll_loss(output.squeeze(), target)
-            except:
+            except: # Different error caused by different shapes now with 1 channel
                 target = target.flatten()
                 loss = F.nll_loss(output.squeeze(), target)
 
@@ -174,10 +182,11 @@ def train(model, epoch, log_interval):
                 f"Train Epoch: {epoch} [{batch_idx * len(data)}/{len(tc.train_loader.dataset)} ({100. * batch_idx / len(tc.train_loader):.0f}%)]\tLoss: {loss.item():.6f}"
             )
 
-        # record loss
+        # record loss and update the tc losses list
         tc.losses.append(loss.item())
 
 def test(model, epoch):
+    # set model to evaluation mode
     model.eval()
     correct = 0
     for data, target in tc.test_loader:
@@ -192,6 +201,7 @@ def test(model, epoch):
         pred = get_likely_index(output)
         correct += number_of_correct(pred, target)
 
+    
     print(
         f"\nTest Epoch: {epoch}\tAccuracy: {correct}/{len(tc.test_loader.dataset)} ({100. * correct / len(tc.test_loader.dataset):.0f}%)\n"
     )
@@ -232,7 +242,9 @@ class FlowerClient(fl.client.NumPyClient):
 
     def fit(self, parameters, config=None):
         self.set_parameters(parameters)
-        train(self.net, 1, 100)
+        EPOCH = 1
+        LOG_INTERVAL = 100
+        train(self.net, EPOCH, LOG_INTERVAL)
         return self.get_parameters(config={}), len(self.train_loader.dataset), {}
 
     def evaluate(self, parameters, config=None):
