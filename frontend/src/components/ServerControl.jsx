@@ -99,7 +99,7 @@ export default function ServerForm(props) {
           </Select>
           <Text paddingTop={12} />
 
-          {/* <HStack>
+          <HStack>
             <Tooltip
               hasArrow
               label=" These labels need to be present in the users' Talon training data. The final model will only include these labels."
@@ -116,7 +116,7 @@ export default function ServerForm(props) {
             padding={3}
             type="commands"
             {...register("commands", { required: false })}
-          /> */}
+          />
 
           <Text paddingTop={12} />
           <HStack>
