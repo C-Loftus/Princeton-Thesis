@@ -13,13 +13,14 @@ SPACING = documentclass=report
 SETTINGS = -V $(GEOM) \
   -V $(FONT_SIZE)\
   -V $(COLOR) \
-  -V $(SPACING) \
   --filter pandoc-citeproc \
   --bibliography=citations.bib \
   --csl=ieee.csl \
   --metadata link-citations=true \
-  --lua-filter=./columns.lua \
-  -F mermaid-filter 
+  -V $(SPACING)  \
+#   --template=report.tex 
+#   --lua-filter=./columns.lua \
+#   -F mermaid-filter 
 
 thesis:
 	pandoc $(SETTINGS) -o $(OUT_DIR)/thesis.pdf main.md
@@ -50,3 +51,4 @@ dependencies:
 	sudo apt install pandoc-citeproc
 	sudo apt install librsvg2-bin
 	sudo npm install --global mermaid-filter
+	sudo apt-get install texlive-bibtex-extra biber

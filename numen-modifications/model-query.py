@@ -3,6 +3,34 @@ import torchaudio
 import numpy as np
 from torch import nn
 import torch.nn.functional as F
+import typer
+import pyaudio
+import wave
+
+import requests
+import sys
+REMOTE_SERVER = "http://localhost:5000"
+
+def top30FromServer():
+        # Send a web request to the server to get the list of commands
+    result= requests.get(REMOTE_SERVER + "/commands")
+    try:
+        training_commands = result.json()['detail']
+    except Exception as e:
+        print(" Error getting commands from the server. Is the server running?")
+        sys.exit(1)
+    return training_commands
+
+def get_labels(fromServer=False):
+    if fromServer:
+        return top30FromServer()
+    else: 
+        return  [
+        "backward", "bed", "bird", "cat", "dog", "down", "eight", "five", "follow", "forward",
+        "four", "go", "happy", "house", "learn", "left", "marvin", "nine", "no", "off", "on",
+        "one", "right", "seven", "sheila", "six", "stop", "three", "tree", "two", "up", "visual",
+        "wow", "yes", "zero"
+        ]
 
 # Define the M5 model architecture
 class M5(nn.Module):
@@ -63,41 +91,78 @@ for key in weights.keys():
 # Load the state dict into the model
 model.load_state_dict(state_dict)
 
+def record_audio():
+
+    CHUNK = 1024
+    FORMAT = pyaudio.paInt16
+    CHANNELS = 1  # Set to 1 for mono recording
+    RATE = 16000  # Set the sample rate to 16000 Hz
+    RECORD_SECONDS = 1
+    WAVE_OUTPUT_FILENAME = "output.wav"
+
+    p = pyaudio.PyAudio()
+
+    print("Recording audio...")
+    stream = p.open(format=FORMAT,
+                    channels=CHANNELS,
+                    rate=RATE,
+                    input=True,
+                    frames_per_buffer=CHUNK)
+
+    frames = []
+
+    for i in range(0, int(RATE / CHUNK * RECORD_SECONDS)):
+        data = stream.read(CHUNK)
+        frames.append(data)
+
+    stream.stop_stream()
+    stream.close()
+    p.terminate()
+
+    wf = wave.open(WAVE_OUTPUT_FILENAME, 'wb')
+    wf.setnchannels(CHANNELS)
+    wf.setsampwidth(p.get_sample_size(FORMAT))
+    wf.setframerate(RATE)
+    wf.writeframes(b''.join(frames))
+    wf.close()
+
+def main(record: bool = True, fromServer: bool = False):
+
+    while True:
+        record_audio() if record else print("Using sample audio file")
+
+        filename = "output.wav" if record else "sample.wav.keep"
+
+        waveform, sample_rate = torchaudio.load(filename)
+
+        # Apply the same pre-processing steps as used in the training data
+        # Here we know that the sample rate is 16000 Hz)
+        mfcc_transform = torchaudio.transforms.MFCC(sample_rate=16000, n_mfcc=40)
+        spectrogram_transform = torchaudio.transforms.Spectrogram(n_fft=1024, hop_length=512)
+
+        mfcc = mfcc_transform(waveform)
+        spectrogram = spectrogram_transform(waveform)
+
+        # Combine the MFCC and spectrogram into a single input tensor
+        input_tensor = torch.cat([mfcc, spectrogram], dim=0)
+
+        # Add a batch dimension
+        input_tensor = input_tensor.unsqueeze(0)
+
+        # Pass the input tensor through the model
+        model.eval()
+        output = model(input_tensor)
 
 
-# Load the audio file
-filename = "sample.wav.keep"
-waveform, sample_rate = torchaudio.load(filename)
+        # Convert the output to a probability distribution
+        probabilities = torch.softmax(output, dim=1)
 
-# Apply the same pre-processing steps as used in the training data
-# Here we know that the sample rate is 16000 Hz)
-mfcc_transform = torchaudio.transforms.MFCC(sample_rate=16000, n_mfcc=40)
-spectrogram_transform = torchaudio.transforms.Spectrogram(n_fft=1024, hop_length=512)
+        labels = get_labels(fromServer)        
 
-mfcc = mfcc_transform(waveform)
-spectrogram = spectrogram_transform(waveform)
+        predicted_label = labels[probabilities.argmax()]
 
-# Combine the MFCC and spectrogram into a single input tensor
-input_tensor = torch.cat([mfcc, spectrogram], dim=0)
-
-# Add a batch dimension
-input_tensor = input_tensor.unsqueeze(0)
-
-# Pass the input tensor through the model
-model.eval()
-output = model(input_tensor)
+        print("The predicted label is:\n", predicted_label)
 
 
-# Convert the output to a probability distribution
-probabilities = torch.softmax(output, dim=1)
-
-# Get the predicted label
-labels = [
-"backward", "bed", "bird", "cat", "dog", "down", "eight", "five", "follow", "forward",
-"four", "go", "happy", "house", "learn", "left", "marvin", "nine", "no", "off", "on",
-"one", "right", "seven", "sheila", "six", "stop", "three", "tree", "two", "up", "visual",
-"wow", "yes", "zero"
-]
-predicted_label = labels[probabilities.argmax()]
-
-print("The predicted label is:", predicted_label)
+if __name__ == "__main__":
+    main()

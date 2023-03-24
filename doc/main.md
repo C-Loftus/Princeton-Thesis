@@ -5,7 +5,9 @@ header-includes:
   - \usepackage{setspace}
   - \doublespacing
   - \usepackage{url}
+  # - \documentclass[twoside,openright]{report}
 author: "Colton Loftus"
+numbersections: true
 ---
 
 # Abstract
@@ -17,6 +19,18 @@ However, many models related to specialty tasks suffer from a lack of data, well
 In my paper, I describe a novel way to apply Federated Learning for voice-based accessibility software. This solution using federated learning allows models to be trained without exposing sensitive voice data to a central server. It seeks to reduce the complexity of the federated learning process for end users and allows users to use their data generated from existing accessibility software. This data can be used to build the backend for new voice control software on mobile devices. Throughout this paper,I describe the technical implementation of this solution and the user experience goals that informed my design.
 
 Finally in the last section of the paper, I discuss a new platform, Linux mobile devices, where voice control is sorely lacking and how we can integrate new ecosystems such as my own software. I argue that the data sovereignty goals of Linux Mobile devices align well with those of federated learning. I discuss not only why federated learning is theoretically useful on this platform, but also the technical challenges of building accessibility software within new platforms. At the end of the paper, I discuss the implications of this work for the future of accessibility software.
+
+## Acknowledgements
+
+I would like to thank my advisor, Professor Kyle Jamieson at Princeton University for his advice and insight throughout the research process.
+
+Any existing code adapted for this project was fairly used in accordance with the terms of the Apache, GPL, or MIT licenses. Relevant licensing information is at the top of the corresponding file. When implementing the technical algorithms and general structure of this monorepo, I used built upon and modified code and design principles from
+
+[https://pytorch.org/tutorials/intermediate/speech_command_recognition_with_torchaudio.html](https://pytorch.org/tutorials/intermediate/speech_command_recognition_with_torchaudio.html)
+
+[https://flower.dev/docs/quickstart-pytorch.html](https://flower.dev/docs/quickstart-pytorch.html)
+
+[https://testdriven.io/blog/fastapi-react/](https://testdriven.io/blog/fastapi-react/)
 
 # Introduction
 
@@ -66,7 +80,7 @@ Finally, in addition to the accessibility aspects of our design for federated le
 
 Before discussing my work, it is useful to give an overview of the existing field of voice-controlled accessibility software, federated learning frameworks, and the design principles that inform them both. This context will help to better explain the overall architecture and the specific choices I made while developing my software. My software seeks to address problems in the existing federated learning and voice controlled accessibility ecosystems.
 
-## Existing Impediments in Machine Learning for Health
+## Impediments in Machine Learning for Health
 
 In recent years, machine learning has created significant advances across healthcare and accessibility. Sophisticated machine learning applications have emerged for drug discovery, disability accommodations, patient monitoring services, and much more. [@10.1145/3167486.3167551] Advances in reinforcement-learning now allows for vital healthcare applications to be deployed even in novel environments and [@10.1145/3477600] new ways of optimizing and distributing training has allowed for models to be trained with limited data sets [@10.1145/3427796.3433935].
 
@@ -306,7 +320,7 @@ In a centralized machine learning paradigm, usually the central server has to ha
 The frontend for the central server was implemented using React. This was since this framework has preexisting tools for accessible user interface design and works well with [Rango](#rango). The library I used for this was Chakra UI. React is also good for accomplishing another one of my main goals: condensing everything into a single page application. This is not only more accessible, it is also simply easier to understand. It is important to note that this simplicity was only able to be accomplished by using the previously mentioned `FastAPI` backend. This allowed us to make the underlying `flwr` server more easily controlled and monitored.
 
 <div style="display: flex;">
-![The web interface as it appears before training.  One can hover the mouse over '?' to get extra info, or use voice to select the boxes through Rango accessibility letters.  The boxes are pre populated with sensible defaults like FedAvgM and the Talon alphabet.](assets/frontend.png){width=70%}
+![The server interface as it appears before training.  One can hover the mouse over '?' to get extra info, or use voice to select the boxes through Rango accessibility letters.  The boxes are pre populated with sensible defaults like FedAvgM and the Talon alphabet.](assets/frontend.png){width=70%}
 </div>
 
 ## Client Interface
@@ -375,6 +389,7 @@ Just as we did previously when discussing different types of voice controlled ac
 #### Phosh
 
 Phosh is a mobile Linux user interface based upon Gnome.Given the fact that many Gnome applications already support devices with small screen resolutions, many apps transfer over well with few modifications necessary. Generally speaking, the user experience seeks to mimic earlier versions of Android. There is an app drawer with graphical logos, menus that are accessed from swiping down at the top of the screen, and a gallery of running applications. As such, it is relatively user friendly and has already shipped on some commercial smartphones like the `Librem 5` from Purism. Given the fact that Linux smartphones are still in their infancy,Phosh has gained much support simply due to the fact that it is particularly stable and intuitive for those familiar with desktop Linux.
+
 ![An example of phosh](assets/2023-02-07-23-14-25.png)
 
 #### Plasma Mobile
@@ -397,11 +412,11 @@ At first glance, this seems to be even worse in accessibility than both Plasma M
 </div> -->
 
 <div style="display: flex;">
-![An example of the interface with a menu opened.](assets/2023-02-11-14-47-48.png){width=50%}
+![An example of the SXMO user interface with a menu opened.](assets/2023-02-11-14-47-48.png){width=50%}
 </div>
 
 <div style="display: flex;">
-![An example of a menu for a specific application](assets/2023-02-13-19-25-59.png){width=50%}
+![An example of a SXMO menu for the terminal emulator program `Foot`](assets/2023-02-13-19-25-59.png){width=50%}
 </div>
 <!-- - Copy
 - Paste
@@ -436,7 +451,7 @@ Thus, to summarize SXMO's design philosophy:
 - don't harshly distinguish between mobile and the desktop
 - try simple discrete input options before complex touchscreen ones
 
-All these properties make SXMO a particularly exciting platform for research. It allows us to experiment with the next generation of accessibility software and alternative HCI perspectives. SXMO isn't trying to mimic iOS or Android, and that is exactly what makes it special, and in our case particularly suited for new forms of voice controlled accessibility software.( And the federated learning systems like our own that will support them)
+All these properties make SXMO a particularly exciting platform for research. It allows us to experiment with the next generation of accessibility software and alternative HCI perspectives. SXMO isn't trying to mimic iOS or Android, and that is exactly what makes it so interesting for exploring new forms of voice controlled accessibility software.( And the federated learning systems like our own that will support them)
 
 Now that we have summarized the landscape of Linux mobile phones and explained the user interface properties that are desirable, I will explain what needs to be done to bring voice control to SXMO and create voice clients on Linux mobile devices generally.
 
@@ -470,17 +485,17 @@ As stated previously, to make useful federated learning systems that people want
 
 Despite the fact that Numen is a general purpose voice control program like [Talon](#talon), it differs in many distinct ways. Numen does not have an associated scripting language, but rather can call existing scripts on the user's device. As a result, it requires a more technical understanding, yet at the same time is lighter weight and can run on ARM devices with low specs (Talon cannot run on ARM in general). It is important that we understand Numen's design principles since it elucidates not just Numen but also the software communities emerging on this platform.
 
-In the code block below there are a few examples of Numen phrase scripts. On the left is a phrase and on the right is in associated command that will be executed. This can be either a list of keys or the path to a shell command. In front of the word, there can also be words with the `@` character. This character signifies a meta property that effects how the model parses the word. For instance reducing response time, or canceling a previous command that was said in the same phrase. For those familiar with Talon and its associated terminology, the left would be a capture with some sort of capture modifier, and the right would be a command.
+In the code block below there are a few examples of Numen phrase scripts. On the left of the ':' character is a phrase and on the right is in associated command that will be executed. This can be either a list of keys or the path to a shell command. In front of the word, there can also be words with the `@` character. This character signifies a meta property that effects how the model parses the word. For instance reducing response time, or canceling a previous command that was said in the same phrase. For those familiar with Talon and its associated terminology, the left would be a capture with some sort of capture modifier, and the right would be a command.
 
 ```shell
-#  Press the control key
+  #  Press the control key
 troll:mod ctrl
-# Delete One Word to the Left
+  # Delete One Word to the Left
 clear left:press ctrl+BackSpace
-# Navigate to the window in the given direction
+  # Navigate to the window in the given direction
 @rapidoff west:unstick press super+Left
-# Transcribe a sentence
-# For example, "scribe please type this".
+  # Transcribe a sentence
+  # For example, "scribe please type this".
 @transcribe say:set fmt echo normal\
 localpen printf %s\\n "$NUMEN_TRANSCRIPT" | /usr/libexec/numen/phrases/fmt "$fmt"
 ```
@@ -493,7 +508,7 @@ Despite the fact that these are good principles, the shell can sometimes feel to
 
 The first additions I made to the codebase was creating a series of phrase scripts. As mentioned previously, phrase scripts map a voice command to a shell script action. The first set of phrase scripts I created were located at `numen-modifications/talon*.phrases`. The purpose of these scripts are to mimic Talon scripts for those who are coming to Numen from previous experience with Talon accessibility software. As such, command names will be more familiar for new users looking to enter this new platform.
 
-The next set of scripts I made include `numen-modifications/sxmo.phrases`. In this file I wrote commands for interacting with SXMO specifically from Numen. As a result, these scripts allow the user to navigate through context menus and mimic the touchscreen or volume rocker gestures that normally control the interface.These gesture commands are normally abstracted away from the user and I had to search through the source code to find the proper shell actions. \footnote{ \url{< https://sources.debian.org/src/sxmo-utils/1.12.0-6/configs/default_hooks/three_button_touchscreen/sxmo_hook_inputhandler.sh/ }} Now with these phrase scripts implemented, the user can control a mobile Linux smartphone with commands similar to those in Talon, and do so within SXMO's interface.
+The next set of scripts I made include `numen-modifications/sxmo.phrases`. In this file I wrote commands for interacting with SXMO specifically from Numen. As a result, these scripts allow the user to navigate through context menus and mimic the touchscreen or volume rocker gestures that normally control the interface.These gesture commands are normally abstracted away from the user and I had to search through the source code to find the proper shell actions. \footnote{\url{https://sources.debian.org/src/sxmo-utils/1.12.0-6/configs/default_hooks/three_button_touchscreen/sxmo_hook_inputhandler.sh/}} Now with these phrase scripts implemented, the user can control a mobile Linux smartphone with commands similar to those in Talon, and do so within SXMO's interface.
 
 With all these additions now summarized, I believe Talon users and others interested in voice controlled accessibility software have a strong foundation to build upon.
 
@@ -535,7 +550,9 @@ At the end of training, we were left with a model of size 0.4055 megabytes when 
 Now that we have a baseline, the next part of the quantitative evaluation was to evaluate a federated learning training cycle with Talon data exclusively. The first part of this evaluated requires simulating how long it would take for a user to generate a high quality dataset. I did this by using Talon for at least three hours of computer work every day for 2 weeks. At the end of this week I ran my audio dataset generation script: `client/scripts/parse_talon.py`.
 As stated previously in the paper, Talon can generate a user dataset by saving recordings and labeling them according to the inferences from the talon voice parser. While these inferences are not always perfect, Talon uses the conformer model architecture from Nvidia. According to the paper in which this model was first described, the Conformer model achieves a word error rate of less than 5% on the LibriSpeech benchmark. [@https://doi.org/10.48550/arxiv.2005.08100] Since we are only looking to generate a dataset of short commands, we can be confident that there is high accuracy in our training data.\footnote{Talon also restricts potential labels during runtime, thus further decreasing the probability of incorrect recognition due to commands that are not appropriate in a particular context or application}
 
-![The Top 30 Commands generated from my Talon dataset](assets/top30cmds.png)
+<div style="display: flex;">
+![The Top 30 Commands generated from my Talon dataset](assets/top30cmds.png){width=70%}
+</div>
 
 The analysis done on the dataset can be found at `client/scripts/dataset-analysis.ipynb`
 As one can see in the figure, the top 30 commands had an average of roughly 80 occurrences, some with much more. Given the fact that Talon is so highly customizable, it is important to note that there will be high variance between workflows. For instance, a user that dictates lots of emails may not have a good dataset,given the fact that much of their dictation is done in long sentences, not short commands. In my experience I averaged around 170 commands a day that were valid to be used for training. However, it is important to note that when we begin training, we only use the 30 most common commands as our labels. This is so the model has suitable properties for a federated learning task. Namely, we want just 30 audio commands so we can have shorter training time and small resulting model size.
@@ -558,9 +575,7 @@ Length of training set: 118, length of validation set: 15
 To begin, I trained with the same epochs and batch size as our baseline SpeechCommands data set benchmark test. At 2 epochs with a batch size of 256, the model performs poorly with only an accuracy of 23%.
 This is to be expected since we have a much smaller dataset
 
-After decreasing the batch size to 16 and increasing the number of epochs to 8, we achieve accuracy: 115/237 (49%).
-
-Finally after once more decreasing the batch size to 8 and increasing the number of epochs to 12, we achieve accuracy: 120/237 (51%).
+After decreasing the batch size to 16 and increasing the number of epochs to 8, we achieve accuracy: 115/237 (49%). Finally after once more decreasing the batch size to 8 and increasing the number of epochs to 12, we achieve accuracy: 120/237 (51%).
 
 After this point, one can continue to decrease the batch size and increase the number of epochs, but the risk of overfitting increases. While this may initially appear as a low accuracy, it is important to keep in context the size of the dataset. Our Talon data has been all automatically generated and automatically labeled. It is also only from two weeks of usage and the SpeechCommands benchmark dataset is almost **45 times larger**. Finally, the data from Talon was all generated using a fifteen dollar pair of wired earbuds, not a professional or expensive microphone. To summarize in comparison, one can see the table below.
 
@@ -664,16 +679,6 @@ For federated learning to be practical, we need users to have datasets that are 
 
 Despite these challenges, I am optimistic about the future of both federated learning and Linux smartphones. Both of these technologies are radical ways to reimagine privacy and data ownership in our age of machine learning and big data. It may never be the case that they are widely adopted, but they provide an avenue through which users can opt out of centralized data collection. Federated voice models may never be better than the ones from Apple or Microsoft. Perhaps Linux smartphones may never be as optimized as the iPhone. However, I hoped to have shown in this paper how simply having alternative platforms can provide us with fruitful new design philosophies. Despite the fact that SXMO may appear primitive and hobbyist, its approach to menu based navigation was unseen elsewhere.
 
-Finally, I hope to have also shown the valuable design work and software engineering occurring at a grassroots and community level, outside universities or industry. Tools I mentioned throughout the paper like [Talon](#talon), [Rango](#Rango) and Cursorless \footnote{\url{https://www.cursorless.org/}} are all community driven. Studying them provided me valuable insights into what everyday users value with their accessibility tools.
+Finally, I hope to have also shown the valuable design work and software engineering occurring at a grassroots and community level, outside universities or industry. Tools I mentioned throughout the paper like [Talon](#talon), [Rango](#Rango) and Cursorless \footnote{\url{https://www.cursorless.org/}} are all community driven. Studying them provided me valuable insights into what everyday users value with their accessibility tools. I am inspired by the dedication and compassion of all those who create accessibility software. I hope to have written this thesis in the same spirit.
 
-# Acknowledgements
-
-I would like to thank my advisor, Professor Kyle Jamieson at Princeton University for his advice and insight throughout the research process.
-
-Any existing code adapted for this project was fairly used in accordance with the terms of the Apache, GPL, or MIT licenses. Relevant licensing information is at the top of the corresponding file. When implementing the technical algorithms and general structure of this monorepo, I used built upon and modified code and design principles from
-
-[https://pytorch.org/tutorials/intermediate/speech_command_recognition_with_torchaudio.html](https://testdriven.io/blog/fastapi-react/)
-
-[https://flower.dev/docs/quickstart-pytorch.html](https://testdriven.io/blog/fastapi-react/)
-
-[https://testdriven.io/blog/fastapi-react/](https://testdriven.io/blog/fastapi-react/)
+# Works Cited

@@ -1,0 +1,8 @@
+mode: all
+-
+and: 
+    " && " 
+
+then:
+    " ; "
+
