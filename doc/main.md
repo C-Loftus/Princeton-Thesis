@@ -502,7 +502,7 @@ localpen printf %s\\n "$NUMEN_TRANSCRIPT" | /usr/libexec/numen/phrases/fmt "$fmt
 
 As one can see from the default commands, Numen generally tends to be lower level and more imperative than declarative. There are some benefits to this. For instance, if a user already knows many keyboard shortcuts, they don't need to learn a list of new declarative commands. They can simply say the key names. This aligns with the ui principles we described previously, namely: [designing around discrete inputs](#design-around-discrete-instead-of-continuous-inputs) as well as [building upon existing interfaces](#build-upon-user-interfacesdont-create-new-ones). This design principle also mimics SXMO and its commitment to the unix philosophy of building simple, composable software components.
 
-Despite the fact that these are good principles, the shell can sometimes feel too low level. Additionally, the program does not support some of the key features seen in other programs like Talon. For instance, there is no notion of modes that separate commands based on a specific use case, or context based commands that only activate with certain programs focused. One example of such a mode that is seen in many voice control programs is sleep mode: namely where the model doesn't do anything until a certain wake command is heard. As such, I wanted to make a few key additions to Numen given what I have learned from studying other voice control solutions. These will help to prepare the platform for new federated voice models like my own.
+Despite the fact that these are good principles, the shell can sometimes feel too low level. Additionally, the program does not support some of the key features seen in other programs like Talon. For instance, there is no notion of modes that separate commands based on a specific use case, or overriding commands with contextual inheritance\footnote{ For instance, in Talon you can define an action like "New Tab" that can perform a completely different action depending on the program and what "New Tab" means inside of it. }. One example of such a mode that is seen in many voice control programs is sleep mode: namely where the model doesn't do anything until a certain wake command is heard. As such, I wanted to make a few key additions to Numen given what I have learned from studying other voice control solutions. These will help to prepare the platform for new federated voice models like my own.
 
 ## My Additions to Numen
 
@@ -510,7 +510,31 @@ The first additions I made to the codebase was creating a series of phrase scrip
 
 The next set of scripts I made include `numen-modifications/sxmo.phrases`. In this file I wrote commands for interacting with SXMO specifically from Numen. As a result, these scripts allow the user to navigate through context menus and mimic the touchscreen or volume rocker gestures that normally control the interface.These gesture commands are normally abstracted away from the user and I had to search through the source code to find the proper shell actions. \footnote{\url{https://sources.debian.org/src/sxmo-utils/1.12.0-6/configs/default_hooks/three_button_touchscreen/sxmo_hook_inputhandler.sh/}} Now with these phrase scripts implemented, the user can control a mobile Linux smartphone with commands similar to those in Talon, and do so within SXMO's interface.
 
-With all these additions now summarized, I believe Talon users and others interested in voice controlled accessibility software have a strong foundation to build upon.
+The next addition I made was implementing a more intuitive scripting library for Numen. This was intended to not only make scripting more straightforward for those with just voice, but also use it to mimic some of the behaviors I was missing from talon
+
+As we discussed previously, Numen phrase scripts are essentially a mapping of a command to an action or shell command. If you wish to write sophisticated behavior, you need to be able to create a script for it in Bash. While this makes it easy to extend, many of the default the shell commands are not intuitive for creation through voice. For instance, special characters like `$`, `"`, `[`, and `(` disrupt the flow of natural language dictation and many common shell commands like `grep`, `pwd`, and `mkdir` are not standard english words. As such they must be spelled out manually instead of dictated. Additionally, unintuitive syntax can make Bash difficult for beginners and those without unix shell experience. For instance, a beginner might not understand `$(var)` vs `'$(var)'` If we wish to make truly accessible software, we need to make sure that our tooling is also intuitive for those without a technical background.
+
+As such, I created a concise, declarative library for the most common shell functions. It abstracts away things like command expansion or checking exit codes. It also makes the syntax more concise and easy to dictate. While this is particularly useful for creating Numen phrase scripts, it is also useful for Talon users or anyone looking to do shell programming through voice. This library can be found at `numen-modifications/lib/constructor.sh`. Some examples of commands created with this library look like:
+
+```shell
+# start a video call
+#  sets the video mode, and launches zoom if it isn't already open
+set VIDEO_MODE && catch focus zoom && launch zoom
+
+# end the video call
+#  focuses zoom and closes the application
+scope VIDEO_MODE && focus zoom && press ctrl alt delete && unset VIDEO_MODE
+
+#  changes directory relative to a project called `embedded_systems`
+#  runs `make test` 5 times,  and prints `success` only if it succeeds all times
+relative my_projects embedded_systems  && assert loop 5 make test && echo success
+```
+
+In my library, you can use the commands `set` and `unset` to change the value of environment variables. Then you can use commands like `scope`to have commands only run if a given environment variable is set. As such, this can mimic the behavior of modes and conditionally set commands without needing to hard code it into Numen itself. Setting environment variables also makes it easier to do interprocess communication. \footnote{ For instance if you are using both Numen and Talon and want information regarding the state of each program in the other.} Novice users do not need to worry about more complicated programming paradigms like message passing or local networking. Finally, we can use the simple python script I created at `numen-modifications/lib/scope_database.py` to contextually set a database of environment variables automatically. The program that is currently focused will export an environment variable with the same name as its title.
+
+Just like my federated learning software, this set of shell commands was influenced by universal design. In one way, it is intended to make dictation more natural for those who need accessibility software to write shell commands. However at the same time it is also useful for those who simply want a simple declarative shell API and may not need more advanced features. Hard forking a codebase or creating new domain specific programming languages may provide short term benefits for accessibility. However at the same time they risk creating splintered software communities with competing goals.
+
+With all these additions now summarized, I believe new Numen users with less technical background or experience only with Talon have a strong foundation to build upon.
 
 # Evaluation
 
@@ -586,30 +610,28 @@ After this point, one can continue to decrease the batch size and increase the n
 
 With this context in mind, the quantitative performance is actually quite promising and is likely to improve further. The process simply needs access to more data and aggregating weights between more people during Federation. Finally, better audio equipment would also likely result in better performance. While these requirements may seem like a challenge, this would most likely all be present in a real life federated learning trial, given the fact that we would have many more people. This would provide much more data, and more weights to aggregate.
 
-## Qualitative Evaluation
+<!-- <!-- ## Qualitative Evaluation
 
 <!-- TODO NOTE trash this section just do quantitative eval? -->
 
-In this section of the evaluation, I will be discussing a qualitative evaluation of my federated learning system and the software I built to implement it. As stated previously, one of my central goals in the project was to turn a sophisticated machine learning technology into a more intuitive and less opaque tool for grassroots communities. As such, in order to evaluate my design goals, I can use a series of evaluation metrics taken from the field of human-computer-interaction (HCI).
+<!-- In this section of the evaluation, I will be discussing a qualitative evaluation of my federated learning system and the software I built to implement it. As stated previously, one of my central goals in the project was to turn a sophisticated machine learning technology into a more intuitive and less opaque tool for grassroots communities. As such, in order to evaluate my design goals, I can use a series of evaluation metrics taken from the field of human-computer-interaction (HCI).
 
 Before I discuss my project itself, it is useful to give a brief background regarding HCI evaluation more generally. Many researchers have argued that as a field, HCI evaluation has progressed from simple binary metrics into more complex notions of dynamic user experiences [@10.1145/2468356.2468714]. For instance, HCI is no longer about simply whether an interface is performant and intuitive, but also dynamic ideas of user satisfaction, product desirability, and accessibility. MacDonald and Atwood argue that in this paradigm, "A major challenge facing evaluators is the lack of a shared conceptual framework for UX, even though several models have been proposed."
 
 Despite this, it is generally the case that evaluations for user experience fall into two distinct categories. Usability inspections and usability testing \footnote{Nielsen, Jakob. Usability Inspection Methods. New York, NY: John Wiley and Sons, 1994}\footnote{ Nielsen, J. (1994). Usability Engineering, Academic Press Inc, p 165} In the former,a software product is evaluated using standardized metrics and criteria. In the latter,the product is evaluated through user feedback.
 
-In this section of the evaluation I will be focusing on useability inspections instead of usability testing for reasons given in the section on [user studies and future ](#user-studies).
+In this section of the evaluation I will be focusing on useability inspections instead of usability testing for reasons given in the section on [user studies and future ](#user-studies). -->
 
-### Accessibility
+<!-- ### Accessibility
 
  <!-- is this rehashing too much? -->
 
-Accessibility is a large field and many users will have drastically different needs. As such, in this section I am primarily focused on accessibility for my target demographic, users who control their computer with voice.
-Throughout the software project, I made sure to use web based user interfaces which pair well with [Talon](#talon) and associated tools like Rango we discussed in earlier sections. Web based user interfaces
+<!-- Accessibility is a large field and many users will have drastically different needs. As such, in this section I am primarily focused on accessibility for my target demographic, users who control their computer with voice.
+Throughout the software project, I made sure to use web based user interfaces which pair well with [Talon](#talon) and associated tools like Rango we discussed in earlier sections. Web based user interfaces --> 
 
-### Software Intelligibility
+<!-- ### Software Intelligibility
 
-In this category we will evaluate how easily
-
-##
+In this category we will evaluate how easily -- -->
 
 # Future Work
 

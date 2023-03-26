@@ -1,4 +1,5 @@
 mode: all
+title: /Visual Studio Code/
 -
 and: 
     " && " 
@@ -6,3 +7,4 @@ and:
 then:
     " ; "
 
+  

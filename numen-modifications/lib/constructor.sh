@@ -1,15 +1,27 @@
 #!/bin/bash
 
+#  focus a window by its title
+focus() {
+    local title=$1
+    local window_id=$(xdotool search --onlyvisible --name "${title}")
+    
+    if [[ -n "${window_id}" ]]; then
+        xdotool windowactivate "${window_id}"
+    else
+        echo "No window found with title ${title}"
+    fi
+}
 
+#  execute the rest of the code block only if the argument passed in is in the title of the focused window
 window() {
     
     # Get the current title of the focused application
-    title=$(xdotool getwindowfocus getwindowname)
+    local title=$(xdotool getwindowfocus getwindowname)
     # last_arg="${!#}"
-    last_arg=$(echo "${!#}" | tr '[:upper:]' '[:lower:]')
+    local last_arg=$(echo "${!#}" | tr '[:upper:]' '[:lower:]')
     
     # Convert the title to lowercase for case-insensitive comparison
-    title_lower=$(echo "$title" | tr '[:upper:]' '[:lower:]')
+    local title_lower=$(echo "$title" | tr '[:upper:]' '[:lower:]')
     
     # Check if the last argument is in the title
     if [[ $title_lower == *"$last_arg"* ]]; then
@@ -33,7 +45,8 @@ unset() {
     unset "$var"
 }
 
-iff() {
+# execute the rest of the code block only if the variable is set
+scope() {
     #  exit if the first argument is not set
     local var=$1
     if [ -z ${!var+x} ]; then
@@ -41,18 +54,20 @@ iff() {
     fi
 }
 
+# change the working directory to a path relative to the home directory
 relative(){
     
     
-    path=$(printf "%s/" "$@")
+    local path=$(printf "%s/" "$@")
     
     # the path is relative to the home directory
-    path="$HOME/$path"
+    local path="$HOME/$path"
     
     # Change the working directory to the new path
     cd "$path"
 }
 
+# execute a command n times
 loop(){
     local n=$1
     shift
@@ -64,12 +79,57 @@ loop(){
     done
 }
 
-# loop 5 echo "hello"
-relative Projects && pwd
-# && pwd | cat
+# close an application by its name
+close() {
+    local title=$1
+    local window_id=$(xdotool search --onlyvisible --name "${title}")
+    
+    if [[ -n "${window_id}" ]]; then
+        xdotool windowclose "${window_id}"
+    else
+        echo "No window found with title ${title}"
+    fi
+}
 
-# echo "test is set" and echo test is set
+#  recursively check if a file exists in the current directory
+search(){
+    local query=$1
+    grep -ri "$query" .
+    
+    if [[ $? -eq 0 ]]; then
+        return 0
 
-# eval set test && iff test && window code && echo "test is set"
-# eval '(set test && iff test && echo "test is set")'
+    else
+        return 1
+    fi
+}
 
+# exit if the command fails, otherwise continue
+assert(){
+    local command=$1
+    eval "$command" &> /dev/null
+    if [ $? -eq 0 ]; then
+        echo "Succeeded"
+    else
+        echo "Failed"
+        exit 1
+    fi
+}
+
+# exit if the command succeeds, otherwise catch the error and   continue
+catch(){
+    local command=$1
+    eval "$command" &> /dev/null
+    if [ $? -eq 0 ]; then
+        exit 1
+    fi
+}
+
+launch() {
+    $@
+}
+
+press() {
+    local key=$@
+    xdotool keydown $key; xdotool keyup $key
+}

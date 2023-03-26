@@ -1,0 +1,16 @@
+coding: 
+  - Emacs
+  - Vim
+  - Visual Studio
+business: 
+  - gmail
+  - excel
+
+fun:
+  - video games
+
+modes:
+  - productivity:
+    - coding
+    - business
+  - fun:
