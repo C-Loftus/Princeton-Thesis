@@ -7,8 +7,10 @@ from flowerThread import StoppableThread, threading
 ADDR = "127.0.0.1:8080"
 
 # Code influenced by the following sources, used with permission and attribution:
+# Use under the terms of the apache license
 # source: https://github.com/adap/flower/issues/487
 # source: https://flower.dev/docs/save-progress.html
+# source: https://flower.dev/docs/quickstart-pytorch.html
 
 def fit_config(server_round: int) -> Dict[str, fl.common.Scalar]:
     config: Dict[str, fl.common.Scalar] = {

@@ -16,11 +16,11 @@ yaml_dict = yaml.safe_load(Path("hierarchy.yaml").read_text())
 
 def extend_children(node, new_child):
     if node.children is None:
-        node.children = [new_child]
+        node.next = new_child
     else:
-        node.children = list(node.children).extend(new_child)
-
-    return node.children
+        while node.next is not None:
+            node = node.next
+        node.next = new_child
 
 def create_tree(yaml_dict):
     head = Node()
@@ -28,18 +28,19 @@ def create_tree(yaml_dict):
     for key in yaml_dict:
         node = Node(key)
         node.parent = head
-        head.children = extend_children(head, node)
+        extend_children(head, yaml_dict[key])
         for sub_key in yaml_dict[key]:
             sub_node = Node(sub_key)
-            node.children = extend_children(node, sub_node)
+            extend_children(node, yaml_dict[key][sub_key])
             sub_node.parent = node
         
     return head
 
-[print(node) for node in create_tree(yaml_dict)]
 
-
-    
+node= create_tree(yaml_dict)
+while node.next is not None:
+    node = node.next
+    print(node)    
 print(yaml_dict)
 
  

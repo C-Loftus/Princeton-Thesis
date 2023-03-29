@@ -69,7 +69,7 @@ def parse(getLabelsFromServer):
     timesSaid = {}
 
     def top30Locally():
-
+        print(" getting the top thirty locally")
         for filename in os.listdir(RECORDING_PATH):
             cmd = parseCmd(filename)
             if validForTraining(filename, cmd):
@@ -142,5 +142,7 @@ if __name__ == "__main__":
         os.makedirs(OUTPUT_PATH)
 
     # clean up old data from previous runs
+    print('cleaning up old data')
     cleanupDir()
+    print('getting talon data and converting it into the proper format')
     parse(getLabelsFromServer)

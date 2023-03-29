@@ -15,8 +15,9 @@ class TRAINING_CONFIG:
     def __init__(self, useTalon: bool = False):
 
         if useTalon:
-            self.batch_size = 8
-            self.n_epoch = 10
+            self.batch_size = 64
+            # self.n_epoch = 10
+            self.n_epoch = 14
         else:
             self.batch_size = 256
             self.n_epoch = 2
@@ -106,7 +107,8 @@ def index_to_label(index):
 
 
 def pad_sequence(batch):
-    # Make all tensor in a batch the same length by padding with zeros
+    # Make all tensor in a batch the same length 
+    # We do this by padding with zeros
     batch = [item.t() for item in batch]
     batch = torch.nn.utils.rnn.pad_sequence(batch, batch_first=True, padding_value=0.0)
     return batch.permute(0, 2, 1)
@@ -242,7 +244,8 @@ class FlowerClient(fl.client.NumPyClient):
 
     def fit(self, parameters, config=None):
         self.set_parameters(parameters)
-        EPOCH = 1
+        # change this
+        EPOCH = 14
         LOG_INTERVAL = 100
         train(self.net, EPOCH, LOG_INTERVAL)
         return self.get_parameters(config={}), len(self.train_loader.dataset), {}

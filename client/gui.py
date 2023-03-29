@@ -1,9 +1,13 @@
+# references:  https://github.com/PySimpleGUI/PySimpleGUI/issues/276
+
 import threading
 import PySimpleGUIWeb as sg
 from training import main_training
 from scripts.parse_talon import parse
 import requests,os 
 from contextlib import redirect_stdout
+from image import gif 
+gif103 = gif().gif103
 
 import shelve
 sg.theme('DarkAmber')
@@ -15,6 +19,13 @@ global db
 db = shelve.open("client.db")
 db["url"] = "None" if "url" not in db else db["url"]
 db["training"] = False
+
+
+def start_loading(window):
+    window.Element('_IMAGE_').update(data= gif103)
+    
+def stop_loading(window):
+    window.Element('_IMAGE_').update(data= None)
 
 def valid_talon_data():
 
@@ -36,7 +47,6 @@ def valid_talon_data():
     
     return directory_exists() and has_training_data() and has_split_lists()
 
-
 def training_manager(window):
     window["-RESPONSE-"].update("Starting the training process. This will take a while...")
     db["training"] = True
@@ -53,9 +63,16 @@ def create_ui():
             [sg.Button("Ping Server", key="-STATUS-")],
             [sg.Button("Start Federated Training on Your Data", key="-START-")],
             [sg.Button("Convert Talon Data", key="-CONVERT-")],
+            [sg.Image(data=None, key='_IMAGE_')],
             [sg.Text("Response:", size=(15, 1)), sg.Multiline(size=(40, 10), key="-RESPONSE-")]]
 
     window = sg.Window("Connection", layout)
+    handle = threading.Thread(target=training_manager, args=(window,))
+
+    def check_if_finished(handle):
+        if not handle.is_alive():
+            window["-RESPONSE-"].update("Finished training process")
+            db["training"] = False
 
     while True:
         if db["training"]:
@@ -88,8 +105,10 @@ def create_ui():
 
         elif event == "-START-" and db["training"] == False:
             try:
-                handle = threading.Thread(target=training_manager, args=(window,))
                 handle.start()
+                # runs in the background
+                check_if_finished(handle)
+                start_loading(window)
                 msg = f'Running training process on {db["url"]} {"without" if not valid_talon_data() else "with"} Talon data'
             except Exception as e:
                 window["-RESPONSE-"].update(str(e))
@@ -101,13 +120,19 @@ def create_ui():
                 with open("convert.log", "w") as f:
                     with redirect_stdout(f):
                         window["-RESPONSE-"].update("Converting Talon data. This may take a while and use a lot of resources...")
-                        parse()
+                        start_loading(window)
+                        parse(getLabelsFromServer=True)
+                        stop_loading(window)
                 window["-RESPONSE-"].update("Successfully converted Talon data")
             except Exception as e:
                 window["-RESPONSE-"].update(str(e))
+
 
 
     window.close()
 
 if __name__ == "__main__":
     create_ui()
+
+
+

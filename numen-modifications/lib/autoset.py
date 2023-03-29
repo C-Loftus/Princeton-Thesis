@@ -1,4 +1,4 @@
-import os, multiprocessing, time
+import os, time
 autoSet = {}
 
 def update_scope():
@@ -7,12 +7,12 @@ def update_scope():
     def do_update():
         window_name = os.popen("xdotool getwindowfocus getwindowname").read()
         window_name = window_name.strip()
-        os.environ[window_name] = "True"
+        os.environ[window_name] = 1
         autoSet[window_name] = True 
 
         for key, _ in autoSet.items():
             if key != window_name:
-                os.environ[key] = "False"
+                os.environ[key] = 0
                 autoSet[key] = False 
 
     while True:
