@@ -23,7 +23,7 @@ SETTINGS = -V $(GEOM) \
 #   -F mermaid-filter 
 
 thesis:
-	pandoc $(SETTINGS) -o $(OUT_DIR)/thesis.pdf main.md
+	pandoc $(SETTINGS) -o $(OUT_DIR)/written_final_report.pdf main.md
 
 combine:
 	pandoc $(SETTINGS) -o $(OUT_DIR)/thesis.pdf ./chapters/*.md 
