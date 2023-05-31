@@ -12,7 +12,7 @@ In addition to the technical aspect of this project, I incorporate my background
 
 I use Pytorch and Flower (flwr) to implement a federated learning pipeline for the `Speech Commands` dataset. Individual clients download this Python code on their own device in order to train the model and share the model weights after training. I use React and Fast API to create a full stack web application to connect to clients. This is intended to be easy to set up for new server administrators that wish to support grassroots disability accessibility organizations.
 
-I also support training on the audio data output from [Talon Voice](talon.wiki), a popular program for voice based computer accessibility. This allows users to take advantage of the accessibility programs they are already using to build new speciality voice models. The resulting model based on the `M5` architecture achieves impressive performance, even on this novel data source.
+I also support training on the audio data output from [Talon Voice](https://talonvoice.com/), a popular program for voice based computer accessibility. This allows users to take advantage of the accessibility programs they are already using to build new speciality voice models. The resulting model based on the `M5` architecture achieves impressive performance, even on this novel data source.
 
 The models that result from my federated learning training software can be deployed on innovative new platforms like Linux mobile phones, a research interest in this paper. This platform is new, grassroots, and needs new accessibility solutions like specialty voice models.
 
