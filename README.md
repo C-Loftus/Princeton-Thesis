@@ -1,6 +1,6 @@
 # Federated Learning for Training Voice Models and Improving Computer Accessibility 
 
-This repository is a monorepo for all code and written work for my Princeton senior thesis in Computer Science. The associated final thesis paper is titled `New Opportunities with Voice Controlled Accessibility Software: Federated Machine Learning and Linux Mobile Devices` and was written under the advising of [Professor Kyle Jamieson](https://www.cs.princeton.edu/~kylej/)
+This repository is a monorepo for all code and written work for my Princeton senior thesis in Computer Science. The associated final thesis paper is titled `New Opportunities with Voice Controlled Accessibility Software: Federated Machine Learning and Linux Mobile Devices` and was written under the advising of [Professor Kyle Jamieson](https://www.cs.princeton.edu/~kylej/). The final pdf can be read [in this repo](https://github.com/C-Loftus/Princeton-Thesis/blob/master/written_final_report.pdf) with the name `written_final_report.pdf`
 
 ## Background
 
