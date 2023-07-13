@@ -47,3 +47,19 @@ training_list.txt
 testing_list.txt
 
 pine-mobile-consumer/
+
+help/*.pdf
+
+# latex artifacts
+*.aux 
+*.bbl 
+*.blg 
+*.log 
+*.out
+*.toc 
+*.lot 
+*.lof 
+*.gz 
+*.dvi 
+*.fdb_latexmk 
+*.fls _minted*

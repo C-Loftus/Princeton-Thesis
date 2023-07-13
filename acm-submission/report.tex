@@ -1,0 +1,532 @@
+% !TEX root = ./test.tex  
+%% https://chi2024.acm.org/submission-guides/chi-publication-formats/
+%% https://authors.acm.org/proceedings/production-information/taps-production-workflow
+
+%%
+%% This is file `sample-manuscript.tex',
+%% generated with the docstrip utility.
+%%
+%% The original source files were:
+%%
+%% samples.dtx  (with options: `manuscript')
+%% 
+%% IMPORTANT NOTICE:
+%% 
+%% For the copyright see the source file.
+%% 
+%% Any modified versions of this file must be renamed
+%% with new filenames distinct from sample-manuscript.tex.
+%% 
+%% For distribution of the original source see the terms
+%% for copying and modification in the file samples.dtx.
+%% 
+%% This generated file may be distributed as long as the
+%% original source files, as listed above, are part of the
+%% same distribution. (The sources need not necessarily be
+%% in the same archive or directory.)
+%%
+%% Commands for TeXCount
+%TC:macro \cite [option:text,text]
+%TC:macro \citep [option:text,text]
+%TC:macro \citet [option:text,text]
+%TC:envir table 0 1
+%TC:envir table* 0 1
+%TC:envir tabular [ignore] word
+%TC:envir displaymath 0 word
+%TC:envir math 0 word
+%TC:envir comment 0 0
+%%
+%%
+%% The first command in your LaTeX source must be the \documentclass command.
+%%%% Small single column format, used for CIE, CSUR, DTRAP, JACM, JDIQ, JEA, JERIC, JETC, PACMCGIT, TAAS, TACCESS, TACO, TALG, TALLIP (formerly TALIP), TCPS, TDSCI, TEAC, TECS, TELO, THRI, TIIS, TIOT, TISSEC, TIST, TKDD, TMIS, TOCE, TOCHI, TOCL, TOCS, TOCT, TODAES, TODS, TOIS, TOIT, TOMACS, TOMM (formerly TOMCCAP), TOMPECS, TOMS, TOPC, TOPLAS, TOPS, TOS, TOSEM, TOSN, TQC, TRETS, TSAS, TSC, TSLP, TWEB.
+% \documentclass[acmsmall]{acmart}
+
+%%%% Large single column format, used for IMWUT, JOCCH, PACMPL, POMACS, TAP, PACMHCI
+% \documentclass[acmlarge,screen]{acmart}
+
+%%%% Large double column format, used for TOG
+% \documentclass[acmtog, authorversion]{acmart}
+
+%%%% Generic manuscript mode, required for submission
+%%%% and peer review
+\documentclass[manuscript,screen,review]{acmart}
+%% Fonts used in the template cannot be substituted; margin 
+%% adjustments are not allowed.
+%%
+%% \BibTeX command to typeset BibTeX logo in the docs
+\AtBeginDocument{%
+  \providecommand\BibTeX{{%
+    \normalfont B\kern-0.5em{\scshape i\kern-0.25em b}\kern-0.8em\TeX}}}
+
+%% Rights management information.  This information is sent to you
+%% when you complete the rights form.  These commands have SAMPLE
+%% values in them; it is your responsibility as an author to replace
+%% the commands and values with those provided to you when you
+%% complete the rights form.
+\setcopyright{acmcopyright}
+\copyrightyear{2023}
+\acmYear{2023}
+\acmDOI{XXXXXXX.XXXXXXX}
+
+%% These commands are for a PROCEEDINGS abstract or paper.
+\acmConference[Conference acronym 'XX]{Make sure to enter the correct
+  conference title from your rights confirmation emai}{June 03--05,
+  2018}{Woodstock, NY}
+%
+%  Uncomment \acmBooktitle if th title of the proceedings is different
+%  from ``Proceedings of ...''!
+%
+\acmBooktitle{Woodstock '18: ACM Symposium on Neural Gaze Detection,
+ June 03--05, 2018, Woodstock, NY} 
+\acmPrice{15.00}
+\acmISBN{978-1-4503-XXXX-X/18/06}
+
+%%
+%% Submission ID.
+%% Use this when submitting an article to a sponsored event. You'll
+%% receive a unique submission ID from the organizers
+%% of the event, and this ID should be used as the parameter to this command.
+%%\acmSubmissionID{123-A56-BU3}
+
+%%
+%% For managing citations, it is recommended to use bibliography
+%% files in BibTeX format.
+%%
+%% You can then either use BibTeX with the ACM-Reference-Format style,
+%% or BibLaTeX with the acmnumeric or acmauthoryear sytles, that include
+%% support for advanced citation of software artefact from the
+%% biblatex-software package, also separately available on CTAN.
+%%
+%% Look at the sample-*-biblatex.tex files for templates showcasing
+%% the biblatex styles.
+%%
+
+%%
+%% The majority of ACM publications use numbered citations and
+%% references.  The command \citestyle{authoryear} switches to the
+%% "author year" style.
+%%
+%% If you are preparing content for an event
+%% sponsored by ACM SIGGRAPH, you must use the "author year" style of
+%% citations and references.
+%% Uncommenting
+%% the next command will enable that style.
+%%\citestyle{acmauthoryear}
+
+%%
+%% end of the preamble, start of the body of the document source.
+\begin{document}
+
+%%
+%% The "title" command has an optional parameter,
+%% allowing the author to define a "short title" to be used in page headers.
+\title{Training Embedded Speech-to-Text Models with Federated Learning and Accessibility Data }
+
+%%
+%% The "author" command and its associated commands are used to define
+%% the authors and their affiliations.
+%% Of note is the shared affiliation of the first two authors, and the
+%% "authornote" and "authornotemark" commands
+%% used to denote shared contribution to the research.
+\author{Colton Loftus}
+\email{trovato@corporation.com}
+\email{cloftus@princeton.edu}
+\affiliation{%
+  \institution{Princeton University}
+  \city{Princeton}
+  \state{New Jersey}
+  \country{USA}
+}
+
+% \author{Julius P. Kumquat}
+% \affiliation{%
+%   \institution{The Kumquat Consortium}
+%   \city{New York}
+%   \country{USA}}
+% \email{jpkumquat@consortium.net}
+
+%%
+%% By default, the full list of authors will be used in the page
+%% headers. Often, this list is too long, and will overlap
+%% other information printed in the page headers. This command allows
+%% the author to define a more concise list
+%% of authors' names for this purpose.
+\renewcommand{\shortauthors}{Loftus}
+
+%% article.
+\begin{abstract}
+  Accessibility software is increasingly dependent upon machine learning models to provide users with a high quality user-experience.  One specific example is voice-controlled-accessibility software like Talon Voice, which uses a speech-to-text model to parse voice commands.
+
+  Despite the significant potential for accessibility benefits, it can be particularly difficult to train new models for specialty accessibility tasks.  Accessibility data like health data or voice recordings is often sensitive and lacks a secure ecosystem through which to share it with researchers. Currently, machine learning tasks for accessibility software often lack corporate incentives and thus depend upon community-led, manual solutions that potentially compromise privacy.
+
+  In this paper, I describe a novel way to apply federated learning for training speech-to-text accessibility models. Federated learning allows models to be trained without exposing sensitive voice data to a central server. By using this privacy-focused training method, my work allows engineers to engage with real-world accessibility communities and use the large amount of data generated by real-world accessibility software. In this case, I use the voice data generated by Talon Voice users to train a new speech-to-text model for low power devices.  The lessons Learned from this training process can be extrapolated to other health tasks.
+
+  Until now, federated learning has been mainly used for enterprise or corporate use cases. By using intuitive user-interfaces we can reduce the complexity of the federated learning process and allow average users to nonetheless engage with a complicated machine learning algorithm. 
+
+\end{abstract}
+
+%%
+%% The code below is generated by the tool at http://dl.acm.org/ccs.cfm.
+%% Please copy and paste the code instead of the example below.
+%%
+\begin{CCSXML}
+  <ccs2012>
+  <concept>
+  <concept_id>10003120.10011738.10011776</concept_id>
+  <concept_desc>Human-centered computing~Accessibility systems and tools</concept_desc>
+  <concept_significance>500</concept_significance>
+  </concept>
+  <concept>
+  <concept_id>10010147.10010257.10010321</concept_id>
+  <concept_desc>Computing methodologies~Machine learning algorithms</concept_desc>
+  <concept_significance>500</concept_significance>
+  </concept>
+  <concept>
+  <concept_id>10002978.10003029.10003032</concept_id>
+  <concept_desc>Security and privacy~Social aspects of security and privacy</concept_desc>
+  <concept_significance>100</concept_significance>
+  </concept>
+  </ccs2012>
+\end{CCSXML}
+
+\ccsdesc[500]{Human-centered computing~Accessibility systems and tools}
+\ccsdesc[500]{Computing methodologies~Machine learning algorithms}
+\ccsdesc[100]{Security and privacy~Social aspects of security and privacy}
+
+%%
+%% Keywords. The author(s) should pick words that accurately describe
+%% the work being presented. Separate the keywords with commas.
+\keywords{Federated Learning, Talon Voice, Accessibility, Speech-to-text, Embedded Devices}
+
+%% A "teaser" image appears between the author and affiliation
+%% information and the body of the document, and typically spans the
+% %% page.
+% \begin{teaserfigure}
+%   \includegraphics[width=\textwidth]{sampleteaser}
+%   \caption{Seattle Mariners at Spring Training, 2010.}
+%   \Description{Enjoying the baseball game from the third-base
+%     seats. Ichiro Suzuki preparing to bat.}
+%   \label{fig:teaser}
+% \end{teaserfigure}
+
+% \received{20 February 2007}
+% \received[revised]{12 March 2009}
+% \received[accepted]{5 June 2009}
+
+%%
+%% This command processes the author and affiliation and title
+%% information and builds the first part of the formatted document.
+\maketitle
+
+\section{Introduction}
+With the advent of wearable devices, smartphones, and higher powered personal computers, average users can generate huge amounts of personal data.  As such, there is exciting potential to use these new data sources to create better health-care software.  For users that use alternative input methods for their computers,  we have the potential to build better voice to text and predictive input models, even for very specific use cases that may ordinarily not have enough public training data. Yet, to use this highly personalized data at scale, we need not only new machine learning algorithms that preserve privacy, but also ways in which users can share this data in a trustworthy and intuitive way.
+
+Despite this potential, many new machine learning techniques or ways of privately aggregating data remain completely abstracted away from the end user. In smartphones, for instance, users are often not told what data is being generated, where it is going, and what sort of models are being trained with it. The technical goal of efficient models is typically prioritized over social or user experience goals. Companies who use algorithms like federated learning for training models privately are generally not concerned with giving users data autonomy or participation in the machine learning process. In corporate settings, these new algorithms are primarily used to reduce the liability that would otherwise come when collecting identifiable data. As a result, federated learning and other privacy algorithms for machine learning typically do not have a large emphasis upon community participation and engaging non-technical users.
+
+My goal is to broaden the scope of the privacy-preserving machine learning technique, federated learning, and show how users of all backgrounds can participate in the training process.  I bring federated learning in conversation with ideas from user-experience design, accessibility software, and community-based organization. Accessibility software is a field that is in need of new models for specialty contexts and preserving privacy within the data aggregation process. We also need the qualitative insights from human-computer-interaction and user experience design that can teach us how to make intuitive machine learning software for people of all abilities. By combining all these fields we can create software that is both easily understood for the end user and practical for creating performant machine learning models for specialty applications.
+
+As such, my goal in this project is to create a full federated learning ecosystem for voice controlled accessibility software. Voice controlled accessibility software allows users to control their computer through voice commands, without using a keyboard or mouse. As a result, it needs performant speech-to-text-models. In order to accomplish these machine learning goals, I define a voice model architecture, create a central server for controlling the software, and design a client for training on local data. Instead of abstracting away federated learning, it can be intuitively presented in such a way that invites people of all backgrounds to participate in new data sharing technologies. Additionally, as of yet the fields of accessibility software and federated learning have been completely separated. My goal is to bring them into conversation and create a practical example of how to integrate the two from both a technical and qualitative design perspective.
+
+At the end of the paper, I discuss Linux mobile devices as a case study for why we need the ability to train new accessibility models, and how to deploy a resulting model.  New platforms like this one often suffer from a lack of accessibility software and are dependent upon community contributions.  My federated learning system helps to overcome these challenges  and work toward a future wear individuals not only have data autonomy, but also are empowered to participate in the machine learning process.
+
+% All of the code for this paper and project can be found at [https://github.com/C-Loftus/Princeton-Thesis/](https://github.com/C-Loftus/
+% Princeton-Thesis/).
+
+
+With this outline in mind, it is useful to give a brief introduction in more detail to the three fields that I will expand upon in my thesis: federated learning, computer accessibility, and qualitative design more generally.
+
+
+\section{Background}
+
+\subsection{Talon}
+
+The main option for general purpose voice control software is Talon. \footnote{\url{https://talonvoice.com}} Talon is similar to Dragon in that it uses voice commands to control the entire Desktop. However, it is more customizable and cross platform on Windows, Mac, and Linux. As a downside, Talon does not support mobile devices. Upon downloading the program, Talon provides little functionality and only contains a speech-to-text model with associated Python libraries. However, there is a large community repository of Talon scripts that build upon these libraries called Knausj Talon. \footnote{\url{https://github.com/knausj85/knausj\_talon}} These can be imported and customized as desired.
+
+One of the benefits of Talon, and one specifically related to federated learning in the context of this paper, is that you can enable the option "Save Recordings". This saves every voice command a user says to Talon as a ".flac" audio file and labels it with the output of the speech-to-text model. Thus, it is very easy to generate a personalized audio command dataset when using Talon.
+
+The most commonly used commands in Talon are the phonetic alphabet, key names, and numbers. As such, it can be expected that many users have a large dataset of these sorts of commands. The alphabet is so commonly used given the fact that it is an easy way to refer to discrete elements on the screen. Talon's phonetic alphabet is distinct from the NATO phonetic alphabet in order to be quicker for voice commands. Given the fact that Talon is built around many quick, concise voice commands, this philosophy overlaps with our goals for training and future machine learning models. We want training data that is common across many users and concise enough to train new speech command models. We can use "Save Recordings" to help create individualized datasets, specific to our federated learning goals.
+
+% display image with the url "https://whalequench.club/assets/alphabet.png"
+
+
+Given the fact that Talon is so customizable, there are user scripts for doing nearly anything you would want on your desktop: anything from coding by voice to playing video games. These solutions are often more customizable and efficient given the fact that their designers are often also part of the Talon community as users.
+
+\subsection{Rango}
+
+One specific tool that overlaps well with my goals in this project is Rango. \footnote{\url{https://github.com/david-tejada/rango/}} This software integrates with Talon and allows the user to navigate the web with just voice. It places small letters called 'hats' over HTML elements, which the user can select or mimic clicking it by saying the letter names. Thus, by creating my user interfaces for the browser, I can take advantage of these already existing tools for better accessibility. This will allow users with health impediments to still participate in federated learning. Without these accessibility tools, we have to rely upon command line interfaces and desktop GUI programs, both of which are difficult to navigate through voice alone.
+
+For more info regarding the design of Talon and its basic functionality one can consult the community wiki or one of the many introductory articles on the software. \footnote{\url{https://talon.wiki/}} \footnote{\url{https://whalequench.club/blog/2019/09/03/learning-to-speak-code.html}} \footnote{\url{https://www.joshwcomeau.com/blog/hands-free-coding/}}
+
+
+\section{Methodology}
+Architecture Design
+
+My project goal was to create a full-stack federated learning system for voice controlled accessibility software. I wanted to create an ecosystem to show how federated learning could be practically applied to a real accessibility software community. In this section, I will discuss my approach to the system design and some of the software engineering principles I used while programming it.
+
+When designing my architecture I was focused on both technical efficiency but also user accessibility. Namely for the latter, I wanted to design solutions that worked well for users who use only voice. I also wanted to consider accessibility from a more abstract standpoint. Namely, how can I design components like a backend API to be more accessible? It is important that I design the architecture in such a way that is not opaque and allows for community contribution. I want users of all backgrounds to be able to clearly trace the path their data takes throughout the machine learning process. While these alternative forms of data sharing should be visible on the user interface, it should also be visible in clean, modular code.
+
+With this in mind, I split up the technical implementation of my project into four main parts.
+
+- Machine Learning Architecture and Algorithms
+- Webserver Backend
+- Webserver Frontend
+- GUI Client for participating in federated learning and converting Talon data
+
+![A visual representation of my federated learning system](assets/diagram.png)
+
+With regards to the technical goal of this architecture, it was intended to make it so both a server administrator ( the person that will eventually get the final trained model ) and existing Talon users can easily start a federated learning training process. They should be able to do this without needing to have any knowledge of coding. In addition to the user experience goals, the technical design is highly modular and is thus easier to build upon in the future. For instance, since the federated learning process can be controlled through a web API, users can develop their own clients or integrate their own ways of parsing Talon user data. My architecture provides a useful default client but users can design their own interfaces as well.
+
+\subsection{Implementation}
+
+With this background in mind, I will now proceed to discuss the implementation of my software and the various challenges I overcame. As stated previously, I sought to create software for implementing a full federated learning ecosystem. Each part of this ecosystem has a decoupled architecture which will allow new innovations to add features to specific parts of the system without needing to change others.
+
+\subsection{Codebase Walkthrough}
+All of the code for this paper and project can be found at [https://github.com/C-Loftus/Princeton-Thesis/](https://github.com/C-Loftus/Princeton-Thesis/).This codebase is set up as a monorepo. The folder titled `doc` holds all documentation including the code used to generate this thesis from its markdown source. `server` holds the code for the central federated learning server and all code for aggregating weights or controlling the system from its web API. `client` holds all the code that a user needs in order to do local training and interact with the server. `frontend` holds the React frontend for the central federated learning server. Finally, `numen-modifications` holds any code related to linux mobile devices, scripts to interact with such devices through voice, or modifications to existing software like 
+% [Numen](#contextualizing-numen).
+
+To build and replicate any software in this repository, there is either a `makefile`, `package.json` , or `pyproject.toml` file in each directory. A `.pythonversion` file specifies the proper version of Python to use (Python 3.8.14) and it is recommended to use `pyenv` to control Python versions to match and avoid any version errors. All testing was done on Ubuntu 22.04 but should work cross platform with few modifications.
+
+\subsection{Important Factors Before Training}
+
+By default this codebase uses all local IP addresses. For training with devices outside your network, you will need to change these constant values to an internet-facing IP address. These constants are generally defined at the top of Python files in this codebase. Once you have your desired network configuration, you need to have a sufficient amount of audio data to train. If you are a Talon user, you can generate this data by enabling the `Save Recordings` option. Otherwise, you can use the `SpeechCommands` dataset as a benchmark. Please see the scripts located at `client/scripts` for programmatic ways to initiate training with or without Talon data.
+
+\subsection{Federated Learning Implementation}
+
+The first and most essential part of my project was implementing the technical code for federated learning. These machine learning and aggregation strategies affected not only my decisions regarding modeling, but also principles of user experience design.
+
+The first thing I had to do was make a decision regarding which federated learning library to use. Currently there are a few main options, namely `fedjax` , `Pysyft` [@DBLP:journals/corr/abs-1811-04017], and `Flower` [@beutel2020flower]. While a comprehensive comparison of all options would be beyond the scope of this paper, I chose to use `Flower` (also known as Flower). This library allows you to apply federation strategies to existing models in popular frameworks like PyTorch and Tensorflow. `Flower` thus allows you to focus more on modeling and abstracts away aspects of federated learning like networking and error handling that are less relevant to this project.
+
+With this decision in mind, I then had to choose a model upon which I would implement federated learning. I had a few main goals for this model given the fact that it would be used on lightweight Linux mobile devices.
+
+- It must be a model capable of processing human speech in English
+- It should be feasible to train without a GPU
+- The model itself should be small and easy to run on a mobile device
+- The model should be focused more on short commands rather than dictating sentences
+
+As a result, I decided to use the M5 voice-to-text model architecture. [@https://doi.org/10.48550/arxiv.1610.00087] This architecture is designed for making inferences on raw waveform data without needing to do extra processing. Compared to larger conformer or wav2letter models, M5 requires less cpu and memory resources to run. These properties also makes it easier to deploy the model to mobile devices that may have limited disk space or nontraditional package management.
+
+With regards the technical aspects of this model, it takes advantage of deeply layered convolutional neural networks. This architecture allows the model to have more fine grained classification. Yet at the same time, the paper describing its implementation says it remains relatively resource efficient to train and process inferences. For instance the paper says how "By applying batch normalization, residual learning, and a careful design of down-sampling layers, we overcome the difficulties in training very deep models while keeping the computation cost low." [@https://doi.org/10.48550/arxiv.1610.00087] In the paper describing this model they use the `UrbanSound8k` dataset and tried to distinguish between different noises in a city. While this dataset is different from the speech commands used for voice controlled accessibility software, it is a good baseline metric for determining the model's performance on classifying discrete noises in a noisy environment. This is an essential property for voice controlled accessibility software.
+
+\subsection{Client Implementation}
+
+After implementing the model in Pytorch code \footnote{I was able to build upon an existing implementation located at: \url{https://pytorch.org/tutorials/intermediate/speech_command_recognition_with_torchaudio.html}}, it then became time to integrate it with `Flower` and federated learning. In `Flower`, it is up to the user to implement 4 main functions on the model. These functions describe how the model will be fit during the training process and how to pass model weights to the central server after training has finished.
+
+\begin{verbatim}
+  class FlowerClient(fl.client.NumPyClient):
+  def get_parameters(self, config):
+  def set_parameters(self, parameters):
+  def fit(self, parameters, config):
+  def evaluate(self, parameters, config):
+\end{verbatim}
+
+
+As previously stated, in federated learning all training happens on device and then the model parameters are exported to a central server where they are aggregated in some way. This preserves privacy but also takes advantage of the benefits from a large user base with lots of training data.
+
+My implementation can be found in the repository at `client/training.py` \footnote{I was able to use the `Flower` Pytorch tutorial as a base to build upon: \url{https://flower.dev/docs/quickstart-pytorch.html}}. With regards to the details of the implementation, I use negative log likelihood as my loss function. This is given the fact I am doing multi-class classification over audio data and want a final probability distribution over labels that sums to one.
+
+Next, I spent a significant amount of time testing and optimizing batch size during training. This is given the fact we want midrange computers to be able to train the model and thus we need to focus on reducing the load of system resources. These questions of optimizing hyperparamters provide a more nuanced perspective to how we think about accessibility in machine learning. While we often think about accessibility as a user-facing property, it can also be a technical or algorithmic one. Resource intensive training can limit users with lower end hardware from participating in software communities. Simpler models and optimizing our hyperparameters for faster training make it so we can engage with the largest possible audience.
+
+\subsection{Client Training Data}
+
+Now that we have defined the overview of my model architecture I will describe the training data that can be used to train the model. This data can be user generated either from Talon as we mentioned, or from preexisting open source datasets. One example of the latter is the `SpeechCommands` dataset. I was able to take advantage of existing research and repositories using this combination of the dataset and M5. This helped to provide a baseline for the start of my training process. \footnote{\url{https://pytorch.org/tutorials/intermediate/speech_command_recognition_with_torchaudio.html}}. This dataset is a series of roughly thirty different common words that could be used as commands: namely, words like common names, numbers, and directions. This is a useful dataset for testing federated learning performance before new user data is factored in.
+
+The next source of user data is from user generated datasets. As spoken previously, Talon is one of the most commonly used community driven voice control solutions. Talon commands use natural language to control the desktop in an intuitive way and automates many tasks that would otherwise require the use of a keyboard. Talon can also call Python scripts or dictate full paragraphs. For context, some example Talon commands include:
+
+- `focus firefox`
+  - (focuses the application Firefox)
+- `new bookmark`
+  - (example of a custom, application specific command that only triggers in certain contexts)
+- `press control shift enter`
+  - ( example of a keypress commands)
+- `the quick brown fox jumps over the lazy dog`
+  - (example of a dictated sentence)
+
+These types of short phrases provide useful data for training a model like ours which is focused on concise commands. By saving the recordings of user dictations, a Talon user can quickly build up a large dataset without needing to do any work manually labeling audio.
+
+By default Talon outputs its data in a .flac format and it includes every single parsed audio statement. As a result it includes audio of variable lengths, some of which may be too long or contain words which are too niche and specific to a given user. Thus, to make the audio data into a full PyTorch audio dataset that can be used for training, I wrote a script to convert the user's data into the training format. After running it, the user will have a curated dataset of voice commands that can be used with the M5 model above. 
+
+To ensure that only useful commands are making it into the training set, the central server can define a schema of commands. A central federated learning server administrator can decide which command names the community should train with. By default the commands are the most common ones said in Talon, namely the names of letters ( according to a phonetic alphabet), numbers, and common key names (enter, home, end, etc). During my research, I have not seen any other projects take advantage of Talon data to create new machine learning datasets. Traditionally, this feature to save recordings is used for debugging. Thus, my implementation is relatively novel and also useful for other projects looking to source new sets of audio data for machine learning.
+
+\subsection{The Flower Federated Learning Server}
+
+Now that we have described the model and the data, it is important to clarify how the `Flower` server is set up and relates to the rest of my code. To begin the entire federated learning process, a server administrator will launch the `Flower` server. This will open a port for multiple clients to connect to. It is up to the clients to use their data and train the models locally. Once a training epoch has completed, the parameters will be sent to the central `Flower` server and an aggregation function will be ran. This aggregation function takes all the individual weights from many different users and synthesizes them together to create one final result.
+
+\subsection{Federated Learning Aggregation Strategies}
+
+In federated learning, the `Flower` server needs to make a decision regarding how to aggregate the weights from the different clients. Specialty aggregation strategies can be used to compensate for high variance in user data or technical limitations among the clients. Such limitations may include battery power, network connection, or processing power. As such, it is important that we select a default aggregation strategy that is favorable for our specialty use case. In this section, I will be analyzing the different options. I will refer to aggregation strategies as they are referred to within the `Flower` library.
+
+When deciding to use a strategy, it is important to consider how many of the following properties hold: [@https://doi.org/10.48550/arxiv.1602.05629]
+
+- Non-IID: Whether or not a certain dataset will be representative of the population distribution
+- Unbalanced: The number of samples per user being much different
+- Massively Distributed: The number of users being very large
+- Heterogeneous: The users' devices are different (e.g. different hardware, different operating systems, different software versions, etc.)
+- Limited communication: The users' devices are not necessarily connected to the internet all the time, or have limited bandwidth
+
+The most well known federated learning algorithm is `FedAvg`, this appeared in the same paper where the term "Federated Learning" was coined.[@https://doi.org/10.48550/arxiv.1602.05629] This algorithm works by randomly sampling from the users and averaging their update weights. However, this algorithm has some limitations. If we have particularly unbalanced data, the algorithm may not aggregate between clients well. For this reason, the algorithm Federated Average with momentum, also known as `FedAvgM`, was proposed. This strategy helps to eliminate the impact of unbalanced data by using a momentum term to help the algorithm converge to a better solution. [@https://doi.org/10.48550/arxiv.1909.06335] It uses a gradient history to reduce variance during training. As a result, this algorithm also has the favorable property of being able to generally train more quickly than `FedAvg`.
+
+While approaching training from perspective of data distribution is one way to approach the tradeoff, we can also use strategies that try to limit network communication between the client and the server. One such strategy is known as `QFedAvg`. This strategy uses a quantization technique to reduce the amount of data that needs to be sent between the client and the server. [@https://doi.org/10.48550/arxiv.1602.05629] This strategy is particularly useful when the clients have limited network connectivity. If network speed is not the issue but rather interruptions in the connection, we can use `FaultTolerantFedAvg`. This strategy behaves similarly to `QFedAvg` but focuses on avoiding connection errors caused by an unreliable network instead of the amount of data sent. Both of these strategies are particularly suited for embedded IoT devices or nontraditional computing locations.
+
+Finally, we can also use adaptive optimization methods from traditionally non-federated algorithms. For instance, using federated versions of Adagrad, Adam, and Yogi makes our systems easier to tune and gains more favorable convergence behavior. [@https://doi.org/10.48550/arxiv.2003.00295] The downside is that `FedOpt`, `FedAdaGrad`, `FedAdam`, `FedYogi` all require initial parameters to be set in `Flower`. This means that they are best used to improve the performance of an existing model.
+
+`Flower` supports all of these aggregation functions and as a result I have built all these algorithms into my own program. However, it is important to discuss which should be the default strategy given the general properties of this machine learning task. As we stated previously, this task for voice recognition with Talon data has:
+
+- A relatively small amount of users but a relatively large amount of data from each
+- No existing publicly available models on top of which to train
+- A shared subset of labels coming from a central schema on the server at training time
+  - However between different users, there is likely to be high variance in the distribution of words
+  - This is since the dataset Talon can be customized and the dataset is coming from natural usage, not a supervised collection process
+- Relatively stable desktop internet connections
+
+From these properties, we can see that training with Talon is actually a much different task than many of the classic federated learning challenges discussed in the original papers. \cite{https://doi.org/10.48550/arxiv.1602.05629}   For users with Talon voice data, the main challenge is trying to converge quickly with a variable amount of data. Unlike medical institutions or private companies, Talon users will likely be using their main desktop computers to train the model. As such speed is much more important. With this in mind, I chose to have `FedAvgM` as the default aggregation function. This algorithm helps to reduce the impact of the uneven data distribution you would see among user datasets. It does not focus as much on network connectivity like `QFedAvg` since we can assume that many Talon users have relatively stable internet connections. This is given the fact that the user demographic of Talon is generally technically literate students and professionals who most likely have stable internet. Finally, I did not choose any of adaptive optimization methods since we currently do not have any pretrained weights to build off of.
+
+In summary, voice data from Talon is not only an interesting data source that is easy to generate over a long period of time, but it also challenges many of our assumptions about federated learning. Many papers emphasize ways to overcome a bottleneck in power, network communication, or convergence time. When dealing with community organizations and specialty tasks like accessibility software, we need to factor in the social aspect. In this context, convergence time is not just a technical metric that affects cloud computing resources, as it would be in a large enterprise. Individual users with just one general purpose computer have a much lower tolerance for long running programs. As such, it is important for us to design our training scripts with these human-centered time scales in mind.
+
+\subsection{Additional Backend Functionality}
+
+
+While `Flower` is an excellent technical library, it provides little functionality for end-user interaction. In this sense, it overlooks the community driven potential similar to other federated learning research mentioned in the background section. By default, the server blocks the main thread and isn't intended to be interacted with while training. In order to get information like the amount of clients, whether training is in process, and networking information, it is necessary to extend the behavior of the default code.
+
+This provided me with another opportunity to make federated learning more user friendly, specifically from a software engineering and development perspective. To extend the behavior of `Flower`, I decided to create another backend web application as a wrapper over the training server. This web application is used to create an API for useful metadata and controlling the training process. For my backend I used FastAPI. FastAPI allows for the creation of web apis in Python.
+
+With regards to technical features, the wrapper over `Flower` is relatively straightforward. It makes training easier to monitor and provides human readable responses to `GET` requests. However despite this, there are once again interesting social implications with such design decisions. For us to achieve our accessibility goals, we sometimes need to consider underlying infrastructure that most users will never directly interact with. To achieve success with federated learning in a communal environment, we need to make it easy for other developers and community members to get the data they need, not just server administrators controlling the central `Flower` backend. These sorts of design decisions help to reinterpret federated learning as a more community oriented technology. Even if software appears to be accessible, if it is not easily extended and maintained, these claims of accessibility will always be uncertain long term. \footnote{More information regarding how to foster accessibility in software development methodology can be found in this useful blog post: \url{https://about.gitlab.com/blog/2021/04/07/how-the-open-source-community-can-build-more-accessible-products/}}
+
+\subsection*{Webserver and Client Frontends}
+
+Now that we have described the entire backend and machine learning implementation, it is useful to describe the graphical frontends that control it. Once again, when creating different frontend technologies, there was not only the question of feature richness and software efficiency, but also the question of how to communicate a complicated machine learning technique to a general audience.
+
+Much has been written regarding how to make machine learning more intuitive for general audiences. [@10.1145/3334480.3375051] [@10.1145/3173574.3173704] [@10.5555/AAI28791133] This literature generally discusses ideas like more intuitive ways to explain the training process or communicating the potential for bias within machine learning. After all, it is not intuitive for most people to hear that a machine could be biased. While this literature does deal with social impact, much of it does not generalize well to federated learning. In this method, average users are expected to invest a larger part in the process. As such, many of the challenges in communication become less about warnings about centralized authority or data privacy and moreso about equitably involving large communities with intuitive user experience design. Many users may be unfamiliar with ideas of data autonomy where less application data is sent to a centralized server and there is a greater guarantee of user privacy. We need to emphasize these distinctions in data sharing and user expectations in order to get the best user outcomes and final models.
+
+Thus, I had a few fundamental goals when designing my interfaces:
+
+- Clearly specify when federated learning is taking place
+  - This will help to explain the use of system resources
+- Include technical terminology but do not rely upon it
+  - Federated learning and data autonomy shouldn't be necessary prerequisites, but they should be conceptually visible for those looking to participate further
+- Use sensible defaults and a few simple settings to reduce the chance of things going wrong
+  - With federated learning, we rely upon aggregating weights generated from a training process on other devices we cannot directly observe
+  - As such, we rely upon users to run our software without errors. Having users change things like hyperparameters could improve performance, but have a greater risk for causing errors
+
+In many traditional web applications, users often don't need to worry about what information is coming from machine learning models verses a simple mapping algorithm or database. For instance, it makes little difference to a user on a shopping website whether the recommendations are coming from linear regression, a neural net, or a look up table. All major computation will be happening on the backend and results can be cached to reduce latency. However, this is not the case in federated learning. In this scenario, training takes up a significant amount of user resources for a significant amount of time. This is especially the case with large data like audio or video.
+
+As such, federated learning is a technique that should not be abstracted away fully, even for relatively novice users. Otherwise, they may assume something to be wrong when their device's resource usage becomes abnormally high. In the following two sections, Server Frontend and Client Interface, I will explain these design principles and include screenshots of my user interfaces. In both of these images, there is a clear indicator when training is occurring. I also make sure to explicitly use terminology like the client server distinction, and consciously refer to the technique of federated learning by name. This style of communication can help to clarify where data is throughout the training process and who bears what responsibility.
+
+\subsection*{ Server Frontend}
+
+In a centralized machine learning paradigm, administrators often use sophisticated interfaces like Tensorboard \footnote{\url{https://www.tensorflow.org/tensorboard}} for managing the training process and tweaking hyperparameters. However, in federated learning, since training is occurring on client devices, the server knows relatively little about the process until the finalized weights are sent to be aggregated centrally. For instance, the server does not know the distribution of the labels within the client data or if they have changed the value of hyperparameters. As such, the central frontend does not need sophisticated functionality. The only info that is necessary is the aggregation strategy, the amount of clients, and the labels that all clients agree to train with. Thus to summarize, the core principle of federated learning remains easily visible, but more specific technical details are unnecessary. For individuals who wish to gain more information regarding these choices, `?` icons provide a place to learn more by hovering over them with the mouse.
+
+<div style="display: flex;">
+![The server interface as it appears before training. One can hover the mouse over '?' to get extra info, or use voice to select the boxes through Rango accessibility letters.  The form boxes are pre populated with sensible defaults like FedAvgM and the Talon alphabet.](assets/frontend.png){width=70%}
+</div>
+
+The frontend for the central server was implemented using React. This was since this framework has preexisting tools for accessible user interface design and works well with Rango. I was able to use Chakra UI \footnote{\url{https://chakra-ui.com/}} to build accessible HTML components given the fact it builds upon React. This library has the added benefit of making my user interface accessible for those using screen readers or other technology to assist vision impairment.
+
+In general, React is also good for accomplishing another one of my main goals: condensing everything into a single page application. By having all my options on one page, the user can clearly see how each option is related and more easily tweak them without needing to navigate between menus. This is better for both ease of use and general accessibility. It is important to note that this simplicity was only able to be accomplished by using the previously mentioned `FastAPI` backend. This allowed us to make the underlying `Flower` server more easily controlled and monitored.
+
+\subsection{ Client Interface}
+
+The second frontend I created was for the training client. Once again, I sought to make this interface simple yet not overly abstracted. The conversion of Talon data gets its own button because it is highly resource intensive for large datasets. We do not want to implicitly do this conversion without the user explicitly requesting it. Additionally, federated learning has its own button and is explicitly called by this technical name. Importantly, all other log information is passed through a response textbox to the user. This allows the central server to send custom messages and the user to easily see any training errors without needing to go into a terminal. This is important since machine learning training can sometimes have issues that require the technical logs to resolve. Finally, the user can ping the federated learning server to see if it is running. Once the federated learning process commences, a gif of a loading animation will appear on the screen to signify it is in process. Upon completion it will go away and the textbox will be updated with a completion message.
+
+% <!-- ![The client interface as it appears before training. It shows info regarding the conversion of Talon data and the status of the server regarding the time left in training. The white dots are a dynamic gif that signifies training or conversion in process. ](assets/loading_client.png) -->
+
+% <div style="display: flex;">
+% ![The client interface as it appears before training. It shows info regarding the conversion of Talon data and the status of the server regarding the time left in training. The white dots are a dynamic gif that signifies training or conversion in process. ](assets/loading_client.png){width=90%}
+% </div>
+
+Both of these interfaces use simple high contrast visual styles in single page applications. The distinctly different colors helps to distinguish the two programs for those who need to use both. Additionally, in both applications all state is stored in a local `shelve` Python database. This is a simple database module built into the Python standard library. This makes it so the federated learning process will not be disrupted if the user interface is refreshed.
+
+Just like our server UI, this client also uses a web-based interface to take advantage of Rango. However, for this client I used the the library `PySimpleGUIWeb`. This is a library for creating browser-based user interfaces in Python. I chose this Python library for the client since it is easier to package with our federated learning code which is also written in Python. My goal was to make the client as easy to install as possible, thus reducing the potential for errors during before training.
+
+
+
+Takeaways for Qualitative Design and Accessibility
+
+As stated in the introduction, one of the main goals of this project was to implement federated learning in a way that would be accessible for users of all backgrounds. It wasn't enough to simply make federated learning more transparent and user friendly. It also had to be done in a way that supported users who rely upon assistive technology.
+
+During my research and design process, I came away with a series of essential principles that helped to guide my design decisions. I synthesized much of this information by combining my federated learning research with the accessibility design principles found in areas like the Talon documentation, \footnote{\url{https://talon.wiki/}} publicly archived discussions on community forums \footnote{\url{https://discuss.lipsurf.com/}}, and also more traditional academic design literature. These takeaways are important to keep in mind not just for this project, but also as we look towards new platforms like Linux mobile devices.
+
+\subsection*{ Design Around Discrete Inputs}
+
+Whenever you are looking to control an application interface, you should look to use tools that have a discretized way of separating different content into components. The clearest example of this difference is seen in keyboard driven interaction verses mouse driven interaction. If you design software around the keyboard, it is also easy to control with voice. For instance, a keyboard shortcut triggered by pressing the `ctrl` and `enter` keys can be replicated by using a program like Talon and telling it a command like "press control enter".
+
+However, this cannot be done in the same way with mouse driven interaction. If the user is required to click a button like a GUI program with a toolkit like QT or GTK, this is much more difficult to do with voice. Instead of a clearly defined shortcut, the user has to navigate the mouse to a specific position. The alternative would be looking into the application code and trying to script the action. However this is not intuitive and is contrary to the idea of designing around the user. It forces the user to look into behavior that is deliberately abstracted away to begin with. Put another way, it prioritizes the application over the user who actually interacts with it.
+
+In my project I put this principle into practice by specifically avoiding mouse-centered interfaces with dragging and dropping or double clicking. While I did have one component that shows extra information when it is hovered over with the mouse, this is not in issue for Talon or other voice accessibility software. We can mimic hovering over an element through Rango and our next design principle, designing around web interfaces.
+
+\subsection*{Design Around Web Interfaces}
+
+While many developers decry the loss in efficiency caused by rewriting application clients for the web instead of directly on the desktop, web interfaces provide a variety of convenient accessibility functionality. As mentioned previously, many programs for the desktop do not expose an accessibility tree. If they do, accessibility in general can often be a second thought for large teams, or a burden for small ones. On the contrary, web interfaces are an easier way to provide cross platform accessibility. Web interfaces are split up into a series of discrete components (HTML blocks) beneath their styling. This makes it significantly easier to navigate with just voice with tools like Rango. Application specific accessibility software like LipSurf \footnote{\url{https://www.lipsurf.com/}} takes advantage of this to an even greater extent. By using Chrome's built in voice recognition API, the entire accessibility program can be installed in one click from the Chrome extension webstore.
+
+For this reason, I chose to build my server frontend in React and used PysimpleGUIWeb \footnote{This is a program for making user interfaces in Python which can be viewed in the browser as HTML. Its alternative, PySimpleGUI desktop, runs as a separate window outside the browser} for the client. This makes it so I don't have to create separate accessible user interfaces for every platform.
+
+\subsection{Carefully Optimize UI Friction}
+
+Within user experience design, there has traditionally been an emphasis on reducing the friction of user interfaces. This essentially means making interface choices feel intuitive and organized around the desired behavior. Adding friction means adding more actions for the user to consider and act upon. For instance, it could be unnecessary friction for the user to fill out their phone number on an order if it can already be obtained from their account information. While friction often makes our interactions with applications slower and unsatisfying, voice driven interaction and federation requires us to think about friction in more nuanced ways.
+
+When dictating commands, models can occasionally misrecognize words or pickup background noise and as a result, run the incorrect script on the user's device. This can be a risk when using voice dictation for important business activities like writing emails or filling out financial forms. As a result, we may sometimes need to make our programs explicitly less efficient in order to be more accessible in the long run. Existing design literature has also talked about the importance of preserving some friction in our interfaces. [@10.1145/3335082.3335106] \footnote{\url{https://www.wolffolins.com/views/why-we-need-friction-in-user-experience}} However, it is rarely from the perspective of accessibility. In these discussions there is primarily a focus on friction as a way of increasing user understanding of the software system and preventing mistakes.
+\footnote{\url{https://www.smashingmagazine.com/2018/01/friction-ux-design-tool/}} For instance, manually typing `DELETE` to delete an account helps to slow down the user and force them to more consciously consider their input choices. While this is a useful design principle, it is rarely in conversation with principles of accessibility. For applications on mobile or desktop that are not accessible through voice, if we add too much friction it may be a significant burden to users who rely upon voice control.
+
+As such, while there is no clear rule for how much friction to add, it is important that we bring voice controlled accessibility software into this discussion. Friction isn't needed just for preventing absent minded user errors, it is also needed to prevent errors caused by the voice model itself. One such way I implemented this design principle can be seen within my client user interface for federated learning training. A screenshot of this design is present in the previous figure. At the top of the interface one can change the server address through a textbox. However, the server is not automatically updated until the update button to the right is explicitly pressed. If a user mistakenly changes this with a wrong voice command, nothing will be updated, even if they click on the main button to start the federated learning trial. In this way, it prevents errors and adds friction in a way that is relatively minor and natural. It is still integrated with our web interface and makes sense for users, even without voice control. This last fact ties in well with our next design principle, universal design.
+
+\subsection{Universal Design}
+
+The last main design principle that influenced my work was universal design. With accessibility software, it is generally understood that the goal is to make computers usable for people of all backgrounds. However, to achieve this goal, some may go beyond and try to create software specifically for voice control. For instance, some users have created desktop environments \footnote{\url{https://git.sr.ht/~geb/tiles}} specifically for voice. While this is laudable work, I was influenced by principles of universal design [@10.1145/257089.257893] [@10.1145/257089.257893] and wanted to create software that bridged people across different abilities. Universal design is a philosophy that originally came from the field of architecture. \footnote{\url{https://universaldesign.org/definition}} It argues that we shouldn't necessarily try to create alternative platforms and applications specifically for accessibility. It argues that different levels of ability are a natural part of being human and we should have a general design that accommodates for this variance. As such, this principle also transfers well to software accessibility. If we try to create overly specialized software we risk the creation of splintered communities and future abandonware. Accessibility should be able to be naturally integrated into existing workflows for people of all backgrounds. Accessibility ideas of declarative, discrete code and interfaces are also good software engineering principles.
+
+This goal of universality also makes it easier for users to transition in and out of their accessibility software setups as their health varies. Thus, the ideal accessibility software ecosystem is symbiotic: software should work well without voice, even better with it, and be easily decoupled if needed. For instance, my federated voice model can be used specifically for accessibility purposes, but could also simply be used to train models for other general voice tasks. Namely, smart home devices or virtual assistants. Additionally, this is yet another reason why building around the web with its robust ecosystem of extensions and developer tools is yet another good idea for accessibility software. My software can be used without issue for both voice and keyboard driven interaction.
+
+
+\section{Results}
+
+
+\section{Discussion}
+\subsection{Future Work}
+
+In this paper, I hope to have shown a general federated learning ecosystem and the related goals in user interface and accessibility design needed to implement it. In this section of the paper I will elaborate more on the next steps and what needs to be done to not only advance this subject matter academically, but also implement federated learning in popular software communities.
+
+\subsection{User Studies}
+
+In the future, it would be useful to extend this technical research by seeking out accessibility software users to participate in a user study. Specifically, we would use their sources of Talon data to train up larger and more accurate federated learning models.
+
+To be able to run more local tests and evaluate the model with larger datasets, it could also be useful to simply collect more raw Talon audio data. This would not be in a federated manner, but would be done in such a way to test and prepare for larger federated learning projects. If we want to run many different test iterations,that may not be practical without a large centralized dataset. During the prototyping process, federation is not always the appropriate testing methodology.
+
+While collecting a centralized sample dataset and recruiting users for federated learning tests would be a fruitful project, it is also important to clarify why such a project was out of the scope of this paper and thus why it will be a matter for future work.
+
+- As a researcher it takes a significant amount of time and trust to convince people in vulnerable backgrounds to want to take part in an academic study
+  - Users need to be able to trust the federated learning system and the fact it will preserve their privacy. ( Talon records every single dictated phrase if the option to save recordings is turned on)
+- The community of Talon users generally has either significant health issues or permanent disabilities, and as such may not have the time or inclination to participate
+- Finally, the Talon community itself is relatively small compared to other online communities
+
+To summarize, user studies would absolutely be useful and worthwhile, but it is important to set expectations beforehand. Such a study would take at least multiple months to recruit, build rapport, and perform the actual study for multiple test iterations.
+
+\subsection*{ Connect `flwr` to more ML Libraries}
+Currently, `flwr` and most other federated learning frameworks primarily support general purpose machine learning libraries like PyTorch, Keras, and Tensorflow. However, as we saw earlier in the paper, `flwr`'s output format, `.npz` weights, don't directly map to higher level toolkits for training specialty models like speech recognition. As a result, there is more work to be done to bridge between these two ecosystems. In the future, if more work is done on uniting them, the model in this paper could be converted into the `Vosk` format, and be used as a alternative backend for existing accessibility toolkits. Once this work is done, my model will be able to be fully integrated within tools like Numen.
+
+\subsection*{ Preventing Bad Actors and User Mistakes}
+
+Throughout this paper, there was the general assumption that users in federated learning would not be trying to take advantage of the system by purposefully using mislabeled training data or altering their training scripts with bad hyperparameters. This is since in the case of voice controlled accessibility software, there is little incentive for hackers. There is no direct profit to be gained or information to be extracted by sending junk weights to the central server.
+
+Despite this, if attackers did such a thing and there is a small enough userbase, it would significantly decrease the performance of the model after the final aggregation. As such, this is a topic worth studying further, especially if federated learning systems ever emerge at the national level for other healthcare tasks. For instance, if federated learning is implemented across hospitals, this could be a significant attack vector for foreign adversaries. In this scenario, we would benefit from existing papers on preventing the impact of attackers in federated learning [@10.1145/3556557.3557951].
+
+
+As we have seen throughout this paper, when designing machine learning systems for healthcare or accessibility, the lines between quantitative and qualitative problems become blurred. On one hand we need efficient training algorithms and well tested model architectures to power our voice controlled accessibility software. Yet at the same time, as we have shown in our discussion of existing industrial federated learning implementations, these properties alone are not enough to engage a wide userbase.
+
+For federated learning to be practical, we need users to have datasets that are unique and easily generated. Programs which automatically record voice or keyboard inputs can be useful for this task. At the same time, once users actually begin training, we need to make sure they understand ideas of data autonomy. Namely, that they are in full control of their data and have to dedicate more system resources to training locally.
+
+Despite these challenges, I am optimistic about the future of both federated learning and Linux smartphones. Both of these technologies are radical ways to reimagine privacy and data ownership in our age of machine learning and big data. It may never be the case that they are widely adopted, but they provide an avenue through which users can opt out of centralized data collection and still take advantage of new machine learning models. In general, I also hoped to have shown in this paper how simply having alternative platforms can provide us with fruitful new design philosophies. For instance, despite the fact that SXMO may appear simplistic and hobbyist, its approach to menu based navigation was unseen elsewhere. It invited us to engage with the idea of discrete accessible interfaces in a more nuanced context.
+
+Finally, I hope to have also shown how we can build upon the valuable design work and software projects for accessibility occurring at a grassroots and community level, outside universities or industry. Accessibility tools I mentioned throughout the paper like Talon, Rango and Cursorless are all community driven. Studying them provided me valuable insights into what everyday users value with their accessibility tools. I am inspired by the dedication and compassion of all these communities that are dedicated to creating better accessibility software. I hope to have written this thesis in the same spirit.
+
+
+\section{Acknowledgements}
+I would like to thank my advisor, Professor Kyle Jamieson at Princeton University for his advice and insight throughout the research process.
+
+% - [https://pytorch.org/tutorials/intermediate/speech_command_recognition_with_torchaudio.html](https://pytorch.org/tutorials/intermediate/speech_command_recognition_with_torchaudio.html)
+% - [https://flower.dev/docs/quickstart-pytorch.html](https://flower.dev/docs/quickstart-pytorch.html)
+% - [https://testdriven.io/blog/fastapi-react/](https://testdriven.io/blog/fastapi-react/)
+
+\bibliographystyle{acm}
+\bibliography{citations.bib}
+\end{document}
+\endinput
+%%
+%% End of file `sample-authordraft.tex'.
